@@ -35,13 +35,19 @@ O sistema legado usa **Gentle.NET** como ORM. Gentle.NET:
 
 | Conceito Gentle | Equivalente EF Core |
 |---|---|
-| `[TableName("tabela")]` | `[Table("tabela")]` ou `modelBuilder.Entity<T>().ToTable("tabela")` |
-| `[TableColumn("coluna")]` | `[Column("coluna")]` |
+| `[TableName("tabela")]` | `modelBuilder.Entity<T>().ToTable("tabela")` (NUNCA usar `[Table]` no Domain) |
+| `[TableColumn("coluna")]` | `modelBuilder.Entity<T>().Property(x => x.Prop).HasColumnName("coluna")` |
 | `Broker.Retrieve<T>(id)` | `dbContext.Set<T>().FindAsync(id)` |
 | `obj.Persist()` | `dbContext.Update(obj); await dbContext.SaveChangesAsync()` |
 | `obj.Remove()` | `dbContext.Remove(obj); await dbContext.SaveChangesAsync()` |
 | `Broker.RetrieveList<T>(key)` | `dbContext.Set<T>().Where(...).ToListAsync()` |
 | `new Transaction()` | `await dbContext.Database.BeginTransactionAsync()` |
+
+## Regra de Arquitetura: Pureza da Camada de Domínio
+
+> ⚠️ PROIBIDO: O uso de Data Annotations como `[Table("nome")]`, `[Column]`, `[Key]` ou `[ForeignKey]` nas entidades de negócio.
+> Este projeto adota os princípios de Clean Architecture. A camada de Domínio deve ser "pura" (agnóstica a persistência e livre de referências a pacotes externos como `System.ComponentModel.DataAnnotations.Schema`).
+> Todo o mapeamento do banco de dados tem que ser feito estritamente via **Fluent API** (usando as classes `IEntityTypeConfiguration<T>` ou dentro do `OnModelCreating`) na camada apropriada de **Infrastructure**.
 
 ## Organização dos DbContexts
 
