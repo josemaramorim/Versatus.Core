@@ -1,0 +1,55 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+*.tmp
+*.temp
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+*.dll
+*.exe
+*.pdb
+*.nupkg
+
+# Test results
+TestResults/
+*.trx
+
+# NuGet
+packages/
+*.nupkg
+
+# Entity Framework
+*.edmx
+*.dbmdl
+
+# Windows
+[Tt]humbs.db
+*.stackdump
+
+# macOS
+.DS_Store
+Icon?
+
+# Linux
+*~
+
+# Temporary files
+*.tmp
+*.bak
+
+# Pastas Específicas do Projeto
+projeto_tag_1906/

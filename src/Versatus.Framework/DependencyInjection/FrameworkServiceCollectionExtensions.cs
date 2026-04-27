@@ -1,0 +1,24 @@
+using Microsoft.Extensions.DependencyInjection;
+using Versatus.Framework.Contexto;
+using Versatus.Framework.Sequencial;
+
+namespace Versatus.Framework.DependencyInjection;
+
+/// <summary>
+/// Extensões para registrar serviços do Framework no container DI.
+/// </summary>
+public static class FrameworkServiceCollectionExtensions
+{
+    public static IServiceCollection AddVersatusFramework(this IServiceCollection services)
+    {
+        // Registrar contexto (implementação específica por aplicação)
+        // services.AddScoped<IContextoExecucao, ContextoExecucao>();
+
+        // Registrar gerador sequencial
+        services.AddScoped<IGeradorSequencial, GeradorSequencial>();
+
+        // Outros serviços base...
+
+        return services;
+    }
+}
