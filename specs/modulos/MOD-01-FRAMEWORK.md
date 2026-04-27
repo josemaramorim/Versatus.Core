@@ -216,14 +216,14 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 - Crie um novo projeto .NET 8 Class Library chamado `Versatus.Framework`
 - Adicione os pacotes NuGet listados na seção 5
 - Configure `<Nullable>enable</Nullable>` no arquivo .csproj
-- Branch: `setup/framework-project`
-- Commit: `setup: Create Versatus.Framework project with EF Core 8`
+- Branch: `setup/framework-project` [x]
+- Commit: `setup: Create Versatus.Framework project with EF Core 8` [x]
 
 **Tarefa 1.2 — Criar estrutura de pastas e arquivos base**
 - Crie as pastas conforme seção 4 do arquivo: `Contexto/`, `Sequencial/`, `Excecoes/`, `Validation/`, `Paginacao/`, `Repositorio/`, `Configuracao/`
 - Crie arquivos vazios para cada classe listada na seção 4
-- Branch: `setup/framework-structure`
-- Commit: `setup: Create folder structure for Versatus.Framework`
+- Branch: `setup/framework-structure` [x]
+- Commit: `setup: Create folder structure for Versatus.Framework` [x]
 
 ### Fase 2: Exceções Base (Prioridade Alta)
 
@@ -258,23 +258,24 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 **Tarefa 3.1 — Implementar ValidationError**
 - Crie `Validation/ValidationError.cs`
 - `record ValidationError(string Campo, string Mensagem)`
-- Branch: `feat/validation-error`
-- Commit: `feat: Implement ValidationError record`
+- Branch: `feat/validation-error` [x]
+- Commit: `feat: Implement ValidationError record` [x]
+- Marque no checklist: ✅ `ValidationError` criado
 
 **Tarefa 3.2 — Implementar ValidationResult**
 - Crie `Validation/ValidationResult.cs`
 - `record ValidationResult(bool IsValid, IReadOnlyList<ValidationError> Errors)`
 - Inclua métodos estáticos `Ok()` e `Fail(params ValidationError[])`
-- Branch: `feat/validation-result`
-- Commit: `feat: Implement ValidationResult record`
+- Branch: `feat/validation-result` [x]
+- Commit: `feat: Implement ValidationResult record` [x]
 - Marque no checklist: ✅ `ValidationResult` criada
 
 **Tarefa 3.3 — Implementar Result<T> genérico**
 - Crie `Validation/Result.cs`
 - `sealed record Result<T>(bool IsSuccess, T? Value, IReadOnlyList<ValidationError> Errors)`
 - Inclua métodos estáticos `Ok(T value)` e `Fail(params ValidationError[])`
-- Branch: `feat/result-generic`
-- Commit: `feat: Implement Result<T> generic record`
+- Branch: `feat/result-generic` [x]
+- Commit: `feat: Implement Result<T> generic record` [x]
 - Marque no checklist: ✅ `Result<T>` criada
 
 ### Fase 4: Paginação
@@ -284,8 +285,8 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 - `record PagedResult<T>(IReadOnlyList<T> Items, int Total)`
 - `Items` é a lista de itens paginada (imutável)
 - `Total` é o total de registros disponíveis (sem filtro de paginação)
-- Branch: `feat/paged-result`
-- Commit: `feat: Implement PagedResult<T> record`
+- Branch: `feat/paged-result` [x]
+- Commit: `feat: Implement PagedResult<T> record` [x]
 - Marque no checklist: ✅ `PagedResult<T>` criada
 
 ### Fase 5: Contexto de Execução
