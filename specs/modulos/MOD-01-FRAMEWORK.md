@@ -240,8 +240,8 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 - Crie `Excecoes/RegraDeNegocioException.cs`
 - Deve herdar de `VersatusException`
 - Usar para violações de regras de negócio esperadas
-- Branch: `feat/regra-negocio-exception`
-- Commit: `feat: Implement RegraDeNegocioException`
+- Branch: `feat/regra-negocio-exception` [x]
+- Commit: `feat: Implement RegraDeNegocioException` [x]
 - Marque no checklist: ✅ `RegraDeNegocioException` criada
 
 **Tarefa 2.3 — Implementar EntidadeNaoEncontradaException**
@@ -249,8 +249,8 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 - Deve herdar de `VersatusException`
 - Use para quando uma entidade do banco não existe
 - Construtor recebe `Type` da entidade e chave (id)
-- Branch: `feat/entidade-nao-encontrada-exception`
-- Commit: `feat: Implement EntidadeNaoEncontradaException`
+- Branch: `feat/entidade-nao-encontrada-exception` [x]
+- Commit: `feat: Implement EntidadeNaoEncontradaException` [x]
 - Marque no checklist: ✅ `EntidadeNaoEncontradaException` criada
 
 ### Fase 3: Validação e Resultados
