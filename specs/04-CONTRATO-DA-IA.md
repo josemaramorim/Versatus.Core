@@ -11,6 +11,7 @@ Antes de escrever qualquer linha de código, a IA **DEVE**:
 2. Ler as Regras Anti-Alucinação (`specs/03-REGRAS-ANTI-ALUCINACAO.md`).
 3. Ler as Boas Práticas e Decisões de Coleções (`specs/decisoes/DEC-005-COLECOES-E-BOAS-PRATICAS.md`).
 4. Ler a Decisão de ORM e Pureza de Domínio (`specs/decisoes/DEC-001-ORM.md`).
+5. **Ler o Log de Progresso e Handoff (Seção 5 deste documento)** para saber o ponto exato de parada e evitar trabalho redundante.
 
 ---
 
@@ -58,7 +59,26 @@ O controle de versão segue o fluxo estrito:
 2. **Cite a Task**: Indique qual seção da SPEC você está implementando.
 3. **Prove com Código**: Mostre o arquivo criado e seu local.
 4. **Resumo Git**: Informe os comandos de commit e merge realizados.
+5. **Update do Log (OBRIGATÓRIO)**: Confirme que você detalhou o progresso na Seção 5 deste documento antes de encerrar.
 
 ---
 
 **Cumpra estas regras e seremos parceiros. Ignore-as e você quebrará o Versatus.**
+
+---
+
+## 5. Log de Progresso e Handoff (Atualizado: 2026-04-28)
+
+Este log serve para que a próxima instância da IA saiba exatamente onde o trabalho parou. **Ao finalizar sua sessão, atualize esta tabela.**
+
+| Módulo Atual | Fase / Status | Task Atual | Branch Ativa | Observação Crítica |
+| :--- | :--- | :--- | :--- | :--- |
+| **MOD-01** | ✅ Concluído | 9.2 (Final) | `develop` | Framework Base e Infra base finalizados. |
+| **MOD-02** | 🚧 Em Progresso | 1.3 (Final Setup) | `setup/acesso-global-project` | Projeto `Versatus.AcessoGlobal` criado e estruturado. |
+
+### Histórico Recente de Decisões:
+- **2026-04-28 (Global):** Padronização total de nomenclatura para **Inglês** em todas as pastas físicas e namespaces (`Repositories`, `Context`, `Exceptions`). O `Versatus.Framework` foi totalmente refatorado.
+- **2026-04-28 (Infra):** O `Versatus.Infra.Data` agora é considerado **Shared Infrastructure** para classes globais como o `GeradorSequencial`. Módulos de negócio devem ter sua própria estrutura de `Infrastructure` interna.
+
+### Próxima Ação Pendente:
+- Iniciar **Fase 2 do MOD-02** (Localização Geográfica), começando pela entidade `Country.cs` (Tarefa 2.1).

@@ -176,6 +176,11 @@ public async Task<Result<DocumentoResponse>> Handle(DocumentoCommand command, Ca
 
 > Taxa de exceção alta torna a aplicação lenta e dificulta análise. Use erros estruturados para regras de negócio comuns.
 
+### REGRA 14 — Persistência do Log de Progresso (Handoff)
+Toda sessão de trabalho deve **obrigatoriamente** encerrar com a atualização da Seção 5 do `specs/04-CONTRATO-DA-IA.md`.
+- A IA deve registrar o que foi feito, qual a branch atual e qual o próximo passo.
+- Isso previne que a próxima instância da IA reinicie tarefas já concluídas ou ignore decisões arquiteturais tomadas durante a sessão.
+
 ---
 
 ## 3. Checklist de Revisão de Código Gerado por IA
@@ -201,6 +206,7 @@ Antes de aceitar qualquer código gerado pela IA, verificar:
 - [ ] **`ILogger<T>` com log estruturado (sem concatenação)?**
 - [ ] **Exceções são da hierarquia `VersatusException`?**
 - [ ] **Alterações sugeridas pela IA foram implementadas APENAS após atualização da SPEC?**
+- [ ] **O Log de Progresso (Handoff) na Seção 5 do Contrato da IA foi atualizado?**
 
 ---
 
