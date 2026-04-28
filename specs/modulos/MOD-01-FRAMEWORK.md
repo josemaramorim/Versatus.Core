@@ -2,7 +2,7 @@
 ## Módulo: servidor/framework/servidor.framework
 
 > **Versão:** 1.0 | **Data:** 2026-04-27 | **Fase:** 0 (pré-requisito de tudo)  
-> **Status:** 🚧 Em Progresso - Interfaces e implementações base criadas (2026-04-27)  
+> **Status:** ✅ Concluído - Framework Base e Infraestrutura implementados (2026-04-28)  
 > **Prioridade:** MÁXIMA — nenhum outro módulo pode começar sem este
 
 ---
@@ -304,21 +304,23 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 **Tarefa 5.1 — Implementar IContextoExecucao**
 - Crie `Contexto/IContextoExecucao.cs`
 - Propriedades: `int IdFilial`, `int IdUsuario`, `int IdEmpresa`, `string[] Perfis`
-- Branch: `feat/contexto-execucao-interface`
-- Commit: `feat: Implement IContextoExecucao interface`
+- Branch: `feat/contexto-execucao-interface` [x]
+- Commit: `feat: Implement IContextoExecucao interface` [x]
 
 **Tarefa 5.2 — Implementar ContextoExecucao**
 - Crie `Contexto/ContextoExecucao.cs` (class simples, implementa IContextoExecucao)
 - Can ser registrado como `Scoped` no DI
-- Branch: `feat/contexto-execucao`
-- Commit: `feat: Implement ContextoExecucao class`
+- Branch: `feat/contexto-execucao` [x]
+- Commit: `feat: Implement ContextoExecucao class` [x]
 - Marque no checklist: ✅ `IContextoExecucao` implementado
 
 **Tarefa 5.3 — Implementar ContextoExecucaoExtensions**
 - Crie `Contexto/ContextoExecucaoExtensions.cs`
 - Método para inicializar contexto a partir de `ClaimsPrincipal` do JWT
 - Branch: `feat/contexto-execucao-extensions`
-- Commit: `feat: Implement ContextoExecucaoExtensions`
+- Branch: `feat/contexto-execucao-extensions` [x]
+- Commit: `feat: Implement ContextoExecucaoExtensions` [x]
+- Marque no checklist: ✅ `ContextoExecucaoExtensions` implementado
 
 ### Fase 6: Gerador Sequencial (CRÍTICO — Prioridade Máxima)
 
@@ -333,15 +335,15 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 **Tarefa 6.2 — Implementar IGeradorSequencial**
 - Crie `Sequencial/IGeradorSequencial.cs`
 - Defina métodos que o serviço deve implementar (baseado na análise 6.1)
-- Branch: `feat/gerador-sequencial-interface`
-- Commit: `feat: Implement IGeradorSequencial interface`
+- Branch: `feat/gerador-sequencial-interface` [x]
+- Commit: `feat: Implement IGeradorSequencial interface` [x]
 
 **Tarefa 6.3 — Implementar GeradorSequencialService**
 - Crie `Sequencial/GeradorSequencialService.cs`
 - Implemente behavier **idêntico** ao `GeradorSequencial.cs` legado
 - Use banco de dados para sincronização de threads (não em-memória)
-- Branch: `feat/gerador-sequencial-service`
-- Commit: `feat: Implement GeradorSequencialService with legacy parity`
+- Branch: `feat/gerador-sequencial-service` [x]
+- Commit: `feat: Implement GeradorSequencialService with legacy parity` [x]
 - Marque no checklist: ✅ `GeradorSequencialService` implementado
 
 **Tarefa 6.4 — Testes de Paridade GeradorSequencial**
@@ -358,16 +360,16 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 - Crie `Repositorio/IRepositorio.cs`
 - Defina contrato para operações CRUD assíncronas com `CancellationToken`
 - Métodos: `GetByIdAsync`, `GetAllAsync`, `AddAsync`, `UpdateAsync`, `DeleteAsync`, `SaveChangesAsync`
-- Branch: `feat/repositorio-interface`
-- Commit: `feat: Implement IRepositorio<T> generic interface`
+- Branch: `feat/repositorio-interface` [x]
+- Commit: `feat: Implement IRepositorio<T> generic interface` [x]
 
 **Tarefa 7.2 — Implementar RepositorioBase<T>**
 - Crie `Repositorio/RepositorioBase.cs`
 - Implemente `IRepositorio<T>` com EF Core
 - Use `DbContext` injetado
 - Todos os métodos devem ser `async` com `CancellationToken`
-- Branch: `feat/repositorio-base`
-- Commit: `feat: Implement RepositorioBase<T> with EF Core`
+- Branch: `feat/repositorio-base` [x]
+- Commit: `feat: Implement RepositorioBase<T> with EF Core` [x]
 - Marque no checklist: ✅ `IRepositorio<T>` e `RepositorioBase<T>` criados
 
 ### Fase 8: Configurações
@@ -376,8 +378,8 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 - Crie `Configuracao/VersatusOptions.cs`
 - Propriedades para configurações do servidor (ex: `TimeoutTransacao`, `MaximoTentativas`)
 - Use padrão `IOptions<VersatusOptions>` para injeção
-- Branch: `feat/versatus-options`
-- Commit: `feat: Implement VersatusOptions configuration`
+- Branch: `feat/versatus-options` [x]
+- Commit: `feat: Implement VersatusOptions configuration` [x]
 - Marque no checklist: ✅ `VersatusOptions` criada
 
 ### Fase 9: Verificação Final
