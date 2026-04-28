@@ -347,7 +347,7 @@ Versatus.AcessoGlobal/
 
 Acompanhe o progresso usando o **Roteiro de Tarefas** na seção 8 abaixo. Cada tarefa tem sua própria verificação.
 
-- [ ] Fase 1: Setup e Estrutura — Completa
+- [x] Fase 1: Setup e Estrutura — Completa
 - [ ] Fase 2: Localização Geográfica — Completa
 - [ ] Fase 3: Hierarquia de Organização — Completa
 - [ ] Fase 4: Segment ação / Classificação — Completa
@@ -370,20 +370,21 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Crie um novo projeto .NET 8 Class Library chamado `Versatus.AcessoGlobal`
 - Adicione referência a `Versatus.Framework`
 - Configure `<Nullable>enable</Nullable>` no arquivo .csproj
-- Branch: `setup/acesso-global-project`
-- Commit: `setup: Create Versatus.AcessoGlobal project with Framework reference`
+- Branch: `setup/acesso-global-project` [x]
+- Commit: `setup: Create Versatus.AcessoGlobal project with Framework reference` [x]
 
 **Tarefa 1.2 — Criar estrutura de pastas e arquivos base**
 - Crie as pastas conforme seção 6: `Domain/`, `Application/`, `Infrastructure/`, `Api/`
 - Subdivida `Domain/` em: `Localizacao/`, `Entidades/`, `Organizacao/`, `Seguranca/`, `Financeiro/`, `Configuracao/`
 - Crie arquivos vazios para cada classe listada
-- Branch: `setup/acesso-global-structure`
-- Commit: `setup: Create AcessoGlobal folder structure`
+- Branch: `setup/acesso-global-structure` [x]
+- Commit: `setup: Create AcessoGlobal folder structure` [x]
 
 **Tarefa 1.3 — Criar DbContext Base**
 - Crie `Infrastructure/AcessoGlobalDbContext.cs` (classe vazia por enquanto)
-- Branch: `setup/acesso-global-dbcontext-base`
-- Commit: `setup: Create AcessoGlobalDbContext base`
+- Branch: `setup/acesso-global-dbcontext-base` [x]
+- Commit: `setup: Create AcessoGlobalDbContext base` [x]
+- Marque no checklist: ✅ Fase 1 — Setup e Estrutura completa
 
 ### Fase 2: Localização Geográfica
 
