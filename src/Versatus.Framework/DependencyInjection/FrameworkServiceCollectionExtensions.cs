@@ -11,11 +11,11 @@ public static class FrameworkServiceCollectionExtensions
 {
     public static IServiceCollection AddVersatusFramework(this IServiceCollection services)
     {
-        // Registrar contexto (implementação específica por aplicação)
-        // services.AddScoped<IContextoExecucao, ContextoExecucao>();
+        // Registrar contexto
+        services.AddScoped<IContextoExecucao, ContextoExecucao>();
 
         // Registrar gerador sequencial
-        services.AddScoped<IGeradorSequencial, GeradorSequencial>();
+        services.AddScoped<IGeradorSequencial, GeradorSequencialService>();
 
         // Outros serviços base...
 

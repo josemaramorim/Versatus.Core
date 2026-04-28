@@ -6,8 +6,8 @@ namespace Versatus.Framework.Contexto;
 /// </summary>
 public interface IContextoExecucao
 {
-    int IdFilial { get; }
-    int IdUsuario { get; }
-    int IdEmpresa { get; }
-    string[] Perfis { get; }
+    int IdFilial { get; set; }
+    int IdUsuario { get; set; }
+    int IdEmpresa { get; set; }
+    string[] Perfis { get; set; }
 }

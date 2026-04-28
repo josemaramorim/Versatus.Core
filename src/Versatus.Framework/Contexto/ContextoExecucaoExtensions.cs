@@ -13,9 +13,9 @@ public static class ContextoExecucaoExtensions
     private const string ClaimIdFilial = "IdFilial";
 
     /// <summary>
-    /// Preenche um objeto ContextoExecucao a partir de um ClaimsPrincipal (usuário logado).
+    /// Preenche um objeto IContextoExecucao a partir de um ClaimsPrincipal (usuário logado).
     /// </summary>
-    public static void InicializarDeClaims(this ContextoExecucao contexto, ClaimsPrincipal principal)
+    public static void Fill(this ClaimsPrincipal principal, IContextoExecucao contexto)
     {
         if (principal == null) return;
 

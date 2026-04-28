@@ -5,8 +5,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Versatus.Framework.Repositorio;
 
-namespace Versatus.Framework.Repositorio;
+namespace Versatus.Infra.Data.Repositorio;
 
 /// <summary>
 /// Implementação base para o padrão Repositório usando Entity Framework Core.
