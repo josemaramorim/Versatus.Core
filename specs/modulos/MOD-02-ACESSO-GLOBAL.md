@@ -470,11 +470,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/categoria-entity`
 - Commit: `feat: Implement Categoria entity` [x]
 
-**Tarefa 4.3 — Implementar Classe**
-- Crie `Domain/Configuracao/Classe.cs`
-- Propriedades: IdClasse, Codigo, Nome
+**Tarefa 4.3 — Implementar Classe** [x]
+- Crie `Domain/Classification/Classe.cs` [x]
+- Propriedades: IdClasse, IdFilial (FK), CodigoFormatado, Nome, Ativo [x]
 - Branch: `feat/classe-entity`
-- Commit: `feat: Implement Classe entity`
+- Commit: `feat: Implement Classe entity` [x]
 
 **Tarefa 4.4 — Configurar Segmentação no DbContext**
 - Atualize `AcessoGlobalDbContext` com entidades de classificação
