@@ -1,16 +1,24 @@
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Versatus.Framework.Sequencial;
 
 /// <summary>
-/// Gerador de sequenciais por filial, replicando o comportamento legado.
-/// CRÍTICO: Preserva integridade do banco, não usar IDENTITY.
+/// Contrato para geração de números sequenciais customizados, substituindo o GeradorSequencial legado.
 /// </summary>
 public interface IGeradorSequencial
 {
     /// <summary>
-    /// Gera o próximo ID sequencial para a tabela e filial especificadas.
+    /// Gera o próximo número sequencial para um determinado objeto/tabela.
     /// </summary>
-    /// <param name="tabela">Nome da tabela (ex: "Cliente", "Produto")</param>
-    /// <param name="idFilial">ID da filial</param>
-    /// <returns>Próximo ID sequencial</returns>
-    Task<int> ProximoAsync(string tabela, int idFilial);
+    /// <param name="nomeObjeto">Nome identificador da regra de sequencial (geralmente nome da tabela).</param>
+    /// <param name="tipo">Escopo do sequencial (Geral, Empresa ou Filial).</param>
+    /// <param name="cancellationToken">Token para cancelamento da operação assíncrona.</param>
+    /// <returns>Próximo número disponível.</returns>
+    Task<int> ProximoAsync(string nomeObjeto, SequencialTipo tipo, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Define manualmente um valor para o sequencial.
+    /// </summary>
+    Task SetValorAsync(string nomeObjeto, SequencialTipo tipo, int novoValor, CancellationToken cancellationToken = default);
 }
