@@ -394,11 +394,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/pais-entity`
 - Commit: `feat: Implement Pais geographic entity` [x]
 
-**Tarefa 2.2 — Implementar Estado**
-- Crie `Domain/Localizacao/Estado.cs`
+**Tarefa 2.2 — Implementar Estado** [x]
+- Crie `Domain/Location/Estado.cs`
 - Propriedades: IdEstado, IdPais (FK), Sigla, Nome
 - Branch: `feat/estado-entity`
-- Commit: `feat: Implement Estado geographic entity`
+- Commit: `feat: Implement Estado geographic entity` [x]
 
 **Tarefa 2.3 — Implementar Cidade**
 - Crie `Domain/Localizacao/Cidade.cs`
