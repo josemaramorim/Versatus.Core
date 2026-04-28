@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Versatus.AcessoGlobal.Domain.Location;
+using Versatus.AcessoGlobal.Domain.Organization;
 
 namespace Versatus.AcessoGlobal.Infrastructure;
 
@@ -19,6 +20,10 @@ public class AcessoGlobalDbContext : DbContext
     public DbSet<Bairro> Bairros => Set<Bairro>();
     public DbSet<TipoLogradouro> TiposLogradouro => Set<TipoLogradouro>();
     public DbSet<Endereco> Enderecos => Set<Endereco>();
+
+    public DbSet<Grupo> Grupos => Set<Grupo>();
+    public DbSet<Empresa> Empresas => Set<Empresa>();
+    public DbSet<Filial> Filiais => Set<Filial>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
