@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Versatus.Framework.Paginacao;
+namespace Versatus.Framework.Pagination;
 
 /// <summary>
 /// Representa o resultado de uma consulta paginada.

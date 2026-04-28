@@ -1,4 +1,4 @@
-namespace Versatus.Framework.Sequencial;
+namespace Versatus.Framework.Sequences;
 
 /// <summary>
 /// Define os escopos de geração de sequencial.

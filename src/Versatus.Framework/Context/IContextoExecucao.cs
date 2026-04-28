@@ -1,4 +1,4 @@
-namespace Versatus.Framework.Contexto;
+namespace Versatus.Framework.Context;
 
 /// <summary>
 /// Contexto de execução da aplicação, substitui IAmbiente do legado.

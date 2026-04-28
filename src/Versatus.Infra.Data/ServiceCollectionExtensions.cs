@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Versatus.Framework.Sequencial;
+using Versatus.Framework.Sequences;
 using Versatus.Infra.Data.Context;
 using Versatus.Infra.Data.Repositories;
 

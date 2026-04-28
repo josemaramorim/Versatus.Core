@@ -1,6 +1,6 @@
 using System;
 
-namespace Versatus.Framework.Excecoes;
+namespace Versatus.Framework.Exceptions;
 
 /// <summary>
 /// Exceção utilizada para violações de regras de negócio esperadas do sistema.

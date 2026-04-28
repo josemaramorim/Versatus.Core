@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using Versatus.Framework.Contexto;
-using Versatus.Framework.Sequencial;
+using Versatus.Framework.Context;
+using Versatus.Framework.Sequences;
 
 namespace Versatus.Framework.DependencyInjection;
 

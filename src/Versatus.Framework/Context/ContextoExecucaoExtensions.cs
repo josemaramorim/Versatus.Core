@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Security.Claims;
 
-namespace Versatus.Framework.Contexto;
+namespace Versatus.Framework.Context;
 
 /// <summary>
 /// Extensões para facilitar a inicialização do contexto de execução a partir do ClaimsPrincipal.

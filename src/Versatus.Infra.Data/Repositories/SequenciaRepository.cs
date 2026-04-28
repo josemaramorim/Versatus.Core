@@ -2,10 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 using Versatus.Framework.Domain.Entities;
-using Versatus.Framework.Repositorio;
-using Versatus.Framework.Sequencial;
+using Versatus.Framework.Repositories;
+using Versatus.Framework.Sequences;
 using Versatus.Infra.Data.Context;
-using Versatus.Infra.Data.Repositorio;
 
 namespace Versatus.Infra.Data.Repositories;
 

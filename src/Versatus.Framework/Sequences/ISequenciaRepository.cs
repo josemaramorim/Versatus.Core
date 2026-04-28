@@ -1,6 +1,6 @@
 using Versatus.Framework.Domain.Entities;
 
-namespace Versatus.Framework.Sequencial;
+namespace Versatus.Framework.Sequences;
 
 /// <summary>
 /// Repositório para Sequencia (a ser implementado com EF Core).

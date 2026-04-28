@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Versatus.Framework.Repositorio;
+namespace Versatus.Framework.Repositories;
 
 /// <summary>
 /// Contrato genérico para o padrão Repositório, utilizando EF Core.

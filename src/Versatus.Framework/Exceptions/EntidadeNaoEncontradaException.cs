@@ -1,6 +1,6 @@
 using System;
 
-namespace Versatus.Framework.Excecoes;
+namespace Versatus.Framework.Exceptions;
 
 /// <summary>
 /// Exceção utilizada quando uma pesquisa por uma entidade específica no banco de dados falha (ex: busca por ID).

@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Versatus.Framework.Contexto;
+using Versatus.Framework.Context;
 using Versatus.Framework.Domain.Entities;
 
-namespace Versatus.Framework.Sequencial;
+namespace Versatus.Framework.Sequences;
 
 /// <summary>
 /// Serviço para geração de números sequenciais customizados seguindo a lógica do legado.

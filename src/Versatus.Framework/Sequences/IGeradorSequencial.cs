@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Versatus.Framework.Sequencial;
+namespace Versatus.Framework.Sequences;
 
 /// <summary>
 /// Contrato para geração de números sequenciais customizados, substituindo o GeradorSequencial legado.

@@ -1,6 +1,6 @@
 using System;
 
-namespace Versatus.Framework.Excecoes;
+namespace Versatus.Framework.Exceptions;
 
 /// <summary>
 /// Exceção base para toda a hierarquia de exceções personalizadas do sistema Versatus.

@@ -252,7 +252,10 @@ compatibilidade com dados existentes.
 | `Tipo[Documento]` | Tipo/configuração do documento | ✅ Manter | Entidade de configuração |
 | `ObjectBase` / `ListBase` | Classes base do framework | ❌ **ELIMINADO** | Sem herança de infra no domínio |
 
-> 📌 **Regra:** Classes `*Lista` do legado **nunca** têm equivalente no novo sistema.
+> 📌 **Regra (Nomenclatura):** Todas as pastas físicas (diretórios) e namespaces devem utilizar a nomenclatura em **Inglês** para manter a consistência técnica com o ecossistema .NET. Termos em Português ficam restritos a metadados de domínio (nomes de tabelas e colunas do legado) e documentação.
+> Exemplo: usar `Repositories` em vez de `Repositorio`, `Exceptions` em vez de `Excecoes`.
+
+> 📌 **Regra (Coleções):** Classes `*Lista` do legado **nunca** têm equivalente no novo sistema.
 > Ver `decisoes/DEC-005-COLECOES-E-BOAS-PRATICAS.md`.
 
 ---

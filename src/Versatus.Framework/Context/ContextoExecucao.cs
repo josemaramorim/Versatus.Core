@@ -1,4 +1,4 @@
-namespace Versatus.Framework.Contexto;
+namespace Versatus.Framework.Context;
 
 /// <summary>
 /// Implementação concreta do contexto de execução.

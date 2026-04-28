@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Versatus.Framework.Configuracao;
-using Versatus.Framework.Contexto;
-using Versatus.Framework.Sequencial;
+using Versatus.Framework.Configuration;
+using Versatus.Framework.Context;
+using Versatus.Framework.Sequences;
 using System;
 
 namespace Versatus.Framework;

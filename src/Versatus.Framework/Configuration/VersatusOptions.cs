@@ -1,4 +1,4 @@
-namespace Versatus.Framework.Configuracao;
+namespace Versatus.Framework.Configuration;
 
 /// <summary>
 /// Configurações globais do Framework Versatus.
