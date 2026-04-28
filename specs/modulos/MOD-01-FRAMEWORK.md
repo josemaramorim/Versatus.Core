@@ -112,14 +112,24 @@ Registro: Singleton por request (IHttpContextAccessor)
 3. Implementar `GeradorSequencialService : IGeradorSequencial`
 4. Criar testes unitários de paridade
 
-#### 3.3.1 Algoritmo do GeradorSequencial (a preencher)
-> ⚠️ Esta seção deve ser preenchida ANTES de qualquer implementação.  
-> Tarefa: Ler `GeradorSequencial.cs` e documentar o algoritmo aqui.
+#### 3.3.1 Algoritmo do GeradorSequencial
 
-```
-STATUS: PENDENTE DE ANÁLISE
-Arquivo a analisar: servidor/framework/servidor.framework/GeradorSequencial.cs
-```
+O gerador legado utiliza as tabelas `GloSequencial` (Pai) e `GloSequencialItem` (Valores por contexto) para evitar o `IDENTITY` nativo e permitir reinício de numeração por Filial/Empresa.
+
+**Fluxo Lógico:**
+1. **Identificação:** Busca o `IdGloSequencial` na tabela `GloSequencial` baseado no nome da classe (`SequencialNome()`) e no tipo (`SequencialTipo`).
+2. **Atualização (Update-first):**
+   - Executa `UPDATE GloSequencialItem SET Numero = Numero + 1 WHERE IdGloSequencial = @id AND ...filtros contextuais`.
+   - Filtros contextuais: Se `Tipo == Filial`, filtra por `IdGloFilial`. Se `Tipo == Empresa`, filtra por `IdGloEmpresa`. Se `Geral`, não filtra contexto.
+3. **Leitura Pós-Update:** Se o `UPDATE` afetou 1 linha, faz um `SELECT Numero` para obter o novo valor incrementado.
+4. **Criação (Insert-fallback):** Se o `UPDATE` afetou 0 linhas (sequencial novo para aquele contexto):
+   - Faz um `INSERT` em `GloSequencialItem` com valor inicial `1` (ou `2` se a entidade for o próprio 'Sequencial').
+   - Retorna `1`.
+5. **Transacionalidade:** Se não houver uma transação externa ativa, abre uma transação local com nível `ReadCommitted`.
+
+**Crítico para Migração:**
+- Manter a distinção entre `IdGloSequencial` (GUID/ID da regra) e `IdGloSequencialItem` (Valor atual).
+- Respeitar a ordem: Update → Select (Se rows > 0) OR Insert (Se rows == 0).
 
 ### 3.4 `Transacao` — gerenciamento de transações
 
@@ -232,8 +242,8 @@ Siga esta sequência de tarefas para implementar MOD-01. Cada tarefa deve result
 - Deve herdar de `Exception`
 - Adicione construtores para mensagem simples, com parâmetros formatados
 - Adicione propriedades para rastreamento (ex: `ErrorCode`, `Timestamp`)
-- Branch: `feat/versatus-exception`
-- Commit: `feat: Implement VersatusException base class`
+- Branch: `feat/versatus-exception` [x]
+- Commit: `feat: Implement VersatusException base class` [x]
 - Marque no checklist: ✅ `VersatusException` criada
 
 **Tarefa 2.2 — Implementar RegraDeNegocioException**

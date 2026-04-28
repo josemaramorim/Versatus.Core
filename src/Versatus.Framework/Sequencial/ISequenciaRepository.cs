@@ -7,7 +7,7 @@ namespace Versatus.Framework.Sequencial;
 /// </summary>
 public interface ISequenciaRepository
 {
-    Task<Sequencia?> GetByTabelaFilialAsync(string tabela, int idFilial);
-    Task AddAsync(Sequencia sequencia);
-    Task UpdateAsync(Sequencia sequencia);
+    Task<Sequencia?> GetByTabelaFilialAsync(string tabela, int idFilial, CancellationToken cancellationToken = default);
+    Task AddAsync(Sequencia sequencia, CancellationToken cancellationToken = default);
+    Task UpdateAsync(Sequencia sequencia, CancellationToken cancellationToken = default);
 }
