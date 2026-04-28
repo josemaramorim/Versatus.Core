@@ -252,8 +252,9 @@ compatibilidade com dados existentes.
 | `Tipo[Documento]` | Tipo/configuração do documento | ✅ Manter | Entidade de configuração |
 | `ObjectBase` / `ListBase` | Classes base do framework | ❌ **ELIMINADO** | Sem herança de infra no domínio |
 
-> 📌 **Regra (Nomenclatura):** Todas as pastas físicas (diretórios) e namespaces devem utilizar a nomenclatura em **Inglês** para manter a consistência técnica com o ecossistema .NET. Termos em Português ficam restritos a metadados de domínio (nomes de tabelas e colunas do legado) e documentação.
-> Exemplo: usar `Repositories` em vez de `Repositorio`, `Exceptions` em vez de `Excecoes`.
+> 📌 **Regra (Nomenclatura):**
+> 1. **Estrutura e Infraestrutura:** Todas as pastas físicas (diretórios), nomes de projetos e namespaces de infraestrutura devem utilizar a nomenclatura em **Inglês** (ex: `Repositories`, `Infrastructure`, `Pagination`).
+> 2. **Negócio e Domínio:** As Entidades de Domínio, Exceptions de Negócio e tabelas/colunas do banco devem preservar **EXATAMENTE** os nomes do legado em **Português** (ex: `Pais.cs`, `Pedido.cs`, `RegraDeNegocioException.cs`). Isso garante que a linguagem onipresente do legado seja preservada e facilite o mapeamento por outros desenvolvedores.
 
 > 📌 **Regra (Coleções):** Classes `*Lista` do legado **nunca** têm equivalente no novo sistema.
 > Ver `decisoes/DEC-005-COLECOES-E-BOAS-PRATICAS.md`.

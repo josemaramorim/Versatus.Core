@@ -303,37 +303,37 @@ autorização. Migrar apenas após o fluxo base funcionar.
 Versatus.AcessoGlobal/
 ├── Domain/
 │   ├── Location/
-│   │   ├── Country.cs
-│   │   ├── State.cs
-│   │   ├── City.cs
-│   │   ├── Neighborhood.cs
-│   │   └── Address.cs
+│   │   ├── Pais.cs
+│   │   ├── Estado.cs
+│   │   ├── Cidade.cs
+│   │   ├── Bairro.cs
+│   │   └── Endereco.cs
 │   ├── Entities/
-│   │   ├── Entity.cs
-│   │   ├── PersonPhysicalData.cs
-│   │   ├── PersonLegalData.cs
-│   │   ├── Customer.cs
-│   │   ├── Supplier.cs
-│   │   └── Employee.cs
+│   │   ├── Entidade.cs
+│   │   ├── DadosPessoaFisica.cs
+│   │   ├── DadosPessoaJuridica.cs
+│   │   ├── Cliente.cs
+│   │   ├── Fornecedor.cs
+│   │   └── Funcionario.cs
 │   ├── Organization/
-│   │   ├── Group.cs
-│   │   ├── Company.cs
-│   │   └── Branch.cs
+│   │   ├── Grupo.cs
+│   │   ├── Empresa.cs
+│   │   └── Filial.cs
 │   ├── Security/
-│   │   ├── User.cs
-│   │   └── Profile.cs
+│   │   ├── Usuario.cs
+│   │   └── Perfil.cs
 │   ├── Finance/
-│   │   ├── Bank.cs
-│   │   ├── PaymentMethod.cs
-│   │   └── PaymentCondition.cs
+│   │   ├── Banco.cs
+│   │   ├── FormaPagamento.cs
+│   │   └── CondicaoPagamento.cs
 │   └── Configuration/
-│       ├── Parameter.cs
-│       └── DocumentSeries.cs
+│       ├── Parametro.cs
+│       └── SerieDocumento.cs
 ├── Application/
-│   ├── Customers/
-│   ├── Suppliers/
-│   ├── Users/
-│   └── Configurations/
+│   ├── Clientes/
+│   ├── Fornecedores/
+│   ├── Usuarios/
+│   └── Configuracoes/
 ├── Infrastructure/
 │   ├── AcessoGlobalDbContext.cs
 │   └── Repositories/

@@ -1,5 +1,7 @@
 # CONTRATO DE EXECUÇÃO — IA VERSATUS
 
+> 💡 **DICA PARA O USUÁRIO:** Se a IA parecer "esquecida", use o prompt em [specs/05-ONBOARDING-IA-PROMPT.md](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/specs/05-ONBOARDING-IA-PROMPT.md).
+
 Este documento define o protocolo obrigatório para qualquer IA que atue no projeto **Versatus.Net8**. A falha em seguir este protocolo resultará em quebra de arquitetura e integridade do sistema.
 
 ---
