@@ -424,12 +424,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/endereco-entity`
 - Commit: `feat: Implement Endereco entity` [x]
 
-**Tarefa 2.7 — Configurar Relacionamentos no DbContext**
-- Atualize `AcessoGlobalDbContext` com `DbSet<Pais>`, `DbSet<Estado>`, etc.
-- Configure ForeignKeys e Cascade Rules
-- Branch: `feat/localizacao-dbcontext`
-- Commit: `feat: Configure geographic entities in DbContext`
-- Marque no checklist: ✅ Fase 2 — Localização Geográfica completa
+**Tarefa 2.7 — Configurar Relacionamentos no DbContext** [x]
+- Atualize `AcessoGlobalDbContext` com `DbSet<Pais>`, `DbSet<Estado>`, etc. [x]
+- Mapeamento via Fluent API (Separate `EntityTypeConfiguration` classes) [x]
+- Commit: `feat: configure AcessoGlobalDbContext mappings` [x]
+- Status: ✅ Fase 2 — Localização Geográfica completa [x]
 
 ### Fase 3: Hierarquia de Organização
 
