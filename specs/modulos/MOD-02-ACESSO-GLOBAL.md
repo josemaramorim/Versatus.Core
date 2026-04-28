@@ -406,11 +406,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/cidade-entity`
 - Commit: `feat: Implement Cidade geographic entity` [x]
 
-**Tarefa 2.4 — Implementar Bairro**
-- Crie `Domain/Localizacao/Bairro.cs`
+**Tarefa 2.4 — Implementar Bairro** [x]
+- Crie `Domain/Location/Bairro.cs`
 - Propriedades: IdBairro, IdCidade (FK), Nome
 - Branch: `feat/bairro-entity`
-- Commit: `feat: Implement Bairro geographic entity`
+- Commit: `feat: Implement Bairro geographic entity` [x]
 
 **Tarefa 2.5 — Implementar TipoLogradouro**
 - Crie `Domain/Localizacao/TipoLogradouro.cs`
