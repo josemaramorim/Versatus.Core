@@ -432,11 +432,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 
 ### Fase 3: Hierarquia de Organização
 
-**Tarefa 3.1 — Implementar Grupo**
-- Crie `Domain/Organizacao/Grupo.cs`
-- Propriedades: IdGrupo, Nome, Descricao
+**Tarefa 3.1 — Implementar Grupo** [x]
+- Crie `Domain/Organization/Grupo.cs`
+- Propriedades: IdGrupo, Nome, Ativo
 - Branch: `feat/grupo-entity`
-- Commit: `feat: Implement Grupo (group) entity`
+- Commit: `feat: Implement Grupo entity` [x]
 
 **Tarefa 3.2 — Implementar Empresa**
 - Crie `Domain/Organizacao/Empresa.cs`
