@@ -418,11 +418,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/tipo-logradouro-entity`
 - Commit: `feat: Implement TipoLogradouro entity` [x]
 
-**Tarefa 2.6 — Implementar Endereco**
-- Crie `Domain/Localizacao/Endereco.cs`
+**Tarefa 2.6 — Implementar Endereco** [x]
+- Crie `Domain/Location/Endereco.cs`
 - Propriedades: IdEndereco, IdTipoLogradouro, IdBairro, IdCidade, Logradouro, Numero, Complemento, CEP
 - Branch: `feat/endereco-entity`
-- Commit: `feat: Implement Endereco entity`
+- Commit: `feat: Implement Endereco entity` [x]
 
 **Tarefa 2.7 — Configurar Relacionamentos no DbContext**
 - Atualize `AcessoGlobalDbContext` com `DbSet<Pais>`, `DbSet<Estado>`, etc.
