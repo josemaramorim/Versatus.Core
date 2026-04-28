@@ -444,11 +444,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/empresa-entity`
 - Commit: `feat: Implement Empresa entity` [x]
 
-**Tarefa 3.3 — Implementar Filial**
-- Crie `Domain/Organizacao/Filial.cs`
-- Propriedades: IdFilial, IdEmpresa (FK), NomeDaFilial, Cnpj, Inscricao, IdCidade (FK)
+**Tarefa 3.3 — Implementar Filial** [x]
+- Crie `Domain/Organization/Filial.cs`
+- Propriedades: IdFilial, IdEmpresa (FK), Nome, Cnpj, Inscricao [x]
 - Branch: `feat/filial-entity`
-- Commit: `feat: Implement Filial entity`
+- Commit: `feat: Implement Filial entity` [x]
 
 **Tarefa 3.4 — Configurar Hierarquia no DbContext**
 - Atualize `AcessoGlobalDbContext` com `DbSet<Grupo>`, `DbSet<Empresa>`, `DbSet<Filial>`
