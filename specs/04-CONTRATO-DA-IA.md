@@ -76,11 +76,11 @@ Este log serve para que a próxima instância da IA saiba exatamente onde o trab
 | Módulo Atual | Fase / Status | Task Atual | Branch Ativa | Observação Crítica |
 | :--- | :--- | :--- | :--- | :--- |
 | **MOD-01** | ✅ Concluído | 9.2 (Final) | `develop` | Framework Base e Infra base finalizados. |
-| **MOD-02** | 🚧 Em Progresso | 2.2 (Concluído) | `setup/acesso-global-project` | Pais.cs e Estado.cs implementados. |
+| **MOD-02** | 🚧 Em Progresso | 2.3 (Concluído) | `setup/acesso-global-project` | Pais, Estado e Cidade implementados. |
 
 ### Histórico Recente de Decisões:
 - **2026-04-28 (Global):** Padronização total de nomenclatura para **Inglês** em todas as pastas físicas e namespaces (`Repositories`, `Context`, `Exceptions`). O `Versatus.Framework` foi totalmente refatorado.
 - **2026-04-28 (Infra):** O `Versatus.Infra.Data` agora é considerado **Shared Infrastructure** para classes globais como o `GeradorSequencial`. Módulos de negócio devem ter sua própria estrutura de `Infrastructure` interna.
 
 ### Próxima Ação Pendente:
-- Iniciar **Tarefa 2.3 do MOD-02** (Cidade.cs).
+- Iniciar **Tarefa 2.4 do MOD-02** (Bairro.cs).
