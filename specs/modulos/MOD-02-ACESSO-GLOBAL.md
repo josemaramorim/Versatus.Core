@@ -450,12 +450,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/filial-entity`
 - Commit: `feat: Implement Filial entity` [x]
 
-**Tarefa 3.4 — Configurar Hierarquia no DbContext**
-- Atualize `AcessoGlobalDbContext` com `DbSet<Grupo>`, `DbSet<Empresa>`, `DbSet<Filial>`
-- Configure relacionamentos Grupo→Empresa→Filial
-- Branch: `feat/organizacao-dbcontext`
-- Commit: `feat: Configure organization hierarchy in DbContext`
-- Marque no checklist: ✅ Fase 3 — Hierarquia de Organização completa
+**Tarefa 3.4 — Configurar Hierarquia no DbContext** [x]
+- Atualize `AcessoGlobalDbContext` com `DbSet<Grupo>`, `DbSet<Empresa>`, `DbSet<Filial>` [x]
+- Configure relacionamentos 1:N entre Grupo-Empresa e Empresa-Filial [x]
+- Commit: `feat: configure organization mappings in DbContext` [x]
+- Status: ✅ Fase 3 — Hierarquia de Organização completa [x]
 
 ### Fase 4: Segmentação / Classificação
 
