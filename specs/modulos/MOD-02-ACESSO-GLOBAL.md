@@ -458,11 +458,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 
 ### Fase 4: Segmentação / Classificação
 
-**Tarefa 4.1 — Implementar CentroCusto**
-- Crie `Domain/Configuracao/CentroCusto.cs`
-- Propriedades: IdCentroCusto, IdFilial (FK), Codigo, Nome
+**Tarefa 4.1 — Implementar CentroCusto** [x]
+- Crie `Domain/Classification/CentroCusto.cs` [x]
+- Propriedades: IdCentroCusto, IdFilial (FK), CodigoFormatado, Nome, Ativo [x]
 - Branch: `feat/centro-custo-entity`
-- Commit: `feat: Implement CentroCusto entity`
+- Commit: `feat: Implement CentroCusto entity` [x]
 
 **Tarefa 4.2 — Implementar Categoria**
 - Crie `Domain/Configuracao/Categoria.cs`
