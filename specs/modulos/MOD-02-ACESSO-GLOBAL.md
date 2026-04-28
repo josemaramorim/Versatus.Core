@@ -464,11 +464,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/centro-custo-entity`
 - Commit: `feat: Implement CentroCusto entity` [x]
 
-**Tarefa 4.2 — Implementar Categoria**
-- Crie `Domain/Configuracao/Categoria.cs`
-- Propriedades: IdCategoria, Codigo, Nome, Tipo (enum)
+**Tarefa 4.2 — Implementar Categoria** [x]
+- Crie `Domain/Classification/Categoria.cs` [x]
+- Propriedades: IdCategoria, IdCategoriaPai (FK), Nome, Ativo [x]
 - Branch: `feat/categoria-entity`
-- Commit: `feat: Implement Categoria entity`
+- Commit: `feat: Implement Categoria entity` [x]
 
 **Tarefa 4.3 — Implementar Classe**
 - Crie `Domain/Configuracao/Classe.cs`
