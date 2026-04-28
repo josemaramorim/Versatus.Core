@@ -388,11 +388,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 
 ### Fase 2: Localização Geográfica
 
-**Tarefa 2.1 — Implementar Pais**
-- Crie `Domain/Localizacao/Pais.cs` (record simples com propriedades: IdPais, Sigla, Nome)
+**Tarefa 2.1 — Implementar Pais** [x]
+- Crie `Domain/Location/Pais.cs` (record simples com propriedades: IdPais, Sigla, Nome)
 - Mapeamento EF Core — tabela `GerPais` (verificar nome real)
 - Branch: `feat/pais-entity`
-- Commit: `feat: Implement Pais geographic entity`
+- Commit: `feat: Implement Pais geographic entity` [x]
 
 **Tarefa 2.2 — Implementar Estado**
 - Crie `Domain/Localizacao/Estado.cs`
