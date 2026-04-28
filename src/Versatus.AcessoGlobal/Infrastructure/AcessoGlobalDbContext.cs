@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Versatus.AcessoGlobal.Domain.Location;
 
 namespace Versatus.AcessoGlobal.Infrastructure;
 
@@ -12,10 +13,18 @@ public class AcessoGlobalDbContext : DbContext
     {
     }
 
+    public DbSet<Pais> Paises => Set<Pais>();
+    public DbSet<Estado> Estados => Set<Estado>();
+    public DbSet<Cidade> Cidades => Set<Cidade>();
+    public DbSet<Bairro> Bairros => Set<Bairro>();
+    public DbSet<TipoLogradouro> TiposLogradouro => Set<TipoLogradouro>();
+    public DbSet<Endereco> Enderecos => Set<Endereco>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         
-        // Configurações de mapeamento serão adicionadas conforme as entidades forem criadas
+        // Aplica todos os mapeamentos definidos neste assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AcessoGlobalDbContext).Assembly);
     }
 }

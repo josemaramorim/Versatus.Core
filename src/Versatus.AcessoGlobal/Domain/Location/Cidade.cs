@@ -12,10 +12,9 @@ public class Cidade
     public int IdCidade { get; set; }
 
     /// <summary>
-    /// Chave estrangeira para o Estado ao qual esta cidade pertence.
-    /// No legado, a relação era feita via Sigla UF (string), mas aqui usaremos IdEstado (FK).
+    /// Sigla do Estado ao qual esta cidade pertence (FK via string Uf no legado).
     /// </summary>
-    public int IdEstado { get; set; }
+    public string SiglaEstado { get; set; } = string.Empty;
 
     /// <summary>
     /// Chave estrangeira para o País. 
