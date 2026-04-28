@@ -302,41 +302,41 @@ autorização. Migrar apenas após o fluxo base funcionar.
 ```
 Versatus.AcessoGlobal/
 ├── Domain/
-│   ├── Localizacao/
-│   │   ├── Pais.cs
-│   │   ├── Estado.cs
-│   │   ├── Cidade.cs
-│   │   ├── Bairro.cs
-│   │   └── Endereco.cs
-│   ├── Entidades/
-│   │   ├── Entidade.cs
-│   │   ├── DadosPessoaFisica.cs
-│   │   ├── DadosPessoaJuridica.cs
-│   │   ├── Cliente.cs
-│   │   ├── Fornecedor.cs
-│   │   └── Funcionario.cs
-│   ├── Organizacao/
-│   │   ├── Grupo.cs
-│   │   ├── Empresa.cs
-│   │   └── Filial.cs
-│   ├── Seguranca/
-│   │   ├── Usuario.cs
-│   │   └── Perfil.cs
-│   ├── Financeiro/
-│   │   ├── Banco.cs
-│   │   ├── FormaPagamento.cs
-│   │   └── CondicaoPagamento.cs
-│   └── Configuracao/
-│       ├── Parametro.cs
-│       └── SerieDocumento.cs
+│   ├── Location/
+│   │   ├── Country.cs
+│   │   ├── State.cs
+│   │   ├── City.cs
+│   │   ├── Neighborhood.cs
+│   │   └── Address.cs
+│   ├── Entities/
+│   │   ├── Entity.cs
+│   │   ├── PersonPhysicalData.cs
+│   │   ├── PersonLegalData.cs
+│   │   ├── Customer.cs
+│   │   ├── Supplier.cs
+│   │   └── Employee.cs
+│   ├── Organization/
+│   │   ├── Group.cs
+│   │   ├── Company.cs
+│   │   └── Branch.cs
+│   ├── Security/
+│   │   ├── User.cs
+│   │   └── Profile.cs
+│   ├── Finance/
+│   │   ├── Bank.cs
+│   │   ├── PaymentMethod.cs
+│   │   └── PaymentCondition.cs
+│   └── Configuration/
+│       ├── Parameter.cs
+│       └── DocumentSeries.cs
 ├── Application/
-│   ├── Clientes/
-│   ├── Fornecedores/
-│   ├── Usuarios/
-│   └── Configuracoes/
+│   ├── Customers/
+│   ├── Suppliers/
+│   ├── Users/
+│   └── Configurations/
 ├── Infrastructure/
 │   ├── AcessoGlobalDbContext.cs
-│   └── Repositorios/
+│   └── Repositories/
 └── Api/
     └── Controllers/
 ```
