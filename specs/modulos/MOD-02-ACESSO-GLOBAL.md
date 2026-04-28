@@ -438,11 +438,11 @@ Siga esta sequência de tarefas para implementar MOD-02. Cada tarefa deve result
 - Branch: `feat/grupo-entity`
 - Commit: `feat: Implement Grupo entity` [x]
 
-**Tarefa 3.2 — Implementar Empresa**
-- Crie `Domain/Organizacao/Empresa.cs`
-- Propriedades: IdEmpresa, IdGrupo (FK), RazaoSocial, NomeFantasia, Cnpj, Inscricao
+**Tarefa 3.2 — Implementar Empresa** [x]
+- Crie `Domain/Organization/Empresa.cs`
+- Propriedades: IdEmpresa, IdGrupo (FK), Nome, Mascaras ERP, Ativo [x]
 - Branch: `feat/empresa-entity`
-- Commit: `feat: Implement Empresa entity`
+- Commit: `feat: Implement Empresa entity` [x]
 
 **Tarefa 3.3 — Implementar Filial**
 - Crie `Domain/Organizacao/Filial.cs`
