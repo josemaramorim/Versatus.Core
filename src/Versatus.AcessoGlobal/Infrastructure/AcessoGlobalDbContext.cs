@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Versatus.AcessoGlobal.Domain.Location;
 using Versatus.AcessoGlobal.Domain.Organization;
+using Versatus.AcessoGlobal.Domain.Classification;
+using Versatus.AcessoGlobal.Domain.Entities;
 
 namespace Versatus.AcessoGlobal.Infrastructure;
 
@@ -24,6 +26,19 @@ public class AcessoGlobalDbContext : DbContext
     public DbSet<Grupo> Grupos => Set<Grupo>();
     public DbSet<Empresa> Empresas => Set<Empresa>();
     public DbSet<Filial> Filiais => Set<Filial>();
+
+    public DbSet<CentroCusto> CentrosCusto => Set<CentroCusto>();
+    public DbSet<Categoria> Categorias => Set<Categoria>();
+    public DbSet<Classe> Classes => Set<Classe>();
+
+    public DbSet<Entidade> Entidades => Set<Entidade>();
+    public DbSet<DadosPessoaFisica> PessoasFisicas => Set<DadosPessoaFisica>();
+    public DbSet<DadosPessoaJuridica> PessoasJuridicas => Set<DadosPessoaJuridica>();
+    public DbSet<EntidadeEndereco> EntidadeEnderecos => Set<EntidadeEndereco>();
+    public DbSet<Cliente> Clientes => Set<Cliente>();
+    public DbSet<Fornecedor> Fornecedores => Set<Fornecedor>();
+    public DbSet<Funcionario> Funcionarios => Set<Funcionario>();
+    public DbSet<Transportadora> Transportadoras => Set<Transportadora>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
