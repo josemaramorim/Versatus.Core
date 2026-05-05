@@ -183,10 +183,11 @@ Toda sessão de trabalho deve **obrigatoriamente** encerrar com a atualização 
 
 ### REGRA 15 — Commits e Branches Atômicos
 A IA deve seguir rigorosamente o fluxo de trabalho atômico:
-1.  **Mudança Pequena = Commit Imediato:** Nunca acumule grandes volumes de código alterado sem um commit lógico.
-2.  **Branches Focadas:** Uma branch deve ter um único objetivo claro (ex: `setup/acesso-global`, `domain/cliente`).
-3.  **Handoff Frequente:** Atualize o `task.md` e o `walkthrough.md` a cada tarefa concluída, e faça o commit desses arquivos junto com o código.
-4.  **Não acumular fases:** Se uma fase da SPEC foi concluída (ex: Fase 6), ela DEVE ser commitada antes de iniciar a Fase 7.
+1.  **Uma Tarefa, Uma Branch:** Para cada nova tarefa ou fase da SPEC, uma nova branch deve ser criada a partir de `develop` (ex: `feat/mod-02-repositories`). Nunca trabalhe diretamente em `develop` ou misture tarefas em uma mesma branch.
+2.  **Mudança Pequena = Commit Imediato:** Nunca acumule grandes volumes de código alterado sem um commit lógico. Commite ao finalizar cada item de implementação.
+3.  **Aprovação para Merge:** Ao concluir o trabalho em uma branch, a IA **DEVE PERGUNTAR** ao usuário se pode realizar o merge para a branch `develop`. Nunca faça merge automático.
+4.  **Handoff e Sincronização:** Atualize o `task.md`, `walkthrough.md` e o Log de Progresso no `04-CONTRATO-DA-IA.md` a cada tarefa concluída. Esses arquivos devem ser commitados junto com o código.
+5.  **Troca de IA:** Se houver troca de assistente, a nova IA deve ler o último Handoff e verificar a branch atual antes de qualquer ação.
 
 ---
 
