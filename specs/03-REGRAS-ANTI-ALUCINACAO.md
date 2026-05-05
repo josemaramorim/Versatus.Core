@@ -181,6 +181,13 @@ Toda sessão de trabalho deve **obrigatoriamente** encerrar com a atualização 
 - A IA deve registrar o que foi feito, qual a branch atual e qual o próximo passo.
 - Isso previne que a próxima instância da IA reinicie tarefas já concluídas ou ignore decisões arquiteturais tomadas durante a sessão.
 
+### REGRA 15 — Commits e Branches Atômicos
+A IA deve seguir rigorosamente o fluxo de trabalho atômico:
+1.  **Mudança Pequena = Commit Imediato:** Nunca acumule grandes volumes de código alterado sem um commit lógico.
+2.  **Branches Focadas:** Uma branch deve ter um único objetivo claro (ex: `setup/acesso-global`, `domain/cliente`).
+3.  **Handoff Frequente:** Atualize o `task.md` e o `walkthrough.md` a cada tarefa concluída, e faça o commit desses arquivos junto com o código.
+4.  **Não acumular fases:** Se uma fase da SPEC foi concluída (ex: Fase 6), ela DEVE ser commitada antes de iniciar a Fase 7.
+
 ---
 
 ## 3. Checklist de Revisão de Código Gerado por IA

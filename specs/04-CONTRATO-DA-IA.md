@@ -76,11 +76,18 @@ Este log serve para que a próxima instância da IA saiba exatamente onde o trab
 | Módulo Atual | Fase / Status | Task Atual | Branch Ativa | Observação Crítica |
 | :--- | :--- | :--- | :--- | :--- |
 | **MOD-01** | ✅ Concluído | 9.2 (Final) | `develop` | Framework Base e Infra base finalizados. |
-| **MOD-02** | 🚧 Em Progresso | 4.3 (Concluído) | `setup/acesso-global-project` | CentroCusto, Categoria e Classe implementados. |
+| **MOD-02** | ✅ Concluído | 8.2 (Final) | `setup/acesso-global-project` | Domínio, Infra e Testes do AcessoGlobal finalizados e validados. |
 
 ### Histórico Recente de Decisões:
+- **2026-05-05 (AcessoGlobal):** Implementação de testes de integração com SQLite In-Memory para validar mapeamentos Fluent API e relacionamentos 1:1.
+- **2026-05-05 (AcessoGlobal):** Criação do projeto de testes `Versatus.AcessoGlobal.Tests` utilizando xUnit, Moq e FluentAssertions.
+- **2026-05-05 (AcessoGlobal):** Implementação de repositórios especializados (`Cliente`, `Fornecedor`, etc.) e serviços de validação de endereços.
+- **2026-05-05 (AcessoGlobal):** Implementação do `EntidadeService` com lógica de geração de sequencial (via `IGeradorSequencial`) e validação de unicidade de CPF/CNPJ.
+- **2026-05-05 (AcessoGlobal):** Finalização das especializações de papéis (Cliente, Fornecedor, Funcionario, Transportadora) com seus respectivos mappings Fluent API e enums originais.
+- **2026-05-05 (AcessoGlobal):** Migração do `Cliente` (tabela `GloCliente`) com suporte a enums específicos (`SituacaoClienteSPC`, `TipoImovel`) e relacionamento 1:1 com `Entidade`.
+- **2026-05-05 (AcessoGlobal):** Implementação da `Entidade` base preservando o padrão de papéis (roles) via booleano do legado para garantir compatibilidade com a tabela `GloEntidade`.
+- **2026-05-05 (AcessoGlobal):** Adição explícita dos pacotes `Microsoft.EntityFrameworkCore` e `Microsoft.EntityFrameworkCore.Relational` ao projeto `Versatus.AcessoGlobal` para suportar mapeamentos Fluent API independentes.
 - **2026-04-28 (Global):** Padronização total de nomenclatura para **Inglês** em todas as pastas físicas e namespaces (`Repositories`, `Context`, `Exceptions`). O `Versatus.Framework` foi totalmente refatorado.
-- **2026-04-28 (Infra):** O `Versatus.Infra.Data` agora é considerado **Shared Infrastructure** para classes globais como o `GeradorSequencial`. Módulos de negócio devem ter sua própria estrutura de `Infrastructure` interna.
 
 ### Próxima Ação Pendente:
-- Iniciar **Tarefa 4.4 do MOD-02** (Configurar DbContext - Classificação).
+- Iniciar **Tarefa 6.2 do MOD-02** (Implementar Fornecedor).
