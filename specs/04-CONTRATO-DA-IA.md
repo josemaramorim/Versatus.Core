@@ -76,9 +76,10 @@ Este log serve para que a próxima instância da IA saiba exatamente onde o trab
 | Módulo Atual | Fase / Status | Task Atual | Branch Ativa | Observação Crítica |
 | :--- | :--- | :--- | :--- | :--- |
 | **MOD-01** | ✅ Concluído | 9.2 (Final) | `develop` | Framework Base e Infra base finalizados. |
-| **MOD-02** | ✅ Concluído | 8.2 (Final) | `setup/acesso-global-project` | Domínio, Infra e Testes do AcessoGlobal finalizados e validados. |
+| **MOD-02** | ✅ Concluído | 8.2 (Final) | `develop` | Domínio, Infra e Testes do AcessoGlobal integrados em develop. |
 
 ### Histórico Recente de Decisões:
+- **2026-05-05 (Git):** Merge da branch `setup/acesso-global-project` para `develop` após aprovação do usuário.
 - **2026-05-05 (AcessoGlobal):** Implementação de testes de integração com SQLite In-Memory para validar mapeamentos Fluent API e relacionamentos 1:1.
 - **2026-05-05 (AcessoGlobal):** Criação do projeto de testes `Versatus.AcessoGlobal.Tests` utilizando xUnit, Moq e FluentAssertions.
 - **2026-05-05 (AcessoGlobal):** Implementação de repositórios especializados (`Cliente`, `Fornecedor`, etc.) e serviços de validação de endereços.
