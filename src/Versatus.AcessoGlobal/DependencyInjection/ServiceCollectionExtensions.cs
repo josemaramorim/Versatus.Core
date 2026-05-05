@@ -1,0 +1,25 @@
+using Microsoft.Extensions.DependencyInjection;
+using Versatus.AcessoGlobal.Domain.Repositories;
+using Versatus.AcessoGlobal.Domain.Services;
+using Versatus.AcessoGlobal.Infrastructure.Repositories;
+
+namespace Versatus.AcessoGlobal.DependencyInjection;
+
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddAcessoGlobal(this IServiceCollection services)
+    {
+        // Repositories
+        services.AddScoped<IEntidadeRepository, EntidadeRepository>();
+        services.AddScoped<IClienteRepository, ClienteRepository>();
+        services.AddScoped<IFornecedorRepository, FornecedorRepository>();
+        services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
+        services.AddScoped<ITransportadoraRepository, TransportadoraRepository>();
+
+        // Domain Services
+        services.AddScoped<IEntidadeService, EntidadeService>();
+        services.AddScoped<IEnderecoService, EnderecoService>();
+
+        return services;
+    }
+}
