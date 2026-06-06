@@ -8,10 +8,10 @@ namespace Versatus.AcessoGlobal.Domain.Entities;
 public class DadosPessoaJuridica
 {
     public int IdEntidade { get; set; }
-    public string Cnpj { get; set; } = string.Empty;
+    public string? Cnpj { get; set; }
     public string RazaoSocial { get; set; } = string.Empty;
-    public RegimeTributarioTipo RegimeTributario { get; set; }
-    public EnquadramentoTipo Enquadramento { get; set; }
+    public RegimeTributarioTipo? RegimeTributario { get; set; }
+    public EnquadramentoTipo? Enquadramento { get; set; }
     public int? IdCnaePrincipal { get; set; }
 
     // Relacionamento reverso

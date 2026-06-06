@@ -33,9 +33,9 @@ public class Pais
     public bool Ativo { get; set; } = true;
 
     // Metadados de Auditoria (preservando estrutura do legado)
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }

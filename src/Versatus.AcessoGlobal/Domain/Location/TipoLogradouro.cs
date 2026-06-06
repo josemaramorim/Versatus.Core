@@ -14,7 +14,7 @@ public class TipoLogradouro
     /// <summary>
     /// Abreviatura do tipo de logradouro (ex: R., Av., Pç.).
     /// </summary>
-    public string Abreviacao { get; set; } = string.Empty;
+    public string? Abreviacao { get; set; }
 
     /// <summary>
     /// Nome descritivo (Descricao no legado).
@@ -27,9 +27,9 @@ public class TipoLogradouro
     public bool Ativo { get; set; } = true;
 
     // Metadados de Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }

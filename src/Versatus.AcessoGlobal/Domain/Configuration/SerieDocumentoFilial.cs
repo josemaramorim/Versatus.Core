@@ -9,12 +9,10 @@ namespace Versatus.AcessoGlobal.Domain.Configuration;
 /// </summary>
 public class SerieDocumentoFilial
 {
-    public int IdRelacao { get; set; }
-    
     /// <summary>
-    /// ID da Série de Documento (IdSequencialSerieDocto no legado).
+    /// Código da Série de Documento (IdGloSerieDocumento no legado).
     /// </summary>
-    public int IdSerie { get; set; }
+    public string CodigoSerie { get; set; } = string.Empty;
 
     /// <summary>
     /// ID da Filial.
@@ -27,9 +25,9 @@ public class SerieDocumentoFilial
     public int ProximoNumero { get; set; }
 
     // Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }
     public DateTime? HoraAlteracao { get; set; }

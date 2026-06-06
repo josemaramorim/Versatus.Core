@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
         // Domain Services
         services.AddScoped<IEntidadeService, EntidadeService>();
         services.AddScoped<IEnderecoService, EnderecoService>();
+        services.AddScoped<IAutenticacaoService, AutenticacaoService>();
 
         return services;
     }

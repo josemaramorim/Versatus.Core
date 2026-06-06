@@ -59,9 +59,9 @@ public class Classe
     public ICollection<Classe> SubClasses { get; set; } = new List<Classe>();
 
     // Metadados de Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }

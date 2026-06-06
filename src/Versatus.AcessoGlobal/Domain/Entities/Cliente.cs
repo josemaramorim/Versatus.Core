@@ -18,13 +18,13 @@ public class Cliente
     public string? CodigoAlternativo { get; set; }
     
     public bool Ativo { get; set; } = true;
-    public bool Bloqueado { get; set; }
-    public bool ItemFinanceiroPadrao { get; set; } = true;
+    public bool? Bloqueado { get; set; }
+    public bool? ItemFinanceiroPadrao { get; set; } = true;
     public bool EnviarCNDNFe { get; set; }
     
-    public double RendaMensal { get; set; }
-    public double LimiteCredito { get; set; }
-    public double ValorAluguel { get; set; }
+    public decimal? RendaMensal { get; set; }
+    public decimal? LimiteCredito { get; set; }
+    public decimal? ValorAluguel { get; set; }
     
     public DateTime? DataAdmissao { get; set; }
     public DateTime? HoraCobranca { get; set; }
@@ -38,9 +38,9 @@ public class Cliente
     public int? IdDiaSemanaCobranca { get; set; }
 
     // Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }
     public DateTime? HoraAlteracao { get; set; }

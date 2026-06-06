@@ -18,7 +18,7 @@ public class BancoMapping : IEntityTypeConfiguration<Banco>
 
         builder.Property(b => b.Codigo)
             .HasColumnName("CodigoBancoCobranca")
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(b => b.Nome)
             .HasColumnName("Descricao")

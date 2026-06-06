@@ -25,7 +25,7 @@ public class CategoriaMapping : IEntityTypeConfiguration<Categoria>
             .IsRequired();
 
         builder.Property(c => c.IdSinteticoAnalitico)
-            .HasColumnName("IdSinteticoAnalitico")
+            .HasColumnName("IdAnaliticoSintetico")
             .IsRequired();
 
         builder.Property(c => c.Ativo)

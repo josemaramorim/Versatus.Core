@@ -10,7 +10,7 @@ public class RegraTributoConfiguracao
     
     // Vigência (em vez de herdar de Vigencia, definimos direto na POCO)
     public DateTime VigenciaInicio { get; set; }
-    public DateTime VigenciaFim { get; set; }
+    public DateTime? VigenciaFim { get; set; }
 
     public DefinicaoTributaria IdDefinicaoTributaria { get; set; }
     public TipoPauta? IdTipoPauta { get; set; }

@@ -17,23 +17,17 @@ public class Parametro
     /// <summary>
     /// Descrição do parâmetro. Mapeia para Descricao no legado.
     /// </summary>
-    public string Descricao { get; set; } = string.Empty;
+    public string? Descricao { get; set; }
 
     /// <summary>
     /// Valor atual do parâmetro. Mapeia para Objeto no legado.
     /// </summary>
-    public string Valor { get; set; } = string.Empty;
+    public string? Valor { get; set; }
 
     /// <summary>
     /// Tipo de dados do valor (string, int, bool). Mapeia para IdTipoValor no legado.
     /// </summary>
-    public string Tipo { get; set; } = string.Empty;
+    public int? Tipo { get; set; }
 
-    // Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
-    public int? IdUsuarioAlteracao { get; set; }
-    public DateTime? DataAlteracao { get; set; }
-    public DateTime? HoraAlteracao { get; set; }
+
 }

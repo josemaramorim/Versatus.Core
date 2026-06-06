@@ -61,4 +61,11 @@ public class AcessoGlobalDbContext : DbContext
         // Aplica todos os mapeamentos definidos neste assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AcessoGlobalDbContext).Assembly);
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Converte propriedades booleanas para short (smallint no SQL Server legado)
+        configurationBuilder.Properties<bool>()
+            .HaveConversion<short>();
+    }
 }

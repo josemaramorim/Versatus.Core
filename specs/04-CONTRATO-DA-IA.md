@@ -110,6 +110,14 @@ O controle de versÃ£o segue o fluxo estrito:
 - Branches `feat/`, `fix/`, `docs/`: Trabalho isolado.
 - **Merge**: Use `--no-ff` para manter o histÃ³rico de branches visÃ­vel.
 
+### D. Desacoplamento Estrito de Controladores (Lei nÂº 4)
+Os controladores (Controllers) devem atuar puramente como adaptadores de entrega HTTP finos.
+- **PROIBIDO**: Acessar o `DbContext` ou qualquer `IRepository` de dentro de qualquer classe de controlador.
+- **PROIBIDO**: Instanciar ou montar agregados e entidades de domÃ­nio diretamente dentro de controladores.
+- **PROIBIDO**: Aninhar classes de DTOs ou Commands dentro de classes de controlador. DTOs de request devem ser declarados como `record`s independentes na camada de DomÃ­nio/AplicaÃ§Ã£o.
+- **OBRIGATÃ“RIO**: Depender exclusivamente de interfaces de **ServiÃ§os** (`IService`) e repassar os DTOs/records intactos para a camada de negÃ³cios.
+
+
 ---
 
 ## 3. PadrÃµes de CÃ³digo (C# 12+)

@@ -13,7 +13,7 @@ public class FormaPagamentoMapping : IEntityTypeConfiguration<FormaPagamento>
         builder.HasKey(fp => fp.IdForma);
 
         builder.Property(fp => fp.IdForma)
-            .HasColumnName("IdFormaPagamento")
+            .HasColumnName("IdGloFormaPagamento")
             .ValueGeneratedNever(); // Controlado pelo GeradorSequencial
 
         builder.Property(fp => fp.Codigo)

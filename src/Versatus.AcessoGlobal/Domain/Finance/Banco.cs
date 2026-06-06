@@ -12,7 +12,7 @@ public class Banco
     /// <summary>
     /// Código do banco para cobrança. Mapeia para CodigoBancoCobranca no legado.
     /// </summary>
-    public int Codigo { get; set; }
+    public int? Codigo { get; set; }
 
     /// <summary>
     /// Nome/Descrição do banco. Mapeia para Descricao no legado.
@@ -22,9 +22,9 @@ public class Banco
     public bool Ativo { get; set; } = true;
 
     // Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }
     public DateTime? HoraAlteracao { get; set; }

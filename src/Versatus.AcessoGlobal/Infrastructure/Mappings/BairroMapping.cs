@@ -13,11 +13,11 @@ public class BairroMapping : IEntityTypeConfiguration<Bairro>
         builder.HasKey(b => b.IdBairro);
 
         builder.Property(b => b.IdBairro)
-            .HasColumnName("IdBairro")
+            .HasColumnName("IdGloBairro")
             .ValueGeneratedNever();
 
         builder.Property(b => b.IdCidade)
-            .HasColumnName("IdCidade")
+            .HasColumnName("IdGloCidade")
             .IsRequired();
 
         builder.Property(b => b.Nome)

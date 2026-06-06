@@ -50,21 +50,21 @@ public class Cidade
     /// <summary>
     /// Latitude para geolocalização.
     /// </summary>
-    public double Latitude { get; set; }
+    public decimal? Latitude { get; set; }
 
     /// <summary>
     /// Longitude para geolocalização.
     /// </summary>
-    public double Longitude { get; set; }
+    public decimal? Longitude { get; set; }
 
     // Propriedades de Navegação
     public Estado? Estado { get; set; }
     public Pais? Pais { get; set; }
 
     // Metadados de Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }

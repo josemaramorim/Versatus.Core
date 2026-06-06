@@ -8,7 +8,7 @@ public class RegraTributoConfiguracaoMapping : IEntityTypeConfiguration<RegraTri
 {
     public void Configure(EntityTypeBuilder<RegraTributoConfiguracao> builder)
     {
-        builder.ToTable("TRBREGREATRIBUTOCONFIGURACAO");
+        builder.ToTable("TRBREGRATRIBUTOCONFIGURACAO");
 
         builder.HasKey(c => c.IdRegraTributoConfiguracao);
 
@@ -21,8 +21,7 @@ public class RegraTributoConfiguracaoMapping : IEntityTypeConfiguration<RegraTri
             .IsRequired();
 
         builder.Property(c => c.VigenciaFim)
-            .HasColumnName("VIGENCIAFIM")
-            .IsRequired();
+            .HasColumnName("VIGENCIAFIM");
 
         builder.Property(c => c.IdDefinicaoTributaria)
             .HasColumnName("IDDEFINICAOTRIBUTARIA")

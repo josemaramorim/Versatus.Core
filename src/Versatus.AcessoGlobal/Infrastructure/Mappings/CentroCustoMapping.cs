@@ -38,7 +38,7 @@ public class CentroCustoMapping : IEntityTypeConfiguration<CentroCusto>
             .IsRequired();
 
         builder.Property(c => c.IdSinteticoAnalitico)
-            .HasColumnName("IdSinteticoAnalitico")
+            .HasColumnName("IdTipo")
             .IsRequired();
 
         builder.Property(c => c.Ativo)

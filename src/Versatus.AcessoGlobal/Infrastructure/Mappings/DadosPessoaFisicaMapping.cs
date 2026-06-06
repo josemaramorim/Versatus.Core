@@ -19,7 +19,7 @@ public class DadosPessoaFisicaMapping : IEntityTypeConfiguration<DadosPessoaFisi
         builder.Property(p => p.Cpf)
             .HasColumnName("CPF")
             .HasMaxLength(11)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(p => p.Rg).HasColumnName("Rg").HasMaxLength(20);
         builder.Property(p => p.OrgaoEmissorRg).HasColumnName("OrgaoEmissorRg").HasMaxLength(20);

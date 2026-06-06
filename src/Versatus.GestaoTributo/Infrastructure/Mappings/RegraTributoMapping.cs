@@ -8,16 +8,16 @@ public class RegraTributoMapping : IEntityTypeConfiguration<RegraTributo>
 {
     public void Configure(EntityTypeBuilder<RegraTributo> builder)
     {
-        builder.ToTable("TRBREGREATRIBUTO");
+        builder.ToTable("TRBREGRATRIBUTO");
 
         builder.HasKey(r => r.IdRegraTributo);
 
         builder.Property(r => r.IdRegraTributo)
-            .HasColumnName("IDTRBREGREATRIBUTO")
+            .HasColumnName("IDTRBREGRATRIBUTO")
             .ValueGeneratedNever();
 
         builder.Property(r => r.IdRegraTributoPai)
-            .HasColumnName("IDTRBREGREATRIBUTOPAI");
+            .HasColumnName("IDTRBREGRATRIBUTOPAI");
 
         builder.Property(r => r.IdTributo)
             .HasColumnName("IDGLOTRIBUTO")

@@ -4,6 +4,7 @@ using Versatus.Framework.Context;
 using Versatus.Framework.Sequences;
 using Versatus.AcessoGlobal.Domain.Entities;
 using Versatus.AcessoGlobal.Domain.Repositories;
+using Versatus.AcessoGlobal.Domain.DTOs;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -27,6 +28,47 @@ public class EntidadeService : IEntidadeService
         _geradorSequencial = geradorSequencial;
         _contexto = contexto;
         _logger = logger;
+    }
+
+    public async Task<IEnumerable<Entidade>> ListarUltimasAsync(int limite = 50, CancellationToken cancellationToken = default)
+    {
+        return await _repository.ListarEntidadesAsync(limite);
+    }
+
+    public async Task<Entidade?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _repository.GetByIdAsync(id, cancellationToken);
+    }
+
+    public async Task<Entidade> CriarAsync(CriarEntidadeDto dto, CancellationToken cancellationToken = default)
+    {
+        var tipoEnum = dto.TipoPessoa.ToUpper() == "J" || dto.TipoPessoa.ToUpper() == "JURIDICA"
+            ? EntidadeTipoPessoa.Juridica
+            : EntidadeTipoPessoa.Fisica;
+
+        var entidade = new Entidade
+        {
+            Nome = dto.Nome,
+            TipoPessoa = tipoEnum
+        };
+
+        if (tipoEnum == EntidadeTipoPessoa.Fisica)
+        {
+            entidade.PessoaFisica = new DadosPessoaFisica
+            {
+                Cpf = dto.Cpf ?? string.Empty
+            };
+        }
+        else
+        {
+            entidade.PessoaJuridica = new DadosPessoaJuridica
+            {
+                Cnpj = dto.Cnpj ?? string.Empty,
+                RazaoSocial = dto.RazaoSocial ?? dto.Nome
+            };
+        }
+
+        return await CriarAsync(entidade, cancellationToken);
     }
 
     public async Task<Entidade> CriarAsync(Entidade entidade, CancellationToken cancellationToken = default)

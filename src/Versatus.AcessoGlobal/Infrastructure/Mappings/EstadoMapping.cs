@@ -16,9 +16,7 @@ public class EstadoMapping : IEntityTypeConfiguration<Estado>
             .HasColumnName("IdSequencialEstado")
             .ValueGeneratedNever();
 
-        builder.Property(e => e.IdPais)
-            .HasColumnName("IdGloPais") // Adicionado conforme SPEC (embora ausente no legado direto)
-            .IsRequired();
+        builder.Ignore(e => e.IdPais);
 
         builder.Property(e => e.Sigla)
             .HasColumnName("Uf")
@@ -38,11 +36,7 @@ public class EstadoMapping : IEntityTypeConfiguration<Estado>
         builder.Property(e => e.ExigeIdentificacaoTecnico).HasColumnName("ExigeIdentificacaoTecnico");
         builder.Property(e => e.ExigeRegistroSistema).HasColumnName("ExigeRegistroSistema");
 
-        // Relacionamentos
-        builder.HasOne(e => e.Pais)
-            .WithMany()
-            .HasForeignKey(e => e.IdPais)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.Ignore(e => e.Pais);
 
         // Auditoria
         builder.Property(e => e.IdUsuarioInclusao).HasColumnName("IdGloUsuarioInclusao");

@@ -49,4 +49,14 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
                       select (int?)c.IdPais)
                      .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<IEnumerable<Entidade>> ListarEntidadesAsync(int limit = 50, CancellationToken cancellationToken = default)
+    {
+        return await Context.Entidades
+            .Include(e => e.PessoaFisica)
+            .Include(e => e.PessoaJuridica)
+            .OrderByDescending(e => e.IdEntidade)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
+    }
 }

@@ -16,10 +16,6 @@ public class UsuarioMapping : IEntityTypeConfiguration<Usuario>
             .HasColumnName("IdGloUsuario")
             .ValueGeneratedNever(); // Controlado pelo GeradorSequencial
 
-        builder.Property(u => u.IdFuncionario)
-            .HasColumnName("IdGloFuncionario")
-            .IsRequired(false);
-
         builder.Property(u => u.Login)
             .HasColumnName("NomeAcesso")
             .HasMaxLength(50)
@@ -32,20 +28,11 @@ public class UsuarioMapping : IEntityTypeConfiguration<Usuario>
 
         builder.Property(u => u.PasswordHash)
             .HasColumnName("Senha")
-            .HasMaxLength(255)
-            .IsRequired();
-
-        builder.Property(u => u.IdPerfil)
-            .HasColumnName("IdGloPerfil")
             .IsRequired();
 
         builder.Property(u => u.Ativo)
             .HasColumnName("Ativo")
             .IsRequired();
-
-        builder.Property(u => u.UltimoLogon)
-            .HasColumnName("DataUltimoLogon")
-            .IsRequired(false);
 
         // Auditoria
         builder.Property(u => u.IdUsuarioInclusao).HasColumnName("IdGloUsuarioInclusao");
@@ -55,10 +42,23 @@ public class UsuarioMapping : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.DataAlteracao).HasColumnName("DataAlteracao");
         builder.Property(u => u.HoraAlteracao).HasColumnName("HoraAlteracao");
 
-        // Relacionamentos
-        builder.HasOne(u => u.Perfil)
+        // Relacionamentos Many-to-Many via GloPerfilUsuario
+        builder.HasMany(u => u.Perfis)
             .WithMany()
-            .HasForeignKey(u => u.IdPerfil)
-            .OnDelete(DeleteBehavior.Restrict);
+            .UsingEntity<Dictionary<string, object>>(
+                "GloPerfilUsuario",
+                j => j.HasOne<Perfil>()
+                      .WithMany()
+                      .HasForeignKey("IdGloPerfil")
+                      .OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Usuario>()
+                      .WithMany()
+                      .HasForeignKey("IdGloUsuario")
+                      .OnDelete(DeleteBehavior.Cascade),
+                j =>
+                {
+                    j.ToTable("GloPerfilUsuario");
+                    j.HasKey("IdGloPerfil", "IdGloUsuario");
+                });
     }
 }

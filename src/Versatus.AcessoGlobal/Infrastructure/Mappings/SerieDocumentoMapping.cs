@@ -31,9 +31,7 @@ public class SerieDocumentoMapping : IEntityTypeConfiguration<SerieDocumento>
             .HasMaxLength(10)
             .IsRequired();
 
-        builder.Property(s => s.ProximoNumero)
-            .HasColumnName("ProximoNumero") // Se for gerado como campo customizado ou temporário
-            .IsRequired();
+        builder.Ignore(s => s.ProximoNumero);
 
         builder.Property(s => s.Ativa)
             .HasColumnName("Ativo")

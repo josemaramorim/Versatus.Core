@@ -97,12 +97,12 @@ public class MappingIntegrationTests : IDisposable
             IdUsuario = 5,
             Login = "admin",
             Nome = "Admin Teste",
-            PasswordHash = "hashedpassword",
-            IdPerfil = 10,
+            PasswordHash = System.Text.Encoding.UTF8.GetBytes("hashedpassword"),
             Ativo = true,
             DataInclusao = DateTime.Today,
             HoraInclusao = DateTime.Today
         };
+        usuario.Perfis.Add(perfil);
 
         // Act
         _context.Perfis.Add(perfil);
@@ -113,13 +113,13 @@ public class MappingIntegrationTests : IDisposable
 
         // Assert
         var usuarioRecuperado = await _context.Usuarios
-            .Include(u => u.Perfil)
+            .Include(u => u.Perfis)
             .FirstOrDefaultAsync(u => u.IdUsuario == 5);
 
         usuarioRecuperado.Should().NotBeNull();
         usuarioRecuperado!.Login.Should().Be("admin");
-        usuarioRecuperado.Perfil.Should().NotBeNull();
-        usuarioRecuperado.Perfil!.Descricao.Should().Be("Administrador do Sistema");
+        usuarioRecuperado.Perfis.Should().NotBeEmpty();
+        usuarioRecuperado.Perfis.First().Descricao.Should().Be("Administrador do Sistema");
     }
 
     [Fact]
@@ -189,9 +189,7 @@ public class MappingIntegrationTests : IDisposable
             Chave = "CAMINHO_XML",
             Descricao = "Caminho para salvar os XMLs",
             Valor = @"C:\XML",
-            Tipo = "string",
-            DataInclusao = DateTime.Today,
-            HoraInclusao = DateTime.Today
+            Tipo = 156
         };
 
         // Act
@@ -208,7 +206,6 @@ public class MappingIntegrationTests : IDisposable
         serieRecuperada.Should().NotBeNull();
         serieRecuperada!.Nome.Should().Be("Série Principal");
         serieRecuperada.Codigo.Should().Be("01");
-        serieRecuperada.ProximoNumero.Should().Be(1000);
 
         paramRecuperado.Should().NotBeNull();
         paramRecuperado!.Chave.Should().Be("CAMINHO_XML");

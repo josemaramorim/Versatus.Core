@@ -23,8 +23,8 @@ public class ClienteMapping : IEntityTypeConfiguration<Cliente>
         builder.Property(c => c.CodigoAlternativo).HasColumnName("CodigoAlternativo").HasMaxLength(20);
 
         builder.Property(c => c.Ativo).HasColumnName("Ativo").IsRequired();
-        builder.Property(c => c.Bloqueado).HasColumnName("Bloqueado").IsRequired();
-        builder.Property(c => c.ItemFinanceiroPadrao).HasColumnName("ItemFinanceiroPadrao").IsRequired();
+        builder.Property(c => c.Bloqueado).HasColumnName("Bloqueado").IsRequired(false);
+        builder.Property(c => c.ItemFinanceiroPadrao).HasColumnName("ItemFinanceiroPadrao").IsRequired(false);
         builder.Property(c => c.EnviarCNDNFe).HasColumnName("EnviarCNDNFe").IsRequired();
 
         builder.Property(c => c.RendaMensal).HasColumnName("RendaMensal");

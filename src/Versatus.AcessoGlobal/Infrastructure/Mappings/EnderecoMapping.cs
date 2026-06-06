@@ -16,12 +16,12 @@ public class EnderecoMapping : IEntityTypeConfiguration<Endereco>
             .HasColumnName("IdGloEndereco")
             .ValueGeneratedNever();
 
-        builder.Property(e => e.IdCidade).HasColumnName("IdGloCidade").IsRequired();
-        builder.Property(e => e.IdBairroInicial).HasColumnName("IdGloBairroInicial").IsRequired();
+        builder.Property(e => e.IdCidade).HasColumnName("IdGloCidade");
+        builder.Property(e => e.IdBairroInicial).HasColumnName("IdGloBairroInicial");
         builder.Property(e => e.IdBairroFinal).HasColumnName("IdGloBairroFinal");
-        builder.Property(e => e.IdTipoLogradouro).HasColumnName("IdGloTipoLogradouro").IsRequired();
+        builder.Property(e => e.IdTipoLogradouro).HasColumnName("IdGloTipoLogradouro");
 
-        builder.Property(e => e.Logradouro).HasColumnName("Logradouro").HasMaxLength(150).IsRequired();
+        builder.Property(e => e.Logradouro).HasColumnName("Logradouro").HasMaxLength(150);
         builder.Property(e => e.CEP).HasColumnName("Cep").HasMaxLength(8);
         builder.Property(e => e.Complemento).HasColumnName("Complemento").HasMaxLength(150);
         builder.Property(e => e.Latitude).HasColumnName("LATITUDE");

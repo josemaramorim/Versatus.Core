@@ -32,23 +32,23 @@ public class Empresa
     public bool Ativo { get; set; } = true;
 
     // Mascaras de Codificação (ERP)
-    public string MascaraClasse { get; set; } = string.Empty;
-    public string MascaraCentroCusto { get; set; } = string.Empty;
-    public string MascaraProjeto { get; set; } = string.Empty;
-    public string MascaraPlanoContabil { get; set; } = string.Empty;
+    public string? MascaraClasse { get; set; }
+    public string? MascaraCentroCusto { get; set; }
+    public string? MascaraProjeto { get; set; }
+    public string? MascaraPlanoContabil { get; set; }
 
     // Mensagens Padrão
-    public string MsgInicial { get; set; } = string.Empty;
-    public string MsgFinal { get; set; } = string.Empty;
+    public string? MsgInicial { get; set; }
+    public string? MsgFinal { get; set; }
 
     // Relacionamentos
     public Grupo? Grupo { get; set; }
     public ICollection<Filial> Filiais { get; set; } = new List<Filial>();
 
     // Metadados de Auditoria
-    public int IdUsuarioInclusao { get; set; }
-    public DateTime DataInclusao { get; set; }
-    public DateTime HoraInclusao { get; set; }
+    public int? IdUsuarioInclusao { get; set; }
+    public DateTime? DataInclusao { get; set; }
+    public DateTime? HoraInclusao { get; set; }
     
     public int? IdUsuarioAlteracao { get; set; }
     public DateTime? DataAlteracao { get; set; }

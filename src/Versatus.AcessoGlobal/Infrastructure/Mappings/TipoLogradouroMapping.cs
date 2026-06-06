@@ -13,13 +13,13 @@ public class TipoLogradouroMapping : IEntityTypeConfiguration<TipoLogradouro>
         builder.HasKey(t => t.IdTipoLogradouro);
 
         builder.Property(t => t.IdTipoLogradouro)
-            .HasColumnName("IdTipoLogradouro")
+            .HasColumnName("IdGloTipoLogradouro")
             .ValueGeneratedNever();
 
         builder.Property(t => t.Abreviacao)
             .HasColumnName("Abreviacao")
             .HasMaxLength(10)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(t => t.Nome)
             .HasColumnName("Descricao")

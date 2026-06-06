@@ -27,4 +27,9 @@ public interface IEntidadeRepository : IRepositorio<Entidade>
     /// Busca o ID do País associado ao endereço comercial/residencial da filial.
     /// </summary>
     Task<int?> GetPaisIdPorFilialAsync(int idFilial, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lista as últimas entidades cadastradas.
+    /// </summary>
+    Task<IEnumerable<Entidade>> ListarEntidadesAsync(int limit = 50, CancellationToken cancellationToken = default);
 }

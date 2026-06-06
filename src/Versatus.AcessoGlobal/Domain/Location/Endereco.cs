@@ -14,12 +14,12 @@ public class Endereco
     /// <summary>
     /// Chave estrangeira para a Cidade.
     /// </summary>
-    public int IdCidade { get; set; }
+    public int? IdCidade { get; set; }
 
     /// <summary>
     /// Chave estrangeira para o Bairro Inicial.
     /// </summary>
-    public int IdBairroInicial { get; set; }
+    public int? IdBairroInicial { get; set; }
 
     /// <summary>
     /// Chave estrangeira para o Bairro Final (opcional, para logradouros que cruzam bairros).
@@ -29,12 +29,12 @@ public class Endereco
     /// <summary>
     /// Chave estrangeira para o Tipo de Logradouro (Rua, Av, etc).
     /// </summary>
-    public int IdTipoLogradouro { get; set; }
+    public int? IdTipoLogradouro { get; set; }
 
     /// <summary>
     /// Nome do logradouro (ex: Paulista, Sete de Setembro).
     /// </summary>
-    public string Logradouro { get; set; } = string.Empty;
+    public string? Logradouro { get; set; }
 
     /// <summary>
     /// CEP do logradouro.
@@ -49,12 +49,12 @@ public class Endereco
     /// <summary>
     /// Latitude para geolocalização.
     /// </summary>
-    public double Latitude { get; set; }
+    public decimal? Latitude { get; set; }
 
     /// <summary>
     /// Longitude para geolocalização.
     /// </summary>
-    public double Longitude { get; set; }
+    public decimal? Longitude { get; set; }
 
     // Propriedades de Navegação
     public Cidade? Cidade { get; set; }

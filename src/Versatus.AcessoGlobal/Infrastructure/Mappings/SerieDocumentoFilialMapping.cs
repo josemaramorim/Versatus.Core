@@ -10,23 +10,18 @@ public class SerieDocumentoFilialMapping : IEntityTypeConfiguration<SerieDocumen
     {
         builder.ToTable("GloSerieDocumentoFilial");
 
-        builder.HasKey(sf => sf.IdRelacao);
+        builder.HasKey(sf => new { sf.CodigoSerie, sf.IdFilial });
 
-        builder.Property(sf => sf.IdRelacao)
-            .HasColumnName("IdGloSerieDocumentoFilial") // surrogate PK para o novo sistema
-            .ValueGeneratedOnAdd(); // auto-incremento para facilidade do relacionamento
-
-        builder.Property(sf => sf.IdSerie)
-            .HasColumnName("IdSequencialSerieDocto")
+        builder.Property(sf => sf.CodigoSerie)
+            .HasColumnName("IdGloSerieDocumento")
+            .HasMaxLength(20)
             .IsRequired();
 
         builder.Property(sf => sf.IdFilial)
             .HasColumnName("IdGloFilial")
             .IsRequired();
 
-        builder.Property(sf => sf.ProximoNumero)
-            .HasColumnName("ProximoNumero") // Se for gerado como campo customizado ou temporário
-            .IsRequired();
+        builder.Ignore(sf => sf.ProximoNumero);
 
         // Auditoria
         builder.Property(sf => sf.IdUsuarioInclusao).HasColumnName("IdGloUsuarioInclusao");
@@ -39,7 +34,8 @@ public class SerieDocumentoFilialMapping : IEntityTypeConfiguration<SerieDocumen
         // Relacionamentos
         builder.HasOne(sf => sf.SerieDocumento)
             .WithMany()
-            .HasForeignKey(sf => sf.IdSerie)
+            .HasForeignKey(sf => sf.CodigoSerie)
+            .HasPrincipalKey(s => s.Codigo)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(sf => sf.Filial)

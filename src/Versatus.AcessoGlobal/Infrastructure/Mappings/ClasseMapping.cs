@@ -38,11 +38,11 @@ public class ClasseMapping : IEntityTypeConfiguration<Classe>
             .IsRequired();
 
         builder.Property(c => c.IdTipoNatureza)
-            .HasColumnName("IdTipoNatureza")
+            .HasColumnName("IdNatureza")
             .IsRequired();
 
         builder.Property(c => c.IdSinteticoAnalitico)
-            .HasColumnName("IdSinteticoAnalitico")
+            .HasColumnName("IdTipo")
             .IsRequired();
 
         builder.Property(c => c.Ativo)

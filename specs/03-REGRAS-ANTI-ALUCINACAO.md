@@ -195,6 +195,13 @@ Toda regra de validação legada (especialmente aquelas que dependem de parâmet
 - **PROIBIDO**: Bypassar validações de formato ou unicidade sem implementar o comportamento condicional herdado (como o bypass de validação para estrangeiros/outros países).
 - **MANDATÓRIO**: Lógica de cálculo ou validação de regras fiscais deve ser implementada com rigor matemático de dígitos verificadores e limites de caracteres, pois falhas nessas validações causam cálculos fiscais incorretos e anomalias de faturamento.
 
+### REGRA 17 — Desacoplamento Estrito de Controladores (Clean Architecture)
+Os controladores (Controllers) devem atuar puramente como adaptadores de entrega HTTP finos e limpos.
+- **PROIBIDO**: Injetar ou acessar o `DbContext` ou qualquer `IRepository` de dentro de qualquer classe de controlador.
+- **PROIBIDO**: Instanciar ou montar agregados e entidades de domínio diretamente dentro de controladores.
+- **PROIBIDO**: Aninhar classes de DTOs ou Commands dentro de classes de controlador. DTOs de request devem ser declarados como `record`s independentes na camada de Domínio/Aplicação.
+- **OBRIGATÓRIO**: Depender exclusivamente de interfaces de **Serviços** (`IService`) e repassar os DTOs/records intactos para a camada de negócios.
+
 ---
 
 ## 3. Checklist de Revisão de Código Gerado por IA

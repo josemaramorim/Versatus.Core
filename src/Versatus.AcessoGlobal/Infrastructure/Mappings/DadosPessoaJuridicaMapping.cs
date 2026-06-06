@@ -19,7 +19,7 @@ public class DadosPessoaJuridicaMapping : IEntityTypeConfiguration<DadosPessoaJu
         builder.Property(p => p.Cnpj)
             .HasColumnName("CNPJ")
             .HasMaxLength(14)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(p => p.RazaoSocial)
             .HasColumnName("RazaoSocial")

@@ -11,7 +11,7 @@ public class UsuarioRepository : AcessoGlobalRepositorioBase<Usuario>, IUsuarioR
     public async Task<Usuario?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
     {
         return await Context.Usuarios
-            .Include(u => u.Perfil)
+            .Include(u => u.Perfis)
             .FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
     }
 }
