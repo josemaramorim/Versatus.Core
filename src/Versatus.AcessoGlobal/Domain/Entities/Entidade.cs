@@ -44,6 +44,7 @@ public class Entidade
     public EntidadeTipoPessoa TipoPessoa { get; set; }
     public IndicadorContribuinteICMS ContribuinteICMS { get; set; }
     public StatusCnpjCpf StatusCnpjCpf { get; set; }
+    public int IdTipoPlataforma { get; set; } = 1309;
 
     // Relacionamentos 1:1 (Complementares)
     public DadosPessoaFisica? PessoaFisica { get; set; }

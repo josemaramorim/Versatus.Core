@@ -52,8 +52,9 @@ public class EntidadeMapping : IEntityTypeConfiguration<Entidade>
         builder.Property(e => e.IsIntermediadorComercial).HasColumnName("IntermediadorComercial").IsRequired();
 
         builder.Property(e => e.TipoPessoa).HasColumnName("IdFisicaJuridica").IsRequired();
-        builder.Property(e => e.ContribuinteICMS).HasColumnName("IdContribuinteICMS").IsRequired();
+        builder.Property(e => e.ContribuinteICMS).HasColumnName("IDINDICADORCONTRIBUINTEICMS").IsRequired();
         builder.Property(e => e.StatusCnpjCpf).HasColumnName("IdStatusCnpjCpf").IsRequired();
+        builder.Property(e => e.IdTipoPlataforma).HasColumnName("IDTIPOPLATAFORMA").IsRequired();
 
         // Auditoria
         builder.Property(e => e.IdUsuarioInclusao).HasColumnName("IdGloUsuarioInclusao");

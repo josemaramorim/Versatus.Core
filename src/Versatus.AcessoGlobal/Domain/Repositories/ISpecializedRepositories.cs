@@ -22,3 +22,9 @@ public interface ITransportadoraRepository : IRepositorio<Transportadora>
 {
     Task<Transportadora?> GetByRntrcAsync(string rntrc, CancellationToken cancellationToken = default);
 }
+
+public interface IParametroRepository : IRepositorio<Versatus.AcessoGlobal.Domain.Configuration.Parametro>
+{
+    Task<Versatus.AcessoGlobal.Domain.Configuration.Parametro?> GetByChaveAsync(string chave, CancellationToken cancellationToken = default);
+    Task<string?> GetParametroValorAsync(string chave, CancellationToken cancellationToken = default);
+}

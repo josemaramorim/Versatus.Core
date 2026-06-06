@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Versatus.Framework.Context;
 using Versatus.Framework.Sequences;
 using Versatus.AcessoGlobal.Domain.Entities;
+using Versatus.AcessoGlobal.Domain.Location;
 using Versatus.AcessoGlobal.Domain.Repositories;
 using Versatus.AcessoGlobal.Domain.Services;
 using Xunit;
@@ -13,6 +14,7 @@ namespace Versatus.AcessoGlobal.Tests;
 public class EntidadeServiceTests
 {
     private readonly Mock<IEntidadeRepository> _repositoryMock;
+    private readonly Mock<IParametroRepository> _parametroRepositoryMock;
     private readonly Mock<IGeradorSequencial> _geradorMock;
     private readonly Mock<IContextoExecucao> _contextoMock;
     private readonly Mock<ILogger<EntidadeService>> _loggerMock;
@@ -21,12 +23,18 @@ public class EntidadeServiceTests
     public EntidadeServiceTests()
     {
         _repositoryMock = new Mock<IEntidadeRepository>();
+        _parametroRepositoryMock = new Mock<IParametroRepository>();
         _geradorMock = new Mock<IGeradorSequencial>();
         _contextoMock = new Mock<IContextoExecucao>();
         _loggerMock = new Mock<ILogger<EntidadeService>>();
         
+        // Permitir CPFs/CNPJs matematicamente inválidos por padrão nos testes legados
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("ACEITACNPJCPFINVALIDO", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("true");
+
         _service = new EntidadeService(
             _repositoryMock.Object,
+            _parametroRepositoryMock.Object,
             _geradorMock.Object,
             _contextoMock.Object,
             _loggerMock.Object);
@@ -94,5 +102,238 @@ public class EntidadeServiceTests
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage($"Já existe uma entidade cadastrada com o CNPJ {cnpj}.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_NaoDeveLancarExcecao_QuandoCpfJaExiste_E_TipoValidacaoForNaoValidar()
+    {
+        // Arrange
+        var cpf = "12345678901";
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste", 
+            PessoaFisica = new DadosPessoaFisica { Cpf = cpf } 
+        };
+        
+        _repositoryMock.Setup(r => r.GetByCpfAsync(cpf, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Entidade { IdEntidade = 999 });
+        
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("TipoBloqueioCpfCnpjDuplicado", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("NaoValidar");
+
+        // Act
+        var resultado = await _service.CriarAsync(entidade);
+
+        // Assert
+        resultado.Should().NotBeNull();
+        _repositoryMock.Verify(r => r.GetByCpfAsync(cpf, It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CriarAsync_NaoDeveLancarExcecao_QuandoCpfJaExiste_E_TipoValidacaoForAvisar()
+    {
+        // Arrange
+        var cpf = "12345678901";
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste", 
+            PessoaFisica = new DadosPessoaFisica { Cpf = cpf } 
+        };
+        
+        _repositoryMock.Setup(r => r.GetByCpfAsync(cpf, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Entidade { IdEntidade = 999 });
+        
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("TipoBloqueioCpfCnpjDuplicado", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("Avisar");
+
+        // Act
+        var resultado = await _service.CriarAsync(entidade);
+
+        // Assert
+        resultado.Should().NotBeNull();
+        _repositoryMock.Verify(r => r.GetByCpfAsync(cpf, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoCpfJaExiste_E_TipoValidacaoForBloquearSalvar()
+    {
+        // Arrange
+        var cpf = "12345678901";
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste", 
+            PessoaFisica = new DadosPessoaFisica { Cpf = cpf } 
+        };
+        
+        _repositoryMock.Setup(r => r.GetByCpfAsync(cpf, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Entidade { IdEntidade = 999 });
+        
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("TipoBloqueioCpfCnpjDuplicado", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("BloquearSalvar");
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage($"Já existe uma entidade cadastrada com o CPF {cpf}.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoRazaoSocialForCurta()
+    {
+        // Arrange
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste Juridico", 
+            TipoPessoa = EntidadeTipoPessoa.Juridica,
+            PessoaJuridica = new DadosPessoaJuridica { RazaoSocial = "AB" } // Curta (< 3)
+        };
+        _geradorMock.Setup(g => g.ProximoAsync("Entidade", SequencialTipo.Geral, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contextoMock.Setup(c => c.IdUsuario).Returns(1);
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("A razão social deve ter no mínimo 3 caracteres válidos.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoCpfForInvalido_E_ParametroAceitaInvalidoForFalse()
+    {
+        // Arrange
+        var cpfInvalido = "11111111111"; // Matemáticos inválidos (dígitos iguais)
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste Fisica", 
+            TipoPessoa = EntidadeTipoPessoa.Fisica,
+            PessoaFisica = new DadosPessoaFisica { Cpf = cpfInvalido } 
+        };
+        _geradorMock.Setup(g => g.ProximoAsync("Entidade", SequencialTipo.Geral, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contextoMock.Setup(c => c.IdUsuario).Returns(1);
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("ACEITACNPJCPFINVALIDO", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("false");
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("CPF inválido.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_NaoDeveLancarExcecao_QuandoCpfForInvalido_E_ParametroAceitaInvalidoForTrue()
+    {
+        // Arrange
+        var cpfInvalido = "11111111111"; 
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste Fisica", 
+            TipoPessoa = EntidadeTipoPessoa.Fisica,
+            PessoaFisica = new DadosPessoaFisica { Cpf = cpfInvalido } 
+        };
+        _geradorMock.Setup(g => g.ProximoAsync("Entidade", SequencialTipo.Geral, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contextoMock.Setup(c => c.IdUsuario).Returns(1);
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("ACEITACNPJCPFINVALIDO", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("true");
+
+        // Act
+        var resultado = await _service.CriarAsync(entidade);
+
+        // Assert
+        resultado.Should().NotBeNull();
+        _repositoryMock.Verify(r => r.AddAsync(entidade, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoCpfNaoForInformado_E_ParametroObrigatorioForBloquearSalvar()
+    {
+        // Arrange
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste Fisica", 
+            TipoPessoa = EntidadeTipoPessoa.Fisica,
+            PessoaFisica = new DadosPessoaFisica { Cpf = "" } 
+        };
+        _contextoMock.Setup(c => c.IdUsuario).Returns(1);
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("CPFCNPJOBRIGATORIO", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("BloquearSalvar");
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Deve ser informado o CPF.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_NaoDeveLancarExcecao_QuandoCpfNaoForInformado_E_ParametroObrigatorioForNaoValidar()
+    {
+        // Arrange
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste Fisica", 
+            TipoPessoa = EntidadeTipoPessoa.Fisica,
+            PessoaFisica = new DadosPessoaFisica { Cpf = "" } 
+        };
+        _geradorMock.Setup(g => g.ProximoAsync("Entidade", SequencialTipo.Geral, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contextoMock.Setup(c => c.IdUsuario).Returns(1);
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("CPFCNPJOBRIGATORIO", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("NaoValidar");
+
+        // Act
+        var resultado = await _service.CriarAsync(entidade);
+
+        // Assert
+        resultado.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task CriarAsync_NaoDeveValidarCpfCnpj_QuandoEntidadeForEstrangeira()
+    {
+        // Arrange
+        var cpfInvalido = "11111111111"; // Matemáticos inválidos
+        var entidade = new Entidade 
+        { 
+            Nome = "Teste Estrangeiro", 
+            TipoPessoa = EntidadeTipoPessoa.Fisica,
+            PessoaFisica = new DadosPessoaFisica { Cpf = cpfInvalido } 
+        };
+        // Adiciona um endereço de outro país (ex: Cidade do país ID 999)
+        var cidadeEstrangeira = new Cidade { IdCidade = 50, IdPais = 999 };
+        var endereco = new EntidadeEndereco 
+        { 
+            TipoEndereco = EnderecoTipo.ComercialResidencial,
+            IdCidade = 50,
+            Cidade = cidadeEstrangeira
+        };
+        entidade.AdicionarEndereco(endereco);
+
+        _geradorMock.Setup(g => g.ProximoAsync("Entidade", SequencialTipo.Geral, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(123);
+        _contextoMock.Setup(c => c.IdUsuario).Returns(1);
+        _contextoMock.Setup(c => c.IdFilial).Returns(1);
+        
+        // Filial é do Brasil (país 1058), Entidade é de outro país (999)
+        _repositoryMock.Setup(r => r.GetPaisIdPorFilialAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1058);
+
+        _parametroRepositoryMock.Setup(p => p.GetParametroValorAsync("ACEITACNPJCPFINVALIDO", It.IsAny<CancellationToken>()))
+            .ReturnsAsync("false"); // Se fosse nacional, deveria lançar exceção de CPF inválido
+
+        // Act
+        var resultado = await _service.CriarAsync(entidade);
+
+        // Assert
+        resultado.Should().NotBeNull();
+        _repositoryMock.Verify(r => r.AddAsync(entidade, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

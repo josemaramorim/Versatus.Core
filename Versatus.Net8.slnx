@@ -1,8 +1,15 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Versatus.Framework/Versatus.Framework.csproj" />
+    <Project Path="src/Versatus.GestaoTributo/Versatus.GestaoTributo.csproj" />
     <Project Path="src/Versatus.Infra.Data/Versatus.Infra.Data.csproj" />
     <Project Path="src/Versatus.NFe/Versatus.NFe.csproj" />
     <Project Path="src/Versatus.AcessoGlobal/Versatus.AcessoGlobal.csproj" />
+  </Folder>
+  <Folder Name="/src/Versatus.AcessoGlobal.Demo/">
+    <Project Path="src/Versatus.AcessoGlobal.Demo/Versatus.AcessoGlobal.Demo/Versatus.AcessoGlobal.Demo.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Versatus.GestaoTributo.Tests/Versatus.GestaoTributo.Tests.csproj" />
   </Folder>
 </Solution>

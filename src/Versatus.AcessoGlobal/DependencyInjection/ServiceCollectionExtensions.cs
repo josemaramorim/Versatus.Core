@@ -15,6 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFornecedorRepository, FornecedorRepository>();
         services.AddScoped<IFuncionarioRepository, FuncionarioRepository>();
         services.AddScoped<ITransportadoraRepository, TransportadoraRepository>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+        services.AddScoped<IParametroRepository, ParametroRepository>();
 
         // Domain Services
         services.AddScoped<IEntidadeService, EntidadeService>();

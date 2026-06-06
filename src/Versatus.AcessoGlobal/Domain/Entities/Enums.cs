@@ -77,8 +77,24 @@ public enum TipoProprietario
 
 public enum TipoTransportador
 {
-    ETC = 1556,
-    TAC = 1557,
-    CTC = 1558,
     Nenhum = 1655
 }
+
+public enum FormaPagtoTipo
+{
+    Dinheiro = 122,
+    ChequeEmpresa = 123,
+    ChequeCliente = 124,
+    CartaoCredito = 125,
+    CartaoDebito = 126,
+    ParcelamentoProprio = 127,
+    ParcelamentoFinanceira = 128,
+    Credito = 236,
+    CreditoPortador = 237,
+    Deposito = 256,
+    Outros = 293,
+    Abatimento = 483,
+    PixEstatico = 1962,
+    PixDinamico = 1963
+}
+

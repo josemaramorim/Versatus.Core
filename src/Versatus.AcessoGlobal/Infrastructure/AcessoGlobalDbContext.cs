@@ -3,6 +3,9 @@ using Versatus.AcessoGlobal.Domain.Location;
 using Versatus.AcessoGlobal.Domain.Organization;
 using Versatus.AcessoGlobal.Domain.Classification;
 using Versatus.AcessoGlobal.Domain.Entities;
+using Versatus.AcessoGlobal.Domain.Security;
+using Versatus.AcessoGlobal.Domain.Finance;
+using Versatus.AcessoGlobal.Domain.Configuration;
 
 namespace Versatus.AcessoGlobal.Infrastructure;
 
@@ -39,6 +42,17 @@ public class AcessoGlobalDbContext : DbContext
     public DbSet<Fornecedor> Fornecedores => Set<Fornecedor>();
     public DbSet<Funcionario> Funcionarios => Set<Funcionario>();
     public DbSet<Transportadora> Transportadoras => Set<Transportadora>();
+
+    public DbSet<Perfil> Perfis => Set<Perfil>();
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
+
+    public DbSet<Banco> Bancos => Set<Banco>();
+    public DbSet<FormaPagamento> FormasPagamento => Set<FormaPagamento>();
+
+    public DbSet<SerieDocumento> SeriesDocumento => Set<SerieDocumento>();
+    public DbSet<SerieDocumentoFilial> SeriesDocumentoFilial => Set<SerieDocumentoFilial>();
+    public DbSet<Parametro> Parametros => Set<Parametro>();
+    public DbSet<ParametroValor> ParametroValores => Set<ParametroValor>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

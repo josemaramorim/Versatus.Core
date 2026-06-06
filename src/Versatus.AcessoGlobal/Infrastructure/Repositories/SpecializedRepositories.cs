@@ -51,3 +51,22 @@ public class TransportadoraRepository : AcessoGlobalRepositorioBase<Transportado
             .FirstOrDefaultAsync(t => t.Rntrc == rntrc, cancellationToken);
     }
 }
+
+public class ParametroRepository : AcessoGlobalRepositorioBase<Versatus.AcessoGlobal.Domain.Configuration.Parametro>, IParametroRepository
+{
+    public ParametroRepository(AcessoGlobalDbContext context) : base(context) { }
+
+    public async Task<Versatus.AcessoGlobal.Domain.Configuration.Parametro?> GetByChaveAsync(string chave, CancellationToken cancellationToken = default)
+    {
+        return await Context.Parametros
+            .FirstOrDefaultAsync(p => p.Chave == chave, cancellationToken);
+    }
+
+    public async Task<string?> GetParametroValorAsync(string chave, CancellationToken cancellationToken = default)
+    {
+        return await (from pv in Context.ParametroValores
+                      join p in Context.Parametros on pv.IdParametro equals p.IdParam
+                      where p.Chave == chave
+                      select pv.Valor).FirstOrDefaultAsync(cancellationToken);
+    }
+}

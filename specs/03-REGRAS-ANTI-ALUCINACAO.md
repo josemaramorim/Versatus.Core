@@ -189,6 +189,12 @@ A IA deve seguir rigorosamente o fluxo de trabalho atômico:
 4.  **Handoff e Sincronização:** Atualize o `task.md`, `walkthrough.md` e o Log de Progresso no `04-CONTRATO-DA-IA.md` a cada tarefa concluída. Esses arquivos devem ser commitados junto com o código.
 5.  **Troca de IA:** Se houver troca de assistente, a nova IA deve ler o último Handoff e verificar a branch atual antes de qualquer ação.
 
+### REGRA 16 — Paridade Estrita de Validações e Parâmetros
+Toda regra de validação legada (especialmente aquelas que dependem de parâmetros de configuração do banco de dados, como `CpfCnpjObrigatorio`, `TipoBloqueioCpfCnpjDuplicado` ou `AceitaCnpjCpfInvalido`, ou de regras de localização/país) é considerada **crítica**.
+- **PROIBIDO**: Ignorar parâmetros de configuração de validação cadastrados na tabela `GloParametro`.
+- **PROIBIDO**: Bypassar validações de formato ou unicidade sem implementar o comportamento condicional herdado (como o bypass de validação para estrangeiros/outros países).
+- **MANDATÓRIO**: Lógica de cálculo ou validação de regras fiscais deve ser implementada com rigor matemático de dígitos verificadores e limites de caracteres, pois falhas nessas validações causam cálculos fiscais incorretos e anomalias de faturamento.
+
 ---
 
 ## 3. Checklist de Revisão de Código Gerado por IA
@@ -214,6 +220,7 @@ Antes de aceitar qualquer código gerado pela IA, verificar:
 - [ ] **`ILogger<T>` com log estruturado (sem concatenação)?**
 - [ ] **Exceções são da hierarquia `VersatusException`?**
 - [ ] **Alterações sugeridas pela IA foram implementadas APENAS após atualização da SPEC?**
+- [ ] **Validações críticas e seus parâmetros de banco associados foram respeitados (REGRA 16)?**
 - [ ] **O Log de Progresso (Handoff) na Seção 5 do Contrato da IA foi atualizado?**
 
 ---

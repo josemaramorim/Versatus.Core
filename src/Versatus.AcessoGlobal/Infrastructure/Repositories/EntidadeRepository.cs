@@ -32,4 +32,21 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
             .Include(e => e.Enderecos)
             .FirstOrDefaultAsync(e => e.IdEntidade == (int)id, cancellationToken);
     }
+
+    public async Task<int?> GetPaisIdPorCidadeAsync(int idCidade, CancellationToken cancellationToken = default)
+    {
+        return await Context.Cidades
+            .Where(c => c.IdCidade == idCidade)
+            .Select(c => (int?)c.IdPais)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<int?> GetPaisIdPorFilialAsync(int idFilial, CancellationToken cancellationToken = default)
+    {
+        return await (from ee in Context.EntidadeEnderecos
+                      join c in Context.Cidades on ee.IdCidade equals c.IdCidade
+                      where ee.IdEntidade == idFilial && ee.TipoEndereco == EnderecoTipo.ComercialResidencial
+                      select (int?)c.IdPais)
+                     .FirstOrDefaultAsync(cancellationToken);
+    }
 }
