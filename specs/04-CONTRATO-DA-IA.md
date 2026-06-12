@@ -115,10 +115,12 @@ Este log serve para que a próxima instância da IA saiba exatamente onde o trab
 | **MOD-01** | ✅ Concluído | 9.2 (Final) | `develop` | Framework Base e Infra base finalizados. |
 | **MOD-02** | ✅ Concluído | 11.0 (Validação)| `develop` | Implementadas validações estritas de CPF/CNPJ (Módulo 11), Obrigatoriedade, Razão Social e bypass de estrangeiros baseados em parâmetros do banco. |
 | **MOD-05** | ✅ Concluído | Estrangulamento (MOD-05) | `develop` | Substituídas consultas locais por chamadas HTTP no legado usando `Servidor.Strangler`. |
+| **MOD-08** | 🔄 Em progresso | Segurança (MOD-08) | `feat/seguranca-integracao-strangler` | Implementada autenticação via API Key com bypass de localhost na API e no legado. |
 | **MOD-07** | 🔄 Em progresso | 4.3 (Fase 4) | `feat/mod-02-demo` | Concluída Fase 4 (ICMS, Substituição Tributária, Mapeamentos, Regimes e Vigências). Fase 5 (SPED) aguarda análise — ver `specs/prompts-execucao/MOD-07-FASE5-ANALISE-SPED.md`. |
 | **MOD-03** | 🔄 Em progresso | Fases 1-3 prontas | `develop` | Prompts de execução criados em `specs/prompts-execucao/`. Iniciar por `MOD-03-FASES1-3-EXECUTION-PROMPT.md`. |
 
 ### Histórico Recente de Decisões:
+- **2026-06-12 (Seguranca):** Implementada a segurança via API Key no helper legado e middleware de validação com loopback bypass no .NET 8, conforme especificado em DEC-006 e MOD-08. Commits adicionados na branch `feat/seguranca-integracao-strangler`.
 - **2026-06-12 (GestaoFinanceira):** Concluído o estrangulamento de validações e parâmetros das entidades `Documento` e `DocumentoFinanceiroBase` no projeto legado. Criado o projeto `Servidor.Strangler` sob a estrutura de pastas recomendada. Alterações mescladas na branch `develop`.
 - **2026-06-11 (Governança):** Criada pasta `specs/prompts-execucao/` com 6 prompts autocontidos para execução do MOD-03 e análise do MOD-07 SPED. Cada prompt inclui regras Git obrigatórias (branch `feat/` ou `docs/`, nunca commitar em `develop`).
 - **2026-06-06 (GestaoTributo):** Conclusão da Fase 4 do MOD-07. Criadas as 9 entidades de domínio em `Domain/ICMS/` (GrupoTributarioICMS, GrupoTributarioInventarioICMS, TributoIcmsSubstituicaoEstoque, DetalheUfTributacao, DetalheCidadeTributacao, RegimeTributarioVigencia, SimplesNacional, SimplesNacionalTributo e PartilhaICMSVigencia). Configurados mapeamentos Fluent API correspondentes preservando chaves estrangeiras, precisions decimais e nomes de tabelas/colunas legadas em maiúsculas. Registrados no `TributoDbContext` e validados via testes de integração passando 100% (9/9).
