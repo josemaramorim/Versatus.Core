@@ -5,6 +5,10 @@
 > **Status:** 📝 Rascunho  
 > **Prioridade:** ALTA — produtos e estoque são base de faturamento e compras
 
+> ⛔ **Regra Git:** Nunca commite diretamente em `develop` ou `main`.  
+> Crie sempre uma branch `feat/gestao-material-xxx` ou `docs/analise-xxx` antes de qualquer código ou documentação.  
+> Veja os prompts prontos em `specs/prompts-execucao/` e o guia em `specs/prompts-execucao/00-GUIA-HANDOFF.md`.
+
 ---
 
 ## 1. Visão Geral do Módulo

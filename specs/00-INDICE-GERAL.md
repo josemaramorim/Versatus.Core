@@ -51,6 +51,15 @@ specs/
 │   ├── MOD-12-GESTAO-PRODUCAO.md       ← Produção, ordens de produção
 │   └── MOD-13-MODULOS-SECUNDARIOS.md  ← Armazém, Frota, Locação, Obra, Transporte
 │
+├── prompts-execucao/                   ← ⭐ PROMPTS PRONTOS PARA OUTRA IA EXECUTAR
+│   ├── 00-GUIA-HANDOFF.md             ← Leia este PRIMEIRO — passo a passo de handoff
+│   ├── MOD-03-FASES1-3-EXECUTION-PROMPT.md  ← Criar projeto + Unidades + Classificação
+│   ├── MOD-03-FASE4-ANALISE-PRODUTO.md      ← Analisar Produto.cs (189 KB)
+│   ├── MOD-03-FASES5-8-EXECUTION-PROMPT.md  ← Grades, Composição, Lote, Série
+│   ├── MOD-03-FASES9-10-ANALISE-ESTOQUE.md  ← Analisar Estoque + MovimentoEstoque
+│   ├── MOD-03-FASES11-12-EXECUTION-PROMPT.md← Auxiliares + Repos + Migration
+│   └── MOD-07-FASE5-ANALISE-SPED.md         ← Analisar EFD + EFDPisCofins + SPED
+│
 └── decisoes/
     ├── DEC-001-ORM.md                  ← Substituição do Gentle.NET
     ├── DEC-002-REMOTING.md             ← Substituição do .NET Remoting
@@ -98,19 +107,20 @@ Módulos mais isolados, podem ser atacados em paralelo após Fase 1.
 
 | SPEC | Módulo | Fase | Status | Observações |
 |---|---|---|---|---|
-| MOD-01 | Framework Base | 0 | 📝 Rascunho | |
-| MOD-02 | Acesso Global | 1 | 📝 Rascunho | 301 arquivos — maior módulo |
-| MOD-03 | Gestão Material | 2 | 📝 Rascunho | |
-| MOD-04 | Faturamento | 3 | 📝 Rascunho | |
+| MOD-01 | Framework Base | 0 | ✔️ Concluído | |
+| MOD-02 | Acesso Global | 1 | ✔️ Concluído | Fases 1-10 completas, 32 testes passando |
+| MOD-03 | Gestão Material | 2 | 🔄 Em progresso | Fases 1-3 prontas — ver `prompts-execucao/` |
+| MOD-04 | Faturamento | 3 | 📝 Rascunho | Aguarda MOD-03 |
 | MOD-05 | Gestão Financeira | 4 | 📝 Rascunho | |
 | MOD-06 | Gestão Compra | 2 | 📝 Rascunho | |
-| MOD-07 | Gestão Tributo | 1 | 📝 Rascunho | |
+| MOD-07 | Gestão Tributo | 1 | 🔄 Em progresso | Fases 1-4 OK; Fase 5 SPED — ver `prompts-execucao/` |
 | MOD-08 | NFe | 3 | 📝 Rascunho | |
 | MOD-09 | Gestão RH | 5 | 📝 Rascunho | |
 | MOD-10 | Gestão Contrato | 5 | 📝 Rascunho | |
 | MOD-11 | Gestão OS | 5 | 📝 Rascunho | |
 | MOD-12 | Gestão Produção | 5 | 📝 Rascunho | |
 | MOD-13 | Módulos Secundários | 5 | 📝 Rascunho | |
+
 
 **Legenda:** 📝 Rascunho | ✅ Aprovado | 🔄 Em progresso | ✔️ Concluído
 
