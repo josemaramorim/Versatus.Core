@@ -1,4 +1,5 @@
-# Prompt de Execução — MOD-05: Integração Segura via API Key (Strangler)
+# Prompt de Execução — MOD-08: Integração Segura via API Key (Strangler)
+
 
 > **Para a IA executora:** Sua tarefa é configurar o canal de comunicação segura entre o legado e a nova API do .NET 8.
 > Você implementará a autenticação via cabeçalho `X-Api-Key` com bypass para conexões de `localhost`.
