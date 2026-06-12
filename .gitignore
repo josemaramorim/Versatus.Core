@@ -53,3 +53,6 @@ Icon?
 
 # Pastas Específicas do Projeto
 projeto_tag_1906/
+
+# Visual Studio
+.vs/
