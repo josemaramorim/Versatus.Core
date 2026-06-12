@@ -121,18 +121,33 @@ Regras desta sessão:
 
 O projeto usa Git como controle de versão oficial. Todas as alterações de SPEC e código devem seguir o fluxo Git + SPEC:
 
-- Use branches nomeadas por módulo/tarefa, por exemplo `mod-03-produto`, `mod-04-faturamento`, `fix/mod-02-senha`
+> ⛔ **REGRA ABSOLUTA — IA NUNCA DEVE:**  
+> - Fazer commit diretamente em `develop` ou `main`  
+> - Executar `git merge develop`, `git push origin develop` ou `git push origin main`  
+> - Executar `git rebase` sem permissão explícita do usuário  
+>
+> ✅ **FLUXO CORRETO:**
+> ```
+> git checkout develop && git pull origin develop
+> git checkout -b feat/modulo-descricao   ← IA trabalha AQUI
+> (commits incrementais na branch feat/)
+> ← Para aqui. Usuário revisa e aprova o PR.
+> ```
+
+- Use branches nomeadas por módulo/tarefa, por exemplo `feat/mod-03-produto`, `docs/analise-estoque`, `fix/mod-02-senha`
+- Convenção de commits: `feat(modulo):`, `fix(modulo):`, `docs(modulo):`, `test(modulo):`
 - Faça commits pequenos e lógicos, com mensagens claras que referenciem o módulo ou a SPEC alterada
 - Nunca implemente mudanças sem que a SPEC correspondente exista ou tenha sido ajustada primeiro
 - Se a IA sugerir uma alteração na SPEC, atualize a SPEC primeiro e commite essa mudança antes de implementar o código
 - Mantenha a branch focada: uma mudança principal por branch sempre que possível
 - Use Pull Requests/Merge Requests para revisão antes de integrar ao ramo principal
 - Adote um fluxo com `develop` para integração contínua de funcionalidades e `release/*` para estabilização
-- Só integre em `main` através de um merge de `release/*` aprovado
+- Só integre em `main` através de um merge de `release/*` aprovado — **nunca diretamente**
 - Mantenha `.gitignore` atualizado para artefatos de build, arquivos de IDE e dados locais
 - Ao revisar um PR, verifique se a implementação está alinhada com a SPEC e se a mensagem de commit descreve a mudança
 
 > Git é o registro oficial do projeto. A SPEC é a fonte da verdade; o código só muda depois que a SPEC é definida ou atualizada.
+
 
 ---
 

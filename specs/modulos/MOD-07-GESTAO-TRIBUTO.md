@@ -1,9 +1,13 @@
 # SPEC — MOD-07: Gestão de Tributos
 ## Módulo: servidor/objeto de negócio/gestao.tributo
 
-> **Versão:** 1.0 | **Data:** 2026-04-27 | **Fase:** 1  
-> **Status:** 📝 Rascunho  
+> **Versão:** 1.1 | **Data:** 2026-06-10 | **Fase:** 1  
+> **Status:** 🛠️ Em andamento (Fases 1–4 concluídas, API expandida)  
 > **Prioridade:** ALTA — base fiscal de todos os documentos
+
+> ⛔ **Regra Git:** Nunca commite diretamente em `develop` ou `main`.  
+> Crie sempre uma branch `feat/gestao-tributo-xxx` ou `docs/analise-xxx` antes de qualquer código ou documentação.  
+> Veja os prompts prontos em `specs/prompts-execucao/` e o guia em `specs/prompts-execucao/00-GUIA-HANDOFF.md`.
 
 ---
 
@@ -146,14 +150,14 @@ A junção NCM + UF de destino determina se há Substituição Tributária.
 
 ## 4. Checklist de Conclusão do Módulo
 
-- [ ] ClassificacaoFiscal (NCM) implementada
-- [ ] CFOP implementado
-- [ ] SituacaoTributaria (CST/CSOSN) implementada
-- [ ] NaturezaOperacao implementada
-- [ ] AplicacaoTributo analisada e implementada
-- [ ] RegraTributoConfiguracao analisada (61 KB)
-- [ ] ICMS-ST implementado
-- [ ] Simples Nacional implementado
+- [x] ClassificacaoFiscal (NCM) implementada
+- [x] CFOP implementado
+- [x] SituacaoTributaria (CST/CSOSN) implementada
+- [x] NaturezaOperacao implementada (exposta via TributacaoController)
+- [x] AplicacaoTributo analisada e implementada
+- [x] RegraTributoConfiguracao analisada (61 KB)
+- [x] ICMS-ST implementado
+- [x] Simples Nacional implementado
 - [ ] EFD-ICMS/IPI implementado com paridade
 - [ ] EFD-PIS/COFINS implementado com paridade
 - [ ] Inventário implementado
@@ -339,10 +343,10 @@ Este roteiro descreve a ordem de implementação de MOD-07. Cada fase deve termi
 
 ## 6. Checklist de Conclusão do Módulo
 
-- [ ] Fase 1: Setup e Estrutura — Completa
-- [ ] Fase 2: Classificação Fiscal e CFOP — Completa
-- [ ] Fase 3: Aplicação de Tributos e Regras — Completa
-- [ ] Fase 4: ICMS e Substituição Tributária — Completa
+- [x] Fase 1: Setup e Estrutura — Completa
+- [x] Fase 2: Classificação Fiscal e CFOP — Completa
+- [x] Fase 3: Aplicação de Tributos e Regras — Completa
+- [x] Fase 4: ICMS e Substituição Tributária — Completa
 - [ ] Fase 5: SPED e Escrituração Fiscal — Completa
 - [ ] Fase 6: Nota Fiscal, Sintegra e Natureza de Operação — Completa
 - [ ] Fase 7: Inventário Fiscal — Completa
@@ -354,14 +358,14 @@ Este roteiro descreve a ordem de implementação de MOD-07. Cada fase deve termi
 
 ## 7. Checklist de Conclusão do Módulo
 
-- [ ] ClassificacaoFiscal (NCM) implementada
-- [ ] CFOP implementado
-- [ ] SituacaoTributaria (CST/CSOSN) implementada
+- [x] ClassificacaoFiscal (NCM) implementada
+- [x] CFOP implementado
+- [x] SituacaoTributaria (CST/CSOSN) implementada
 - [ ] NaturezaOperacao implementada
-- [ ] AplicacaoTributo analisada e implementada
-- [ ] RegraTributoConfiguracao analisada (61 KB)
-- [ ] ICMS-ST implementado
-- [ ] Simples Nacional implementado
+- [x] AplicacaoTributo analisada e implementada
+- [x] RegraTributoConfiguracao analisada (61 KB)
+- [x] ICMS-ST implementado
+- [x] Simples Nacional implementado
 - [ ] EFD-ICMS/IPI implementado com paridade
 - [ ] EFD-PIS/COFINS implementado com paridade
 - [ ] Inventário implementado
@@ -369,9 +373,34 @@ Este roteiro descreve a ordem de implementação de MOD-07. Cada fase deve termi
 
 ---
 
+---
+
+## Camada de API — TributacaoController (expandido)
+
+> **Status:** ✅ Implementada e validada (build 0 erros; 10/10 testes passando)
+
+`TributacaoController` em `Versatus.GestaoTributo/Api/Controllers/` foi expandido com os seguintes endpoints:
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/api/tributacao/classificacoes-fiscais` | Lista NCMs (ClassificacaoFiscal) |
+| GET | `/api/tributacao/classificacoes-fiscais/{id}` | Busca NCM por ID |
+| GET | `/api/tributacao/cfops` | Lista CFOPs |
+| GET | `/api/tributacao/cests` | Lista CESTs |
+| GET | `/api/tributacao/situacoes-tributarias` | Lista CSTs/CSOSNs |
+| GET | `/api/tributacao/grupos-icms` | Lista GrupoTributarioICMS |
+| GET | `/api/tributacao/regimes-tributarios` | Lista RegimeTributarioVigencia |
+| GET | `/api/tributacao/simples-nacional` | Lista tabelas SimplesNacional |
+| POST | `/api/tributacao/classificacoes-fiscais` | Cria nova ClassificacaoFiscal |
+| PUT | `/api/tributacao/classificacoes-fiscais/{id}` | Atualiza ClassificacaoFiscal |
+| DELETE | `/api/tributacao/classificacoes-fiscais/{id}` | Remove ClassificacaoFiscal |
+
+---
+
 | Data | Autor | Alteração |
 |---|---|---|
 | 2026-04-27 | Gerado por análise | Criação inicial |
+| 2026-06-10 | IA (implementação) | TributacaoController expandido; ITributoService/TributoService enriquecidos com métodos de consulta (Cests, SituacoesTributarias, GruposIcms, etc.) |
 
 ---
 

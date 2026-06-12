@@ -11,17 +11,20 @@ public class TributoService : ITributoService
     private readonly ICfopRepository _cfopRepository;
     private readonly ISimplesNacionalRepository _simplesNacionalRepository;
     private readonly IRegraTributoConfiguracaoRepository _regraTributoConfiguracaoRepository;
+    private readonly Versatus.GestaoTributo.Infrastructure.TributoDbContext _context;
 
     public TributoService(
         IClassificacaoFiscalRepository classificacaoFiscalRepository,
         ICfopRepository cfopRepository,
         ISimplesNacionalRepository simplesNacionalRepository,
-        IRegraTributoConfiguracaoRepository regraTributoConfiguracaoRepository)
+        IRegraTributoConfiguracaoRepository regraTributoConfiguracaoRepository,
+        Versatus.GestaoTributo.Infrastructure.TributoDbContext context)
     {
         _classificacaoFiscalRepository = classificacaoFiscalRepository;
         _cfopRepository = cfopRepository;
         _simplesNacionalRepository = simplesNacionalRepository;
         _regraTributoConfiguracaoRepository = regraTributoConfiguracaoRepository;
+        _context = context;
     }
 
     public async Task<IEnumerable<ClassificacaoFiscal>> ListarClassificacoesAsync(int limite = 50, CancellationToken cancellationToken = default)
@@ -42,5 +45,30 @@ public class TributoService : ITributoService
     public async Task<RegraTributoConfiguracao?> ObterRegraConfiguracaoComDetalhesAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _regraTributoConfiguracaoRepository.ObterComDetalhesAsync(id, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Cest>> ListarCestsAsync(int limite = 50, CancellationToken cancellationToken = default)
+    {
+        return await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(_context.Cests.Take(limite), cancellationToken);
+    }
+
+    public async Task<IEnumerable<SituacaoTributaria>> ListarSituacoesTributariasAsync(CancellationToken cancellationToken = default)
+    {
+        return await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(_context.SituacoesTributarias, cancellationToken);
+    }
+
+    public async Task<IEnumerable<GrupoTributarioICMS>> ListarGruposTributariosIcmsAsync(CancellationToken cancellationToken = default)
+    {
+        return await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(_context.GruposTributariosICMS, cancellationToken);
+    }
+
+    public async Task<IEnumerable<TributoIcmsSubstituicaoEstoque>> ListarSubstituicoesEstoqueAsync(CancellationToken cancellationToken = default)
+    {
+        return await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(_context.TributosIcmsSubstituicoesEstoque, cancellationToken);
+    }
+
+    public async Task<IEnumerable<RegimeTributarioVigencia>> ListarRegimesVigentesAsync(CancellationToken cancellationToken = default)
+    {
+        return await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(_context.RegimesTributariosVigencias, cancellationToken);
     }
 }
