@@ -1,7 +1,7 @@
 # Prompt de Execução — MOD-05: Estrangulamento de Documento Financeiro (Legado)
 
 > **Para a IA executora:** Sua tarefa aqui é **modificar os arquivos C# no projeto legado** (`projeto_tag_1906`) para substituir a lógica interna de consultas ao banco via Gentle.NET por chamadas HTTP para a nova API do .NET 8.
-> Utilize o [FinancialStranglerHelper.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/FinancialStranglerHelper.cs) já criado e configurado para realizar as requisições.
+> Em conformidade com a **Lei nº 5 (Padrão de Estrangulamento do Legado)**, todos os DTOs e helpers de rede devem ser isolados no projeto compartilhado **`Servidor.Strangler`** sob namespaces modulares.
 
 ---
 
@@ -20,7 +20,8 @@ git checkout -b feat/estrangulamento-documento-financeiro
 ```powershell
 git add projeto_tag_1906/servidor/objeto de negócio/gestao.financeira/Documento.cs
 git add projeto_tag_1906/servidor/objeto de negócio/gestao.financeira/DocumentoFinanceiroBase.cs
-git commit -m "feat(gestao-financeira): estrangula validações e parâmetros locais via chamadas à API .NET 8"
+git add projeto_tag_1906/servidor/framework/Servidor.Strangler/
+git commit -m "feat(gestao-financeira): estrangula validações e parâmetros locais usando projeto Servidor.Strangler"
 # NÃO faça merge — deixe a branch para o usuário revisar
 ```
 
@@ -33,61 +34,89 @@ Ao substituir as queries internas das entidades `Documento` e `DocumentoFinancei
 
 ---
 
-## Arquivos a Modificar
+## Arquivos a Modificar / Criar
 
-1. [DocumentoFinanceiroBase.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/DocumentoFinanceiroBase.cs)
-2. [Documento.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/Documento.cs)
+### [CRIAR / MIGRAR no projeto Servidor.Strangler]
+1. [FinancialStranglerHelper.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/projeto_tag_1906/servidor/framework/Servidor.Strangler/Common/FinancialStranglerHelper.cs) (Mover para a pasta `Common` do novo projeto `Servidor.Strangler`)
+2. [EntidadeDto.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/projeto_tag_1906/servidor/framework/Servidor.Strangler/Gestao.Financeira/DTOs/EntidadeDto.cs)
+3. [FornecedorDto.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/projeto_tag_1906/servidor/framework/Servidor.Strangler/Gestao.Financeira/DTOs/FornecedorDto.cs)
+4. [ClienteDto.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/projeto_tag_1906/servidor/framework/Servidor.Strangler/Gestao.Financeira/DTOs/ClienteDto.cs)
+5. [ParametroDto.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/projeto_tag_1906/servidor/framework/Servidor.Strangler/Gestao.Financeira/DTOs/ParametroDto.cs)
+
+### [MODIFICAR nos objetos de negócio]
+6. [DocumentoFinanceiroBase.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/DocumentoFinanceiroBase.cs)
+7. [Documento.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/Documento.cs)
 
 ---
 
 ## Roteiro de Implementação
 
-### Passo 1: Adicionar os DTOs de Desserialização
-No final do arquivo [DocumentoFinanceiroBase.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/DocumentoFinanceiroBase.cs) (dentro do namespace `Projeto.Servidor.ObjetosNegocio.GestaoFinanceira`), declare os DTOs para mapear as respostas do JSON retornado pelo .NET 8:
+### Passo 1: Configurar o Projeto `Servidor.Strangler`
+1. Crie um projeto Class Library .NET Framework 4.7 na pasta `projeto_tag_1906/servidor/framework/Servidor.Strangler/`.
+2. Adicione a referência ao pacote NuGet `Newtonsoft.Json` (v13.0.1 ou compatível).
+3. Mova o helper [FinancialStranglerHelper.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/FinancialStranglerHelper.cs) do projeto do financeiro para a pasta `Common/` deste novo projeto.
+4. Ajuste o namespace do helper para: `Projeto.Servidor.Strangler.Common`.
+5. Adicione uma **Project Reference** de `gestao.financeira` para `Servidor.Strangler`.
 
-```csharp
-public class EntidadeDto
-{
-    public int IdEntidade { get; set; }
-    public bool IsCliente { get; set; }
-    public bool IsFornecedor { get; set; }
-    public bool IsInstituicaoFinanceira { get; set; }
-}
+### Passo 2: Criar os DTOs Modulares no Novo Projeto
+Crie os arquivos DTO dentro de `Servidor.Strangler/Gestao.Financeira/DTOs/` seguindo o namespace `Projeto.Servidor.Strangler.GestaoFinanceira.DTOs`:
 
-public class FornecedorDto
-{
-    public int IdFornecedor { get; set; }
-    public int? IdCondicaoPagamento { get; set; }
-}
-
-public class ClienteDto
-{
-    public int IdCliente { get; set; }
-    public bool? ItemFinanceiroPadrao { get; set; }
-    public int? IdCondicaoPagamento { get; set; }
-}
-
-public class ParametroDto
-{
-    public string Chave { get; set; }
-    public string Valor { get; set; }
-}
-```
-
-### Passo 2: Estrangular `ValidarEntidade`
-* **Local:** [DocumentoFinanceiroBase.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/DocumentoFinanceiroBase.cs) no método `ValidarEntidade()`.
-* **Código Legado:**
+* **`EntidadeDto.cs`**:
   ```csharp
-  if (this.PagarReceber == PagarReceberTipo.Pagar)
+  namespace Projeto.Servidor.Strangler.GestaoFinanceira.DTOs
   {
-      if (!this.Entidade.Fornecedor)
+      public class EntidadeDto
       {
-          msg = String.Format("Para documento do tipo '{0}', a entidade deve ser do tipo 'Fornecedor'.", sTipo);
-          throw new ObjetoNegocioException(ObjetoNegocioMensagem.DocumentoFinanceiroValidar, msg); 
+          public int IdEntidade { get; set; }
+          public bool IsCliente { get; set; }
+          public bool IsFornecedor { get; set; }
+          public bool IsInstituicaoFinanceira { get; set; }
       }
   }
   ```
-* **Alteração requerida:** Substitua a verificação por uma chamada HTTP utilizando `FinancialStranglerHelper`:
+* **`FornecedorDto.cs`**:
+  ```csharp
+  namespace Projeto.Servidor.Strangler.GestaoFinanceira.DTOs
+  {
+      public class FornecedorDto
+      {
+          public int IdFornecedor { get; set; }
+          public int? IdCondicaoPagamento { get; set; }
+      }
+  }
+  ```
+* **`ClienteDto.cs`**:
+  ```csharp
+  namespace Projeto.Servidor.Strangler.GestaoFinanceira.DTOs
+  {
+      public class ClienteDto
+      {
+          public int IdCliente { get; set; }
+          public bool? ItemFinanceiroPadrao { get; set; }
+          public int? IdCondicaoPagamento { get; set; }
+      }
+  }
+  ```
+* **`ParametroDto.cs`**:
+  ```csharp
+  namespace Projeto.Servidor.Strangler.GestaoFinanceira.DTOs
+  {
+      public class ParametroDto
+      {
+          public string Chave { get; set; }
+          public string Valor { get; set; }
+      }
+  }
+  ```
+
+### Passo 3: Importar os Namespaces e Estrangular `ValidarEntidade`
+* **Local:** [DocumentoFinanceiroBase.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/DocumentoFinanceiroBase.cs).
+* **Preparação:** Adicione os imports no topo:
+  ```csharp
+  using Projeto.Servidor.Strangler.Common;
+  using Projeto.Servidor.Strangler.GestaoFinanceira.DTOs;
+  ```
+* **Lógica:** Substitua o método `ValidarEntidade()` original:
   ```csharp
   protected void ValidarEntidade()
   {
@@ -99,7 +128,7 @@ public class ParametroDto
 
       try
       {
-          // Chamada para a API nova .NET 8
+          // Consome a API do .NET 8 via Helper compartilhado
           var entidade = FinancialStranglerHelper.GetJson<EntidadeDto>("entidade/" + this.IdEntidade);
 
           if (entidade == null)
@@ -133,10 +162,9 @@ public class ParametroDto
   }
   ```
 
-### Passo 3: Estrangular `CarregarCondicaoPagamentoDefault`
+### Passo 4: Estrangular `CarregarCondicaoPagamentoDefault`
 * **Local:** [DocumentoFinanceiroBase.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/DocumentoFinanceiroBase.cs) no método `CarregarCondicaoPagamentoDefault()`.
-* **Código Legado:** Utilizava `Factory.Retornar(typeof(IFornecedor), ...)` e `Factory.Retornar(typeof(IClienteEmpresa), ...)`.
-* **Alteração requerida:** Mudar para chamadas HTTP correspondentes:
+* **Alteração requerida:** Substituir pela leitura HTTP:
   ```csharp
   private void CarregarCondicaoPagamentoDefault()
   {
@@ -185,13 +213,9 @@ public class ParametroDto
   }
   ```
 
-### Passo 4: Estrangular Parâmetros Globais e Portador Padrão
+### Passo 5: Estrangular Parâmetros Globais e Portador Padrão
 * **Local:** [DocumentoFinanceiroBase.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/DocumentoFinanceiroBase.cs) no método `GetPortadorDefault()`.
-* **Código Legado:**
-  ```csharp
-  int idPortadorDefault = AmbienteServidorGlobal.ParametroServidor.ParametroValor(Parametros.PortadorPadrao, this.Ambiente).ValorInt;
-  ```
-* **Alteração requerida:** Substituir pela chamada do endpoint de parâmetros da nova API:
+* **Alteração requerida:** Consumir parâmetros globais via `GET parametro/PortadorPadrao`:
   ```csharp
   protected int GetPortadorDefault()
   {
@@ -206,38 +230,21 @@ public class ParametroDto
       }
       catch
       {
-          // Fallback caso falhe a API
-          idPortadorDefault = 1; // ID padrão de portador
-      }
-
-      if (this.IdEntidade == 0)
-          return idPortadorDefault;
-
-      if (this.PagarReceber == PagarReceberTipo.Receber)
-      {
-          try
-          {
-              var cli = FinancialStranglerHelper.GetJson<ClienteDto>("cliente/" + this.IdEntidade);
-              // Se houver portador específico mapeado no DTO, pode-se extrair
-          }
-          catch
-          {
-              // Ignora e usa padrão
-          }
+          idPortadorDefault = 1; // ID padrão fallback
       }
 
       return idPortadorDefault;        
   }
   ```
 
-### Passo 5: Estrangular `PermiteItemFinanceiroPadrao`
-* **Local:** [Documento.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/Documento.cs) no método `PermiteItemFinanceiroPadrao()`.
-* **Código Legado:**
+### Passo 6: Estrangular `PermiteItemFinanceiroPadrao`
+* **Local:** [Documento.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/projeto_tag_1906/servidor/objeto%20de%20neg%C3%B3cio/gestao.financeira/Documento.cs).
+* **Preparação:** Adicione os imports no topo:
   ```csharp
-  IClienteConsulta cc = (IClienteConsulta)Factory.Retornar(typeof(IClienteConsulta), this.Ambiente, this.IdEntidade);
-  return cc.ItemFinanceiroPadrao;
+  using Projeto.Servidor.Strangler.Common;
+  using Projeto.Servidor.Strangler.GestaoFinanceira.DTOs;
   ```
-* **Alteração requerida:** Substituir pelo consumo da API de Clientes:
+* **Alteração requerida:** Substituir o método `PermiteItemFinanceiroPadrao()`:
   ```csharp
   private bool PermiteItemFinanceiroPadrao()
   {
@@ -261,6 +268,6 @@ public class ParametroDto
 ## Verificação e Testes
 
 Ao finalizar as alterações:
-1. Abra a solução legada ou execute o build do projeto `gestao.financeira` usando o MSBuild para garantir que compila sem erros.
-2. Certifique-se de que a API do .NET 8 esteja rodando em `http://localhost:5000` (ou na porta correspondente) e teste a abertura de um documento financeiro no legado para validar que as chamadas HTTP respondem perfeitamente.
-3. Se todas as validações de compilação passarem, submeta a branch para revisão.
+1. Compile a solução legada inteira, garantindo que o projeto `Servidor.Strangler` compile primeiro e seja referenciado sem avisos pelo `gestao.financeira`.
+2. Certifique-se de que a API .NET 8 está ativa e responda de forma condizente aos endpoints chamados.
+3. Submeta a branch para revisão do usuário após o build com sucesso.

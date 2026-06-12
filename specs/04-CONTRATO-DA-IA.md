@@ -67,6 +67,14 @@ Os controladores (Controllers) devem atuar puramente como adaptadores de entrega
 - **PROIBIDO**: Aninhar classes de DTOs ou Commands dentro de classes de controlador. DTOs de request devem ser declarados como `record`s independentes na camada de Domínio/Aplicação.
 - **OBRIGATÓRIO**: Depender exclusivamente de interfaces de **Serviços** (`IService`) e repassar os DTOs/records intactos para a camada de negócios.
 
+### E. Padrão de Estrangulamento do Legado (Lei nº 5)
+Qualquer código utilitário de rede, integração ou DTO criado no projeto legado para fins de estrangulamento (Strangler Fig Pattern) **DEVE** residir no projeto dedicado **`Servidor.Strangler`** e seguir uma divisão modular estrita de diretórios e namespaces por área de negócio.
+- **PROIBIDO**: Criar DTOs ou helpers HTTP misturados nos arquivos originais de entidades legadas (ex: no fim do arquivo ou na mesma pasta de objeto de negócio).
+- **OBRIGATÓRIO**: Organizar o projeto `Servidor.Strangler` sob a seguinte hierarquia de diretórios:
+  - `Common/` (Para infraestrutura genérica de rede, como o `FinancialStranglerHelper.cs`).
+  - `[NomeDoModulo]/DTOs/` (Para os DTOs de cada área, ex: `Gestao.Financeira/DTOs/`, `Gestao.Material/DTOs/`, etc.).
+- **OBRIGATÓRIO**: Utilizar namespaces condizentes com a estrutura de diretórios (ex: `Projeto.Servidor.Strangler.GestaoFinanceira.DTOs`).
+
 ---
 
 ## 3. Padrões de Código (C# 12+)
