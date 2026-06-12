@@ -11,6 +11,8 @@ using Versatus.GestaoTributo.DependencyInjection;
 using Versatus.GestaoTributo.Infrastructure;
 using Versatus.WebAPI.Context;
 using Versatus.WebAPI.Services;
+using Versatus.WebAPI.Middleware;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,7 +115,11 @@ if (app.Environment.IsDevelopment() || true) // Habilita em todos os ambientes n
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+app.UseMiddleware<ApiKeyAuthMiddleware>();
+
 app.UseAuthorization();
+
 
 app.MapControllers();
 

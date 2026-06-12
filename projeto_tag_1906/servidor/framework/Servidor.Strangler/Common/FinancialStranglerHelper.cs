@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
@@ -6,12 +6,13 @@ using Newtonsoft.Json;
 namespace Projeto.Servidor.Strangler.Common
 {
     /// <summary>
-    /// Helper utilitário para comunicação HTTP síncrona com a nova API do .NET 8,
-    /// utilizado na estratégia de estrangulamento do legado Versatus.
+    /// Helper utilitÃ¡rio para comunicaÃ§Ã£o HTTP sÃ­ncrona com a nova API do .NET 8,
+    /// utilizado na estratÃ©gia de estrangulamento do legado Versatus.
     /// </summary>
     public static class FinancialStranglerHelper
     {
         private static string _apiBaseUrl = null;
+        private static string _stranglerApiKey = null;
 
         public static string ApiBaseUrl
         {
@@ -25,7 +26,7 @@ namespace Projeto.Servidor.Strangler.Common
                     }
                     catch
                     {
-                        // Ignora erro fora de ambiente de aplicação ativa
+                        // Ignora erro fora de ambiente de aplicaÃ§Ã£o ativa
                     }
 
                     if (string.IsNullOrEmpty(_apiBaseUrl))
@@ -42,11 +43,45 @@ namespace Projeto.Servidor.Strangler.Common
             }
         }
 
+        public static string StranglerApiKey
+        {
+            get
+            {
+                if (_stranglerApiKey == null)
+                {
+                    try
+                    {
+                        _stranglerApiKey = System.Configuration.ConfigurationManager.AppSettings["Net8StranglerApiKey"];
+                    }
+                    catch
+                    {
+                        // Ignora erro fora de ambiente de aplicaÃ§Ã£o ativa
+                    }
+
+                    if (string.IsNullOrEmpty(_stranglerApiKey))
+                    {
+                        _stranglerApiKey = "";
+                    }
+                }
+                return _stranglerApiKey;
+            }
+        }
+
+        private static void ConfigurarClient(WebClient client)
+        {
+            client.Encoding = Encoding.UTF8;
+            string key = StranglerApiKey;
+            if (!string.IsNullOrEmpty(key))
+            {
+                client.Headers["X-Api-Key"] = key;
+            }
+        }
+
         public static T GetJson<T>(string relativeUrl)
         {
             using (var client = new WebClient())
             {
-                client.Encoding = Encoding.UTF8;
+                ConfigurarClient(client);
                 string fullUrl = ApiBaseUrl + relativeUrl;
                 string json = client.DownloadString(fullUrl);
                 return JsonConvert.DeserializeObject<T>(json);
@@ -57,7 +92,7 @@ namespace Projeto.Servidor.Strangler.Common
         {
             using (var client = new WebClient())
             {
-                client.Encoding = Encoding.UTF8;
+                ConfigurarClient(client);
                 client.Headers[HttpRequestHeader.ContentType] = "application/json";
                 string fullUrl = ApiBaseUrl + relativeUrl;
                 string jsonBody = JsonConvert.SerializeObject(body);
@@ -69,7 +104,7 @@ namespace Projeto.Servidor.Strangler.Common
         {
             using (var client = new WebClient())
             {
-                client.Encoding = Encoding.UTF8;
+                ConfigurarClient(client);
                 client.Headers[HttpRequestHeader.ContentType] = "application/json";
                 string fullUrl = ApiBaseUrl + relativeUrl;
                 string jsonBody = JsonConvert.SerializeObject(body);
