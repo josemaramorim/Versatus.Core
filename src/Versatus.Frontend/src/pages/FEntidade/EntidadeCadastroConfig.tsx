@@ -7,6 +7,18 @@ import type { IEntidadeForm } from './types';
 import { defaultValues } from './types';
 import { entidadeSchema } from './schema';
 
+function formatCpfCnpj(value: string | undefined): string {
+  if (!value) return '';
+  const clean = value.replace(/\D/g, '');
+  if (clean.length === 11) {
+    return clean.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+  if (clean.length === 14) {
+    return clean.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+  }
+  return value;
+}
+
 export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
   getTitulo(): string {
     return 'Entidade';
@@ -53,7 +65,10 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
         header: 'CPF / CNPJ',
         field: 'cpf',
         width: 180,
-        renderCell: (record) => (record.tipoPessoa === 1 ? record.cpf : record.cnpj)
+        renderCell: (record) => {
+          const rawValue = record.tipoPessoa === 1 ? record.cpf : record.cnpj;
+          return formatCpfCnpj(rawValue);
+        }
       },
       {
         header: 'Tipo da Entidade',
