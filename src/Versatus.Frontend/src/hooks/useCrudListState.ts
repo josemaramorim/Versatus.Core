@@ -159,6 +159,11 @@ export function useCrudListState<T>(
         return;
       }
 
+      if (key === 'role') {
+        result = result.filter((item) => (item as any)[filterValue] === true);
+        return;
+      }
+
       result = result.filter((item) => {
         const value = (item as any)[key];
         if (value === undefined || value === null) return false;
