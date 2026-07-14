@@ -18,8 +18,9 @@ import {
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { BaseCadastro } from '../../components/layout/BaseCadastro';
-import { useBaseCadastro } from '../../hooks/useBaseCadastro';
+import { CadastroBasePage } from '../../components/crud/CadastroBasePage';
+import { EntidadeCadastroConfig } from './EntidadeCadastroConfig';
+import type { CadastroModalMode } from '../../types/cadastro';
 
 import type { IEntidadeForm } from './types';
 import { defaultValues } from './types';
@@ -46,40 +47,34 @@ import {
   IntermediadorTab 
 } from './tabs/CommonRolesTab';
 
-export const FEntidade: React.FC = () => {
-  const [snackbar, setSnackbar] = useState<{
+export interface IEntidadeFormViewProps {
+  mode: CadastroModalMode;
+  record: IEntidadeForm;
+  onSave: (data: IEntidadeForm) => void;
+}
+
+export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
+  mode,
+  record,
+  onSave
+}) => {
+  const [toast, setToast] = useState<{
     open: boolean;
     message: string;
-    severity: 'success' | 'error' | 'warning' | 'info';
+    severity: 'success' | 'error';
   }>({
     open: false,
     message: '',
     severity: 'success',
   });
 
-  const showMessage = (message: string, severity: 'success' | 'error' | 'warning' | 'info' = 'success') => {
-    setSnackbar({
+  const showMessage = (message: string, severity: 'success' | 'error' = 'success') => {
+    setToast({
       open: true,
       message,
       severity,
     });
   };
-
-  const {
-    state,
-    record,
-    handleAdicionar,
-    handleEditar,
-    handleDesfazer,
-    handleSalvar,
-    handleExcluir,
-  } = useBaseCadastro<IEntidadeForm>({
-    defaultValues,
-    apiEndpoint: '/api/entidade',
-    onSaveSuccess: () => {
-      showMessage('Cadastro de Entidade salvo com sucesso!', 'success');
-    }
-  });
 
   const [activeMainTab, setActiveMainTab] = useState(0);
   const [activeInfoTab, setActiveInfoTab] = useState(0);
@@ -89,12 +84,12 @@ export const FEntidade: React.FC = () => {
   const [activeFilialTab, setActiveFilialTab] = useState(0);
   const [activeObraTab, setActiveObraTab] = useState(0);
 
-  const isBrowse = state === 'browse';
+  const isBrowse = mode === 'delete' || mode === 'view';
 
   // Configuração do React Hook Form
   const methods = useForm<IEntidadeForm>({
     resolver: zodResolver(entidadeSchema) as any,
-    defaultValues,
+    defaultValues: record,
     mode: 'onChange',
   });
 
@@ -355,31 +350,25 @@ export const FEntidade: React.FC = () => {
     return targetRole || '';
   };
 
-  // Lançar submissão com validação
-  const onSalvarClick = () => {
-    handleSubmit(
-      (data: IEntidadeForm) => {
-        handleSalvar(data);
-      },
-      (validationErrors) => {
-        console.warn('Validação falhou! Erros no formulário:', validationErrors);
-        showMessage('Por favor, corrija os erros sinalizados no formulário antes de salvar.', 'error');
-      }
-    )();
-  };
-
   return (
     <FormProvider {...methods}>
-      <BaseCadastro
-        titulo="Cadastro Unificado de Entidade"
-        state={state}
-        onAdicionar={handleAdicionar}
-        onEditar={handleEditar}
-        onSalvar={onSalvarClick}
-        onDesfazer={handleDesfazer}
-        onExcluir={handleExcluir}
-        onSair={() => showMessage('Voltando...', 'info')}
+      <form 
+        id="crud-form" 
+        noValidate
+        onSubmit={handleSubmit(
+          (data) => {
+            onSave(data);
+          },
+          (validationErrors) => {
+            console.warn('Validação falhou! Erros no formulário:', validationErrors);
+            showMessage('Por favor, corrija os erros sinalizados no formulário antes de salvar.', 'error');
+          }
+        )}
       >
+        {/* Botões ocultos para acionamento remoto no rodapé do Modal */}
+        <button id="crud-submit-btn" type="submit" style={{ display: 'none' }} />
+        <button id="crud-reset-btn" type="button" style={{ display: 'none' }} onClick={() => reset(record)} />
+
         <Box sx={{ width: '100%' }}>
           
           {/* Cabeçalho Fixo do Formulário */}
@@ -646,23 +635,95 @@ export const FEntidade: React.FC = () => {
             <IntermediadorTab isBrowse={isBrowse} />
           )}
         </Box>
-      </BaseCadastro>
+      </form>
 
       <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={6000} 
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        open={toast.open} 
+        autoHideDuration={4000} 
+        onClose={() => setToast((prev) => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
-          severity={snackbar.severity} 
+          onClose={() => setToast((prev) => ({ ...prev, open: false }))} 
+          severity={toast.severity} 
           variant="filled"
           sx={{ width: '100%' }}
         >
-          {snackbar.message}
+          {toast.message}
         </Alert>
       </Snackbar>
     </FormProvider>
+  );
+};
+
+// Componente principal FEntidade ligado ao CadastroBasePage (OOP)
+export const FEntidade: React.FC = () => {
+  const initialRecords: IEntidadeForm[] = [
+    {
+      ...defaultValues,
+      codigo: 'ENT-0001',
+      razaoSocial: 'Versatus Tecnologia Ltda',
+      apelido: 'Versatus',
+      tipoPessoa: 2,
+      cnpj: '12345678000199',
+      contribuinteIcms: 'Sim',
+      isCliente: true,
+      isFornecedor: true,
+      isFuncionario: false,
+      isTransportadora: false,
+      isComissionado: false,
+      isAgencia: false,
+      isFinanceira: false,
+      isContador: false,
+      isRepresentante: false,
+      isOutro: false,
+      isProspecto: false,
+      isAluno: false,
+      isProfessor: false,
+      isIntermediador: false,
+      isObra: false,
+      isFilial: false,
+      enderecos: [],
+      telefones: [],
+      contatos: []
+    },
+    {
+      ...defaultValues,
+      codigo: 'ENT-0002',
+      razaoSocial: 'Carlos Alberto Silva',
+      apelido: 'Carlos Silva',
+      tipoPessoa: 1,
+      cpf: '98765432100',
+      contribuinteIcms: 'Nao',
+      isCliente: true,
+      isFornecedor: false,
+      isFuncionario: true,
+      isTransportadora: false,
+      isComissionado: false,
+      isAgencia: false,
+      isFinanceira: false,
+      isContador: false,
+      isRepresentante: false,
+      isOutro: false,
+      isProspecto: false,
+      isAluno: false,
+      isProfessor: false,
+      isIntermediador: false,
+      isObra: false,
+      isFilial: false,
+      enderecos: [],
+      telefones: [],
+      contatos: []
+    }
+  ];
+
+  return (
+    <CadastroBasePage<IEntidadeForm>
+      config={new EntidadeCadastroConfig()}
+      initialRecords={initialRecords}
+      renderForm={(mode, record, onSave) => (
+        <EntidadeFormView mode={mode} record={record} onSave={onSave} />
+      )}
+    />
   );
 };
