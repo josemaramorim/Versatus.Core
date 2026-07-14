@@ -81,7 +81,7 @@ export function CrudTable<T>({
                     : (row as any)[col.field];
                   return (
                     <TableCell key={cIdx} sx={{ py: 1.5 }}>
-                      {cellValue !== undefined && cellValue !== null ? String(cellValue) : ''}
+                      {cellValue}
                     </TableCell>
                   );
                 })}
