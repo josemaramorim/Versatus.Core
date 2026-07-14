@@ -54,6 +54,16 @@ export const CrudFilters: React.FC<ICrudFiltersProps> = ({
                     ))}
                   </Select>
                 </FormControl>
+              ) : filtro.type === 'date' ? (
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="date"
+                  label={filtro.label}
+                  value={val}
+                  onChange={(e) => onFilterChange(filtro.field, e.target.value)}
+                  slotProps={{ inputLabel: { shrink: true } }}
+                />
               ) : (
                 <TextField
                   fullWidth

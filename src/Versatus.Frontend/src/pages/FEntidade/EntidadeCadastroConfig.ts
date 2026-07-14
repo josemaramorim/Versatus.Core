@@ -64,6 +64,11 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
   getFiltros(): IFiltroConfig[] {
     return [
       {
+        field: 'codigo',
+        label: 'Código',
+        type: 'text'
+      },
+      {
         field: 'razaoSocial',
         label: 'Razão Social / Nome',
         type: 'text'
@@ -80,6 +85,20 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
         options: [
           { label: 'Física', value: 1 },
           { label: 'Jurídica', value: 2 }
+        ]
+      },
+      {
+        field: 'dataNascimento',
+        label: 'Data de Nascimento',
+        type: 'date'
+      },
+      {
+        field: 'contribuinteIcms',
+        label: 'Contribuinte ICMS',
+        type: 'select',
+        options: [
+          { label: 'Sim', value: 'Sim' },
+          { label: 'Não', value: 'Nao' }
         ]
       }
     ];
