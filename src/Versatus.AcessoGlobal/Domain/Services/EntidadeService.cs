@@ -1,10 +1,18 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Versatus.Framework.Context;
 using Versatus.Framework.Sequences;
 using Versatus.AcessoGlobal.Domain.Entities;
 using Versatus.AcessoGlobal.Domain.Repositories;
 using Versatus.AcessoGlobal.Domain.DTOs;
+using Versatus.AcessoGlobal.Infrastructure;
+using Versatus.Framework.Pagination;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -15,19 +23,25 @@ public class EntidadeService : IEntidadeService
     private readonly IGeradorSequencial _geradorSequencial;
     private readonly IContextoExecucao _contexto;
     private readonly ILogger<EntidadeService> _logger;
+    private readonly AcessoGlobalDbContext _context;
+    private readonly IServiceProvider _serviceProvider;
 
     public EntidadeService(
         IEntidadeRepository repository,
         IParametroRepository parametroRepository,
         IGeradorSequencial geradorSequencial,
         IContextoExecucao contexto,
-        ILogger<EntidadeService> logger)
+        ILogger<EntidadeService> logger,
+        AcessoGlobalDbContext context,
+        IServiceProvider serviceProvider)
     {
         _repository = repository;
         _parametroRepository = parametroRepository;
         _geradorSequencial = geradorSequencial;
         _contexto = contexto;
         _logger = logger;
+        _context = context;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<IEnumerable<Entidade>> ListarUltimasAsync(int limite = 50, CancellationToken cancellationToken = default)
@@ -316,6 +330,408 @@ public class EntidadeService : IEntidadeService
         var digit2 = r < 2 ? 0 : 11 - r;
 
         return cleanCnpj.EndsWith($"{digit1}{digit2}");
+    }
+
+    public async Task<PagedResult<Entidade>> ListarPaginadoAsync(
+        int pagina, 
+        int registrosPorPagina, 
+        string ordenarPor, 
+        string direcaoOrdenacao, 
+        string termoBusca, 
+        string papelFiltro, 
+        CancellationToken cancellationToken = default)
+    {
+        return await _repository.ListarPaginadoAsync(pagina, registrosPorPagina, ordenarPor, direcaoOrdenacao, termoBusca, papelFiltro, cancellationToken);
+    }
+
+    public async Task<Entidade?> ObterCompletoPorIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _repository.GetCompletoPorIdAsync(id, cancellationToken);
+    }
+
+    public async Task<Entidade> SalvarCompletoAsync(SalvarEntidadeDto dto, CancellationToken cancellationToken = default)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var tipoEnum = dto.TipoPessoa == 2 ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
+            var entidade = new Entidade
+            {
+                Nome = dto.Nome,
+                Email = dto.Email,
+                EmailNFE = dto.EmailNFE,
+                EmailFinanceiro = dto.EmailFinanceiro,
+                EmailVenda = dto.EmailVenda,
+                EmailCompra = dto.EmailCompra,
+                HomePage = dto.HomePage,
+                Observacao = dto.Observacao,
+                InscricaoEstadual = dto.InscricaoEstadual,
+                InscricaoMunicipal = dto.InscricaoMunicipal,
+                InscricaoSuframa = dto.InscricaoSuframa,
+                Ativo = dto.Ativo,
+                TipoPessoa = tipoEnum,
+                IsCliente = dto.IsCliente,
+                IsFornecedor = dto.IsFornecedor,
+                IsTransportadora = dto.IsTransportadora,
+                IsComissionado = dto.IsComissionado,
+                IsAgenciaBancaria = dto.IsAgencia,
+                IsInstituicaoFinanceira = dto.IsFinanceira,
+                IsFilial = dto.IsFilial,
+                IsFuncionario = dto.IsFuncionario,
+                IsObra = dto.IsObra,
+                IsRepresentante = dto.IsRepresentante,
+                IsOutro = dto.IsOutro,
+                IsProspecto = dto.IsProspecto,
+                IsContador = dto.IsContador,
+                IsAluno = dto.IsAluno,
+                IsProfessor = dto.IsProfessor,
+                IsIntermediadorComercial = dto.IsIntermediador,
+                IdUsuarioInclusao = _contexto.IdUsuario,
+                DataInclusao = DateTime.Today,
+                HoraInclusao = DateTime.Now
+            };
+
+            if (tipoEnum == EntidadeTipoPessoa.Fisica)
+            {
+                entidade.PessoaFisica = new DadosPessoaFisica
+                {
+                    Cpf = dto.Cpf ?? string.Empty,
+                    Rg = dto.Rg ?? string.Empty
+                };
+            }
+            else
+            {
+                entidade.PessoaJuridica = new DadosPessoaJuridica
+                {
+                    Cnpj = dto.Cnpj ?? string.Empty,
+                    RazaoSocial = dto.Nome
+                };
+            }
+
+            entidade.IdEntidade = await _geradorSequencial.ProximoAsync("Entidade", SequencialTipo.Geral, cancellationToken);
+            if (entidade.PessoaFisica != null) entidade.PessoaFisica.IdEntidade = entidade.IdEntidade;
+            if (entidade.PessoaJuridica != null) entidade.PessoaJuridica.IdEntidade = entidade.IdEntidade;
+
+            var defaultCidadeId = await _context.Cidades.Select(c => c.IdCidade).FirstOrDefaultAsync(cancellationToken);
+            if (defaultCidadeId == 0) defaultCidadeId = 1;
+
+            var defaultLogradouroId = await _context.TiposLogradouro.Select(t => t.IdTipoLogradouro).FirstOrDefaultAsync(cancellationToken);
+            if (defaultLogradouroId == 0) defaultLogradouroId = 1;
+
+            SincronizarEnderecos(entidade, dto.Enderecos, defaultCidadeId, defaultLogradouroId);
+
+            await ValidarEntidadeAsync(entidade, isNew: true, cancellationToken);
+
+            await _repository.AddAsync(entidade, cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            await ProcessarPapeisAsync(entidade.IdEntidade, dto, isNew: true, cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+            return entidade;
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            _logger.LogError(ex, "Erro ao gravar dados completos da entidade. Rollback executado.");
+            throw;
+        }
+    }
+
+    public async Task<Entidade> AtualizarCompletoAsync(int id, SalvarEntidadeDto dto, CancellationToken cancellationToken = default)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var entidade = await _repository.GetCompletoPorIdAsync(id, cancellationToken);
+            if (entidade == null)
+            {
+                throw new InvalidOperationException($"Entidade com ID {id} não encontrada para atualização.");
+            }
+
+            var tipoEnum = dto.TipoPessoa == 2 ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
+
+            entidade.Nome = dto.Nome;
+            entidade.Email = dto.Email;
+            entidade.EmailNFE = dto.EmailNFE;
+            entidade.EmailFinanceiro = dto.EmailFinanceiro;
+            entidade.EmailVenda = dto.EmailVenda;
+            entidade.EmailCompra = dto.EmailCompra;
+            entidade.HomePage = dto.HomePage;
+            entidade.Observacao = dto.Observacao;
+            entidade.InscricaoEstadual = dto.InscricaoEstadual;
+            entidade.InscricaoMunicipal = dto.InscricaoMunicipal;
+            entidade.InscricaoSuframa = dto.InscricaoSuframa;
+            entidade.Ativo = dto.Ativo;
+            entidade.TipoPessoa = tipoEnum;
+            entidade.IsCliente = dto.IsCliente;
+            entidade.IsFornecedor = dto.IsFornecedor;
+            entidade.IsTransportadora = dto.IsTransportadora;
+            entidade.IsComissionado = dto.IsComissionado;
+            entidade.IsAgenciaBancaria = dto.IsAgencia;
+            entidade.IsInstituicaoFinanceira = dto.IsFinanceira;
+            entidade.IsFilial = dto.IsFilial;
+            entidade.IsFuncionario = dto.IsFuncionario;
+            entidade.IsObra = dto.IsObra;
+            entidade.IsRepresentante = dto.IsRepresentante;
+            entidade.IsOutro = dto.IsOutro;
+            entidade.IsProspecto = dto.IsProspecto;
+            entidade.IsContador = dto.IsContador;
+            entidade.IsAluno = dto.IsAluno;
+            entidade.IsProfessor = dto.IsProfessor;
+            entidade.IsIntermediadorComercial = dto.IsIntermediador;
+
+            entidade.IdUsuarioAlteracao = _contexto.IdUsuario;
+            entidade.DataAlteracao = DateTime.Today;
+            entidade.HoraAlteracao = DateTime.Now;
+
+            if (tipoEnum == EntidadeTipoPessoa.Fisica)
+            {
+                if (entidade.PessoaFisica == null)
+                {
+                    entidade.PessoaFisica = new DadosPessoaFisica { IdEntidade = id };
+                }
+                entidade.PessoaFisica.Cpf = dto.Cpf ?? string.Empty;
+                entidade.PessoaFisica.Rg = dto.Rg ?? string.Empty;
+                entidade.PessoaJuridica = null;
+            }
+            else
+            {
+                if (entidade.PessoaJuridica == null)
+                {
+                    entidade.PessoaJuridica = new DadosPessoaJuridica { IdEntidade = id };
+                }
+                entidade.PessoaJuridica.Cnpj = dto.Cnpj ?? string.Empty;
+                entidade.PessoaJuridica.RazaoSocial = dto.Nome;
+                entidade.PessoaFisica = null;
+            }
+
+            var defaultCidadeId = await _context.Cidades.Select(c => c.IdCidade).FirstOrDefaultAsync(cancellationToken);
+            if (defaultCidadeId == 0) defaultCidadeId = 1;
+
+            var defaultLogradouroId = await _context.TiposLogradouro.Select(t => t.IdTipoLogradouro).FirstOrDefaultAsync(cancellationToken);
+            if (defaultLogradouroId == 0) defaultLogradouroId = 1;
+
+            SincronizarEnderecos(entidade, dto.Enderecos, defaultCidadeId, defaultLogradouroId);
+
+            await ValidarEntidadeAsync(entidade, isNew: false, cancellationToken);
+
+            await _repository.UpdateAsync(entidade, cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            await ProcessarPapeisAsync(entidade.IdEntidade, dto, isNew: false, cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+            return entidade;
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            _logger.LogError(ex, "Erro ao atualizar dados completos da entidade. Rollback executado.");
+            throw;
+        }
+    }
+
+    public async Task ExcluirAsync(int id, CancellationToken cancellationToken = default)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var entidade = await _repository.GetByIdAsync(id, cancellationToken);
+            if (entidade == null) return;
+
+            using var scope = _serviceProvider.CreateScope();
+            
+            var clienteRepo = scope.ServiceProvider.GetRequiredService<IClienteRepository>();
+            var cliente = await clienteRepo.GetByIdAsync(id, cancellationToken);
+            if (cliente != null) await scope.ServiceProvider.GetRequiredService<IClienteService>().ExcluirAsync(id, cancellationToken);
+
+            var fornecedorRepo = scope.ServiceProvider.GetRequiredService<IFornecedorRepository>();
+            var fornecedor = await fornecedorRepo.GetByIdAsync(id, cancellationToken);
+            if (fornecedor != null) await scope.ServiceProvider.GetRequiredService<IFornecedorService>().ExcluirAsync(id, cancellationToken);
+
+            var funcionarioRepo = scope.ServiceProvider.GetRequiredService<IFuncionarioRepository>();
+            var funcionario = await funcionarioRepo.GetByIdAsync(id, cancellationToken);
+            if (funcionario != null) await scope.ServiceProvider.GetRequiredService<IFuncionarioService>().ExcluirAsync(id, cancellationToken);
+
+            var transportadoraRepo = scope.ServiceProvider.GetRequiredService<ITransportadoraRepository>();
+            var transportadora = await transportadoraRepo.GetByIdAsync(id, cancellationToken);
+            if (transportadora != null) await scope.ServiceProvider.GetRequiredService<ITransportadoraService>().ExcluirAsync(id, cancellationToken);
+
+            await _repository.DeleteAsync(entidade, cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            _logger.LogError(ex, "Erro ao excluir entidade {IdEntidade}. Rollback executado.", id);
+            throw;
+        }
+    }
+
+    private void SincronizarEnderecos(Entidade entidade, List<EnderecoDto>? incomingDtos, int defaultCidadeId, int defaultLogradouroId)
+    {
+        var dbEnderecos = _context.EntidadeEnderecos.Where(ee => ee.IdEntidade == entidade.IdEntidade).ToList();
+        var incomingList = incomingDtos ?? new List<EnderecoDto>();
+
+        var keysToKeep = incomingList.Select(x => x.Id).ToHashSet();
+        var itemsToRemove = dbEnderecos.Where(item => !keysToKeep.Contains(item.IdEntidadeEndereco)).ToList();
+        foreach (var item in itemsToRemove)
+        {
+            _context.EntidadeEnderecos.Remove(item);
+        }
+
+        foreach (var dto in incomingList)
+        {
+            var dbItem = dbEnderecos.FirstOrDefault(item => item.IdEntidadeEndereco == dto.Id && dto.Id > 0);
+            if (dbItem == null)
+            {
+                var novoEnd = new EntidadeEndereco
+                {
+                    IdEntidade = entidade.IdEntidade,
+                    IdCidade = defaultCidadeId,
+                    IdTipoLogradouro = defaultLogradouroId,
+                    Logradouro = dto.Logradouro,
+                    Numero = int.TryParse(dto.Numero, out var num) ? num : null,
+                    Cep = dto.Cep,
+                    Complemento = string.Empty,
+                    Bairro = null,
+                    Ativo = true,
+                    Padrao = false,
+                    TipoEndereco = ParseEnderecoTipo(dto.Tipo)
+                };
+                _context.EntidadeEnderecos.Add(novoEnd);
+            }
+            else
+            {
+                dbItem.Logradouro = dto.Logradouro;
+                dbItem.Numero = int.TryParse(dto.Numero, out var num) ? num : null;
+                dbItem.Cep = dto.Cep;
+                dbItem.TipoEndereco = ParseEnderecoTipo(dto.Tipo);
+                _context.EntidadeEnderecos.Update(dbItem);
+            }
+        }
+    }
+
+    private EnderecoTipo ParseEnderecoTipo(string tipo)
+    {
+        if (string.IsNullOrWhiteSpace(tipo)) return EnderecoTipo.ComercialResidencial;
+        return tipo.ToLower() switch
+        {
+            "comercial" => EnderecoTipo.Comercial,
+            "residencial" => EnderecoTipo.Residencial,
+            "entrega" => EnderecoTipo.Entrega,
+            "cobrança" or "cobranca" => EnderecoTipo.Cobranca,
+            _ => EnderecoTipo.ComercialResidencial
+        };
+    }
+
+    private async Task ProcessarPapeisAsync(int id, SalvarEntidadeDto dto, bool isNew, CancellationToken cancellationToken)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        
+        var clienteService = scope.ServiceProvider.GetRequiredService<IClienteService>();
+        var clienteRepo = scope.ServiceProvider.GetRequiredService<IClienteRepository>();
+        var clienteExistente = await clienteRepo.GetByIdAsync(id, cancellationToken);
+
+        if (dto.IsCliente)
+        {
+            var clienteDto = new CriarClienteDto
+            {
+                IdEntidade = id,
+                Ativo = true,
+                LimiteCredito = 0
+            };
+            if (clienteExistente == null)
+            {
+                await clienteService.CriarAsync(clienteDto, cancellationToken);
+            }
+            else
+            {
+                await clienteService.AtualizarAsync(id, clienteDto, cancellationToken);
+            }
+        }
+        else if (clienteExistente != null)
+        {
+            await clienteService.ExcluirAsync(id, cancellationToken);
+        }
+
+        var fornecedorService = scope.ServiceProvider.GetRequiredService<IFornecedorService>();
+        var fornecedorRepo = scope.ServiceProvider.GetRequiredService<IFornecedorRepository>();
+        var fornecedorExistente = await fornecedorRepo.GetByIdAsync(id, cancellationToken);
+
+        if (dto.IsFornecedor)
+        {
+            var fornecedorDto = new CriarFornecedorDto
+            {
+                IdEntidade = id,
+                Ativo = true
+            };
+            if (fornecedorExistente == null)
+            {
+                await fornecedorService.CriarAsync(fornecedorDto, cancellationToken);
+            }
+            else
+            {
+                await fornecedorService.AtualizarAsync(id, fornecedorDto, cancellationToken);
+            }
+        }
+        else if (fornecedorExistente != null)
+        {
+            await fornecedorService.ExcluirAsync(id, cancellationToken);
+        }
+
+        var funcionarioService = scope.ServiceProvider.GetRequiredService<IFuncionarioService>();
+        var funcionarioRepo = scope.ServiceProvider.GetRequiredService<IFuncionarioRepository>();
+        var funcionarioExistente = await funcionarioRepo.GetByIdAsync(id, cancellationToken);
+
+        if (dto.IsFuncionario)
+        {
+            var funcionarioDto = new CriarFuncionarioDto
+            {
+                IdEntidade = id,
+                Ativo = true
+            };
+            if (funcionarioExistente == null)
+            {
+                await funcionarioService.CriarAsync(funcionarioDto, cancellationToken);
+            }
+            else
+            {
+                await funcionarioService.AtualizarAsync(id, funcionarioDto, cancellationToken);
+            }
+        }
+        else if (funcionarioExistente != null)
+        {
+            await funcionarioService.ExcluirAsync(id, cancellationToken);
+        }
+
+        var transportadoraService = scope.ServiceProvider.GetRequiredService<ITransportadoraService>();
+        var transportadoraRepo = scope.ServiceProvider.GetRequiredService<ITransportadoraRepository>();
+        var transportadoraExistente = await transportadoraRepo.GetByIdAsync(id, cancellationToken);
+
+        if (dto.IsTransportadora)
+        {
+            var transportadoraDto = new CriarTransportadoraDto
+            {
+                IdEntidade = id,
+                Ativo = true
+            };
+            if (transportadoraExistente == null)
+            {
+                await transportadoraService.CriarAsync(transportadoraDto, cancellationToken);
+            }
+            else
+            {
+                await transportadoraService.AtualizarAsync(id, transportadoraDto, cancellationToken);
+            }
+        }
+        else if (transportadoraExistente != null)
+        {
+            await transportadoraService.ExcluirAsync(id, cancellationToken);
+        }
     }
 }
 
