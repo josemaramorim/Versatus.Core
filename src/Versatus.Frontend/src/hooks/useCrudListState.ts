@@ -9,8 +9,17 @@ export function useCrudListState<T>(
   // Estado principal de registros (Grade)
   const [records, setRecords] = useState<T[]>(initialRecords);
 
-  // Estado de Filtros de Busca
+  // Filtros aplicados na Grid
   const [filters, setFilters] = useState<Record<string, any>>({});
+  // Filtros temporários digitados na Gaveta (Rascunho)
+  const [tempFilters, setTempFilters] = useState<Record<string, any>>({});
+
+  // Controle de abertura da Gaveta de Filtros
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+
+  // Estados de Paginação
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // Estado de Ordenação
   const [sortConfig, setSortConfig] = useState<ISortConfig>({
@@ -24,16 +33,46 @@ export function useCrudListState<T>(
 
   const isModalOpen = modalMode !== 'none';
 
-  // Lógica de alteração e limpeza de filtros
+  // Lógica de alteração de filtros temporários na Gaveta
   const handleFilterChange = (field: string, value: any) => {
-    setFilters((prev) => ({
+    setTempFilters((prev) => ({
       ...prev,
       [field]: value
     }));
   };
 
+  // Abrir a gaveta e sincronizar o rascunho com os filtros atualmente aplicados
+  const handleOpenFilterDrawer = () => {
+    setTempFilters(filters);
+    setIsFilterDrawerOpen(true);
+  };
+
+  // Aplicar os filtros do rascunho na Grid
+  const handleApplyFilters = () => {
+    setFilters(tempFilters);
+    setPage(0); // Volta para a primeira página
+    setIsFilterDrawerOpen(false);
+  };
+
+  // Limpar todos os filtros
   const handleClearFilters = () => {
     setFilters({});
+    setTempFilters({});
+    setPage(0);
+    setIsFilterDrawerOpen(false);
+  };
+
+  // Remover um filtro específico clicando no Chip
+  const handleRemoveFilterChip = (field: string) => {
+    const updatedFilters = { ...filters };
+    delete updatedFilters[field];
+
+    const updatedTempFilters = { ...tempFilters };
+    delete updatedTempFilters[field];
+
+    setFilters(updatedFilters);
+    setTempFilters(updatedTempFilters);
+    setPage(0);
   };
 
   // Alternar ordenação de coluna
@@ -47,6 +86,16 @@ export function useCrudListState<T>(
       }
       return { column, direction: 'asc' };
     });
+  };
+
+  // Funções de paginação
+  const handleChangePage = (_: any, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   // Funções de abertura de Modal por Ações
@@ -71,17 +120,13 @@ export function useCrudListState<T>(
 
   // Confirmação de Operações no Formulário
   const onSave = (recordData: T) => {
-    // Gancho de pré-gravação da classe de configuração (OOP)
     const processedRecord = config.beforeSave(recordData);
 
     if (modalMode === 'insert') {
-      // Inserção
       setRecords((prev) => [...prev, processedRecord]);
     } else if (modalMode === 'edit') {
-      // Edição (Encontrar e substituir o objeto correspondente)
       setRecords((prev) =>
         prev.map((item) => {
-          // Identificador padrão no ERP geralmente é 'codigo' ou 'id'
           const keyField = 'codigo' in (item as any) ? 'codigo' : 'id';
           if ((item as any)[keyField] === (processedRecord as any)[keyField]) {
             return processedRecord;
@@ -94,7 +139,6 @@ export function useCrudListState<T>(
   };
 
   const onDeleteConfirm = () => {
-    // Exclusão
     setRecords((prev) =>
       prev.filter((item) => {
         const keyField = 'codigo' in (item as any) ? 'codigo' : 'id';
@@ -104,7 +148,7 @@ export function useCrudListState<T>(
     setModalMode('none');
   };
 
-  // Lógica de Filtragem e Ordenação dos dados em tempo real
+  // Lógica de Filtragem e Ordenação dos dados (em memória)
   const filteredAndSortedRecords = useMemo(() => {
     let result = [...records];
 
@@ -119,17 +163,14 @@ export function useCrudListState<T>(
         const value = (item as any)[key];
         if (value === undefined || value === null) return false;
 
-        // Se for string, busca parcial sem case-sensitive
         if (typeof value === 'string') {
           return value.toLowerCase().includes(filterValue.toString().toLowerCase());
         }
         
-        // Se for booleano, correspondência exata
         if (typeof value === 'boolean') {
           return value === filterValue;
         }
 
-        // Outros tipos, correspondência de string exata
         return value.toString() === filterValue.toString();
       });
     });
@@ -159,22 +200,39 @@ export function useCrudListState<T>(
     return result;
   }, [records, filters, sortConfig]);
 
+  // 3. Fazer fatiamento da Paginação sobre a lista filtrada/ordenada
+  const paginatedRecords = useMemo(() => {
+    const startIndex = page * rowsPerPage;
+    return filteredAndSortedRecords.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredAndSortedRecords, page, rowsPerPage]);
+
   return {
-    records: filteredAndSortedRecords,
+    records: paginatedRecords, // Registros já fatiados para a página atual
+    totalRecords: filteredAndSortedRecords.length, // Total após os filtros aplicados
     filters,
+    tempFilters,
+    isFilterDrawerOpen,
+    page,
+    rowsPerPage,
     sortConfig,
     modalMode,
     selectedRecord,
     isModalOpen,
     handleFilterChange,
+    handleOpenFilterDrawer,
+    handleApplyFilters,
     handleClearFilters,
+    handleRemoveFilterChip,
     handleSort,
+    handleChangePage,
+    handleChangeRowsPerPage,
     onAdicionarClick,
     onEditarClick,
     onDeletarClick,
     onModalClose,
     onSave,
     onDeleteConfirm,
+    setIsFilterDrawerOpen,
     setRecords
   };
 }
