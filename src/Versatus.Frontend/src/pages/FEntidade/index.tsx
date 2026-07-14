@@ -23,7 +23,6 @@ import { EntidadeCadastroConfig } from './EntidadeCadastroConfig';
 import type { CadastroModalMode } from '../../types/cadastro';
 
 import type { IEntidadeForm } from './types';
-import { defaultValues } from './types';
 import { entidadeSchema } from './schema';
 
 import { DadosGeraisTab } from './tabs/DadosGeraisTab';
@@ -658,71 +657,10 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
 
 // Componente principal FEntidade ligado ao CadastroBasePage (OOP)
 export const FEntidade: React.FC = () => {
-  const initialRecords: IEntidadeForm[] = [
-    {
-      ...defaultValues,
-      codigo: 'ENT-0001',
-      razaoSocial: 'Versatus Tecnologia Ltda',
-      apelido: 'Versatus',
-      tipoPessoa: 2,
-      cnpj: '12345678000199',
-      contribuinteIcms: 'Sim',
-      dataNascimento: '1995-10-25',
-      isCliente: true,
-      isFornecedor: true,
-      isFuncionario: false,
-      isTransportadora: false,
-      isComissionado: false,
-      isAgencia: false,
-      isFinanceira: false,
-      isContador: false,
-      isRepresentante: false,
-      isOutro: false,
-      isProspecto: false,
-      isAluno: false,
-      isProfessor: false,
-      isIntermediador: false,
-      isObra: false,
-      isFilial: false,
-      enderecos: [],
-      telefones: [],
-      contatos: []
-    },
-    {
-      ...defaultValues,
-      codigo: 'ENT-0002',
-      razaoSocial: 'Carlos Alberto Silva',
-      apelido: 'Carlos Silva',
-      tipoPessoa: 1,
-      cpf: '98765432100',
-      contribuinteIcms: 'Nao',
-      dataNascimento: '1985-02-12',
-      isCliente: true,
-      isFornecedor: false,
-      isFuncionario: true,
-      isTransportadora: false,
-      isComissionado: false,
-      isAgencia: false,
-      isFinanceira: false,
-      isContador: false,
-      isRepresentante: false,
-      isOutro: false,
-      isProspecto: false,
-      isAluno: false,
-      isProfessor: false,
-      isIntermediador: false,
-      isObra: false,
-      isFilial: false,
-      enderecos: [],
-      telefones: [],
-      contatos: []
-    }
-  ];
-
   return (
     <CadastroBasePage<IEntidadeForm>
       config={new EntidadeCadastroConfig()}
-      initialRecords={initialRecords}
+      initialRecords={[]}
       renderForm={(mode, record, onSave) => (
         <EntidadeFormView mode={mode} record={record} onSave={onSave} />
       )}

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BaseCadastroConfig } from '../types/cadastro';
 import type { ISortConfig, CadastroModalMode } from '../types/cadastro';
 
@@ -6,34 +6,170 @@ export function useCrudListState<T>(
   config: BaseCadastroConfig<T>,
   initialRecords: T[] = []
 ) {
-  // Estado principal de registros (Grade)
   const [records, setRecords] = useState<T[]>(initialRecords);
+  const [totalRecords, setTotalRecords] = useState<number>(initialRecords.length);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Filtros aplicados na Grid
   const [filters, setFilters] = useState<Record<string, any>>({});
-  // Filtros temporários digitados na Gaveta (Rascunho)
   const [tempFilters, setTempFilters] = useState<Record<string, any>>({});
-
-  // Controle de abertura da Gaveta de Filtros
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
-  // Estados de Paginação
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  // Estado de Ordenação
   const [sortConfig, setSortConfig] = useState<ISortConfig>({
     column: 'codigo',
     direction: 'asc'
   });
 
-  // Estado do Modal
   const [modalMode, setModalMode] = useState<CadastroModalMode>('none');
   const [selectedRecord, setSelectedRecord] = useState<T>(config.getDefaultValues());
 
   const isModalOpen = modalMode !== 'none';
+  const isEntidade = config.getApiEndpoint() === '/api/entidade';
 
-  // Lógica de alteração de filtros temporários na Gaveta
+  // --- Mapeadores de Entidade (Front <-> API) ---
+  const mapBackendToForm = useCallback((backend: any): any => {
+    return {
+      idEntidade: backend.idEntidade,
+      codigo: `ENT-${String(backend.idEntidade).padStart(4, '0')}`,
+      razaoSocial: backend.pessoaJuridica?.razaoSocial || backend.nome || '',
+      apelido: backend.nome || '',
+      tipoPessoa: backend.tipoPessoa || 1,
+      ativo: backend.ativo ?? true,
+      cpf: backend.pessoaFisica?.cpf || '',
+      cnpj: backend.pessoaJuridica?.cnpj || '',
+      rg: backend.pessoaFisica?.rg || '',
+      isCliente: backend.isCliente || false,
+      isFornecedor: backend.isFornecedor || false,
+      isFuncionario: backend.isFuncionario || false,
+      isTransportadora: backend.isTransportadora || false,
+      isComissionado: backend.isComissionado || false,
+      isAgencia: backend.isAgenciaBancaria || false,
+      isFinanceira: backend.isInstituicaoFinanceira || false,
+      isFilial: backend.isFilial || false,
+      isObra: backend.isObra || false,
+      isRepresentante: backend.isRepresentante || false,
+      isOutro: backend.isOutro || false,
+      isProspecto: backend.isProspecto || false,
+      isContador: backend.isContador || false,
+      isAluno: backend.isAluno || false,
+      isProfessor: backend.isProfessor || false,
+      isIntermediador: backend.isIntermediadorComercial || false,
+      inscricaoEstadual: backend.inscricaoEstadual || '',
+      inscricaoMunicipal: backend.inscricaoMunicipal || '',
+      inscricaoSuframa: backend.inscricaoSuframa || '',
+      emailPrincipal: backend.email || '',
+      emailNfe: backend.emailNFE || '',
+      emailFinanceiro: backend.emailFinanceiro || '',
+      emailVendas: backend.emailVenda || '',
+      emailCompras: backend.emailCompra || '',
+      homePage: backend.homePage || '',
+      observacao: backend.observacao || '',
+      enderecos: (backend.enderecos || []).map((end: any) => ({
+        id: end.idEntidadeEndereco,
+        tipo: end.tipoEndereco === 1 ? 'ComercialResidencial' :
+              end.tipoEndereco === 2 ? 'Comercial' :
+              end.tipoEndereco === 3 ? 'Residencial' :
+              end.tipoEndereco === 4 ? 'Entrega' :
+              end.tipoEndereco === 5 ? 'Cobranca' : 'Outro',
+        logradouro: end.logradouro || '',
+        numero: String(end.numero || ''),
+        bairro: end.bairro?.nome || '',
+        cidade: end.cidade?.nome || '',
+        uf: end.cidade?.estado?.sigla || '',
+        cep: end.cep || ''
+      })),
+      telefones: [],
+      contatos: [],
+      cnaes: [],
+      empresas: []
+    };
+  }, []);
+
+  const mapFormToBackendDto = useCallback((form: any): any => {
+    return {
+      nome: form.razaoSocial || '',
+      apelido: form.apelido || '',
+      email: form.emailPrincipal || '',
+      emailNFE: form.emailNfe || '',
+      emailFinanceiro: form.emailFinanceiro || '',
+      emailVenda: form.emailVendas || '',
+      emailCompra: form.emailCompras || '',
+      homePage: form.homePage || '',
+      observacao: form.observacao || '',
+      inscricaoEstadual: form.inscricaoEstadual || '',
+      inscricaoMunicipal: form.inscricaoMunicipal || '',
+      inscricaoSuframa: form.inscricaoSuframa || '',
+      ativo: form.ativo,
+      tipoPessoa: Number(form.tipoPessoa),
+      cpf: form.cpf || '',
+      cnpj: form.cnpj || '',
+      rg: form.rg || '',
+      isCliente: form.isCliente || false,
+      isFornecedor: form.isFornecedor || false,
+      isFuncionario: form.isFuncionario || false,
+      isTransportadora: form.isTransportadora || false,
+      isComissionado: form.isComissionado || false,
+      isAgencia: form.isAgencia || false,
+      isFinanceira: form.isFinanceira || false,
+      isFilial: form.isFilial || false,
+      isObra: form.isObra || false,
+      isRepresentante: form.isRepresentante || false,
+      isOutro: form.isOutro || false,
+      isProspecto: form.isProspecto || false,
+      isContador: form.isContador || false,
+      isAluno: form.isAluno || false,
+      isProfessor: form.isProfessor || false,
+      isIntermediador: form.isIntermediador || false,
+      enderecos: (form.enderecos || []).map((end: any) => ({
+        id: end.id || 0,
+        tipo: end.tipo || 'ComercialResidencial',
+        logradouro: end.logradouro || '',
+        numero: end.numero || '',
+        cep: end.cep || ''
+      }))
+    };
+  }, []);
+
+  // --- Chamada à API ---
+  const fetchRecords = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: String(page + 1),
+        limit: String(rowsPerPage),
+        sortBy: sortConfig.column,
+        sortOrder: sortConfig.direction,
+        search: filters.termoBusca || '',
+        role: filters.role || ''
+      });
+
+      const response = await fetch(`${config.getApiEndpoint()}/paginado?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error('Erro ao buscar dados na API');
+      }
+
+      const data = await response.json();
+      const rawItems = data.items || [];
+      
+      const mappedItems = isEntidade 
+        ? rawItems.map((item: any) => mapBackendToForm(item)) 
+        : rawItems;
+
+      setRecords(mappedItems);
+      setTotalRecords(data.total || 0);
+    } catch (error) {
+      console.error('Erro na requisição paginada:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, rowsPerPage, sortConfig, filters, config, isEntidade, mapBackendToForm]);
+
+  useEffect(() => {
+    fetchRecords();
+  }, [fetchRecords]);
+
+  // --- Filtros ---
   const handleFilterChange = (field: string, value: any) => {
     setTempFilters((prev) => ({
       ...prev,
@@ -41,20 +177,17 @@ export function useCrudListState<T>(
     }));
   };
 
-  // Abrir a gaveta e sincronizar o rascunho com os filtros atualmente aplicados
   const handleOpenFilterDrawer = () => {
     setTempFilters(filters);
     setIsFilterDrawerOpen(true);
   };
 
-  // Aplicar os filtros do rascunho na Grid
   const handleApplyFilters = () => {
     setFilters(tempFilters);
-    setPage(0); // Volta para a primeira página
+    setPage(0);
     setIsFilterDrawerOpen(false);
   };
 
-  // Limpar todos os filtros
   const handleClearFilters = () => {
     setFilters({});
     setTempFilters({});
@@ -62,7 +195,6 @@ export function useCrudListState<T>(
     setIsFilterDrawerOpen(false);
   };
 
-  // Remover um filtro específico clicando no Chip
   const handleRemoveFilterChip = (field: string) => {
     const updatedFilters = { ...filters };
     delete updatedFilters[field];
@@ -75,7 +207,7 @@ export function useCrudListState<T>(
     setPage(0);
   };
 
-  // Alternar ordenação de coluna
+  // --- Ordenação & Paginação ---
   const handleSort = (column: string) => {
     setSortConfig((prev) => {
       if (prev.column === column) {
@@ -88,7 +220,6 @@ export function useCrudListState<T>(
     });
   };
 
-  // Funções de paginação
   const handleChangePage = (_: any, newPage: number) => {
     setPage(newPage);
   };
@@ -98,15 +229,38 @@ export function useCrudListState<T>(
     setPage(0);
   };
 
-  // Funções de abertura de Modal por Ações
+  // --- Modal Ações ---
   const onAdicionarClick = () => {
     setSelectedRecord(config.getDefaultValues());
     setModalMode('insert');
   };
 
-  const onEditarClick = (record: T) => {
-    setSelectedRecord(record);
-    setModalMode('edit');
+  const onEditarClick = async (record: T) => {
+    setLoading(true);
+    try {
+      const id = (record as any).idEntidade || (record as any).id;
+      if (!id) {
+        setSelectedRecord(record);
+        setModalMode('edit');
+        return;
+      }
+
+      const response = await fetch(`${config.getApiEndpoint()}/completo/${id}`);
+      if (!response.ok) {
+        throw new Error('Erro ao buscar detalhes da entidade');
+      }
+
+      const data = await response.json();
+      const mappedRecord = isEntidade ? mapBackendToForm(data) : data;
+      setSelectedRecord(mappedRecord);
+      setModalMode('edit');
+    } catch (err) {
+      console.error(err);
+      setSelectedRecord(record);
+      setModalMode('edit');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onDeletarClick = (record: T) => {
@@ -118,102 +272,67 @@ export function useCrudListState<T>(
     setModalMode('none');
   };
 
-  // Confirmação de Operações no Formulário
-  const onSave = (recordData: T) => {
-    const processedRecord = config.beforeSave(recordData);
+  // --- Persistência de Dados ---
+  const onSave = async (recordData: T) => {
+    setLoading(true);
+    try {
+      const processedRecord = config.beforeSave(recordData);
+      const url = modalMode === 'edit' 
+        ? `${config.getApiEndpoint()}/${(processedRecord as any).idEntidade}`
+        : config.getApiEndpoint();
 
-    if (modalMode === 'insert') {
-      setRecords((prev) => [...prev, processedRecord]);
-    } else if (modalMode === 'edit') {
-      setRecords((prev) =>
-        prev.map((item) => {
-          const keyField = 'codigo' in (item as any) ? 'codigo' : 'id';
-          if ((item as any)[keyField] === (processedRecord as any)[keyField]) {
-            return processedRecord;
-          }
-          return item;
-        })
-      );
-    }
-    setModalMode('none');
-  };
+      const method = modalMode === 'edit' ? 'PUT' : 'POST';
+      const body = isEntidade ? mapFormToBackendDto(processedRecord) : processedRecord;
 
-  const onDeleteConfirm = () => {
-    setRecords((prev) =>
-      prev.filter((item) => {
-        const keyField = 'codigo' in (item as any) ? 'codigo' : 'id';
-        return (item as any)[keyField] !== (selectedRecord as any)[keyField];
-      })
-    );
-    setModalMode('none');
-  };
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
 
-  // Lógica de Filtragem e Ordenação dos dados (em memória)
-  const filteredAndSortedRecords = useMemo(() => {
-    let result = [...records];
-
-    // 1. Filtrar registros com base no estado de filtros configurados
-    Object.keys(filters).forEach((key) => {
-      const filterValue = filters[key];
-      if (filterValue === undefined || filterValue === null || filterValue === '') {
-        return;
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || 'Erro ao persistir entidade');
       }
 
-      if (key === 'role') {
-        result = result.filter((item) => (item as any)[filterValue] === true);
-        return;
+      setModalMode('none');
+      await fetchRecords();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'Erro ao persistir registro.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onDeleteConfirm = async () => {
+    setLoading(true);
+    try {
+      const id = (selectedRecord as any).idEntidade || (selectedRecord as any).id;
+      const response = await fetch(`${config.getApiEndpoint()}/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao excluir registro');
       }
 
-      result = result.filter((item) => {
-        const value = (item as any)[key];
-        if (value === undefined || value === null) return false;
-
-        if (typeof value === 'string') {
-          return value.toLowerCase().includes(filterValue.toString().toLowerCase());
-        }
-        
-        if (typeof value === 'boolean') {
-          return value === filterValue;
-        }
-
-        return value.toString() === filterValue.toString();
-      });
-    });
-
-    // 2. Ordenar registros
-    const { column, direction } = sortConfig;
-    if (column) {
-      result.sort((a, b) => {
-        let valA = (a as any)[column];
-        let valB = (b as any)[column];
-
-        if (valA === undefined || valA === null) valA = '';
-        if (valB === undefined || valB === null) valB = '';
-
-        if (typeof valA === 'string' && typeof valB === 'string') {
-          return direction === 'asc' 
-            ? valA.localeCompare(valB) 
-            : valB.localeCompare(valA);
-        }
-
-        if (valA < valB) return direction === 'asc' ? -1 : 1;
-        if (valA > valB) return direction === 'asc' ? 1 : -1;
-        return 0;
-      });
+      setModalMode('none');
+      await fetchRecords();
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao excluir registro.');
+    } finally {
+      setLoading(false);
     }
-
-    return result;
-  }, [records, filters, sortConfig]);
-
-  // 3. Fazer fatiamento da Paginação sobre a lista filtrada/ordenada
-  const paginatedRecords = useMemo(() => {
-    const startIndex = page * rowsPerPage;
-    return filteredAndSortedRecords.slice(startIndex, startIndex + rowsPerPage);
-  }, [filteredAndSortedRecords, page, rowsPerPage]);
+  };
 
   return {
-    records: paginatedRecords, // Registros já fatiados para a página atual
-    totalRecords: filteredAndSortedRecords.length, // Total após os filtros aplicados
+    records,
+    totalRecords,
+    loading,
     filters,
     tempFilters,
     isFilterDrawerOpen,
