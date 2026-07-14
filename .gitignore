@@ -56,3 +56,11 @@ projeto_tag_1906/
 
 # Visual Studio
 .vs/
+
+# Frontend (Versatus.Frontend)
+src/Versatus.Frontend/node_modules/
+src/Versatus.Frontend/dist/
+src/Versatus.Frontend/dist-ssr/
+src/Versatus.Frontend/*.local
+src/Versatus.Frontend/.env
+src/Versatus.Frontend/.env.*.local
