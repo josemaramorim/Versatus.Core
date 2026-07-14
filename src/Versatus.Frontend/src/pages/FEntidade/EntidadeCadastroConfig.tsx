@@ -1,3 +1,5 @@
+
+import { Box, Chip, Tooltip } from '@mui/material';
 import type { ZodTypeAny } from 'zod';
 import type { IColunaConfig, IFiltroConfig } from '../../types/cadastro';
 import { BaseCadastroConfig } from '../../types/cadastro';
@@ -56,7 +58,7 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
       {
         header: 'Tipo da Entidade',
         field: 'role',
-        width: 250,
+        width: 320,
         renderCell: (record) => {
           const roles: string[] = [];
           if (record.isCliente) roles.push('Cliente');
@@ -75,8 +77,43 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
           if (record.isAluno) roles.push('Aluno');
           if (record.isProfessor) roles.push('Professor');
           if (record.isIntermediador) roles.push('Intermediador');
-          
-          return roles.length > 0 ? roles.join(', ') : 'Geral';
+
+          if (roles.length === 0) {
+            return <Chip label="Geral" variant="outlined" size="small" sx={{ borderRadius: 1 }} />;
+          }
+
+          const visibleRoles = roles.slice(0, 2);
+          const hiddenRoles = roles.slice(2);
+
+          return (
+            <Box sx={{ display: 'flex', gap: 0.7, flexWrap: 'wrap', alignItems: 'center' }}>
+              {visibleRoles.map((role, idx) => (
+                <Chip
+                  key={idx}
+                  label={role}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  sx={{ borderRadius: 1, fontWeight: 500 }}
+                />
+              ))}
+              {hiddenRoles.length > 0 && (
+                <Tooltip title={hiddenRoles.join(', ')} arrow placement="top">
+                  <Chip
+                    label={`+${hiddenRoles.length}`}
+                    size="small"
+                    sx={{ 
+                      borderRadius: 1, 
+                      bgcolor: 'action.hover', 
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  />
+                </Tooltip>
+              )}
+            </Box>
+          );
         }
       }
     ];
@@ -136,7 +173,6 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
   // Gancho opcional para processamento antes de salvar (OOP)
   override beforeSave(record: IEntidadeForm): IEntidadeForm {
     console.log('FEntidade - Executando processamento pré-salvamento:', record.codigo);
-    // Exemplo: se pessoa física, limpa dados jurídicos irrelevantes e vice-versa
     if (record.tipoPessoa === 1) {
       return {
         ...record,
