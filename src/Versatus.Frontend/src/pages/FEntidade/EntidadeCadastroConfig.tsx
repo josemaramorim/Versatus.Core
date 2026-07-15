@@ -40,13 +40,18 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
 
   /** Transforma a resposta aninhada da API no formato plano do formulário */
   override mapBackendToForm(backend: any): IEntidadeForm {
+    // A API envia tipoPessoa: 2 para Física e 3 para Jurídica.
+    // O formulário do frontend espera 1 para Física e 2 para Jurídica.
+    const frontendTipoPessoa = backend.tipoPessoa === 2 ? 1 : 
+                             backend.tipoPessoa === 3 ? 2 : 1;
+
     return {
       ...defaultValues,
       idEntidade: backend.idEntidade,
       codigo: String(backend.idEntidade),
       razaoSocial: backend.nome || '',
       apelido: backend.pessoaJuridica?.razaoSocial || '',
-      tipoPessoa: backend.tipoPessoa || 1,
+      tipoPessoa: frontendTipoPessoa,
       ativo: backend.ativo ?? true,
       cpf: backend.pessoaFisica?.cpf || '',
       cnpj: backend.pessoaJuridica?.cnpj || '',
@@ -95,6 +100,11 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
 
   /** Transforma o formulário plano no DTO esperado pela API */
   override mapFormToBackend(form: IEntidadeForm): any {
+    // O formulário envia 1 para Física e 2 para Jurídica.
+    // A API espera tipoPessoa: 2 para Física e 3 para Jurídica.
+    const backendTipoPessoa = Number(form.tipoPessoa) === 1 ? 2 : 
+                             Number(form.tipoPessoa) === 2 ? 3 : 2;
+
     return {
       nome: form.razaoSocial || '',
       apelido: form.apelido || '',
@@ -109,7 +119,7 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
       inscricaoMunicipal: form.inscricaoMunicipal || '',
       inscricaoSuframa: form.inscricaoSuframa || '',
       ativo: form.ativo,
-      tipoPessoa: Number(form.tipoPessoa),
+      tipoPessoa: backendTipoPessoa,
       cpf: form.cpf || '',
       cnpj: form.cnpj || '',
       rg: form.rg || '',
