@@ -342,7 +342,7 @@ export function useCrudListState<T>(
 
       setModalMode('none');
       await fetchRecords();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       const msg = err.message || 'Erro ao excluir registro.';
       if (options?.onError) {
