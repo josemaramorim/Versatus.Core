@@ -52,6 +52,24 @@ export abstract class BaseCadastroConfig<T> {
   abstract getFiltros(): IFiltroConfig[];
   abstract getValidationSchema(): ZodTypeAny;
 
+  /**
+   * Transforma o objeto retornado pela API no formato do formulário/estado do front-end.
+   * Implementação padrão: retorna os dados como recebidos (sem transformação).
+   * Sobrescreva em subclasses quando a API usar uma estrutura diferente do formulário.
+   */
+  mapBackendToForm(backend: any): T {
+    return backend as T;
+  }
+
+  /**
+   * Transforma o objeto do formulário no formato esperado pela API para POST/PUT.
+   * Implementação padrão: retorna os dados como estão.
+   * Sobrescreva em subclasses quando necessário.
+   */
+  mapFormToBackend(form: T): any {
+    return form;
+  }
+
   // Gancho opcional para processamento antes de salvar
   beforeSave(record: T): T {
     return record;

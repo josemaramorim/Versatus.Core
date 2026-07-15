@@ -38,6 +38,107 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
     return entidadeSchema;
   }
 
+  /** Transforma a resposta aninhada da API no formato plano do formulário */
+  override mapBackendToForm(backend: any): IEntidadeForm {
+    return {
+      ...defaultValues,
+      idEntidade: backend.idEntidade,
+      codigo: String(backend.idEntidade),
+      razaoSocial: backend.nome || '',
+      apelido: backend.pessoaJuridica?.razaoSocial || '',
+      tipoPessoa: backend.tipoPessoa || 1,
+      ativo: backend.ativo ?? true,
+      cpf: backend.pessoaFisica?.cpf || '',
+      cnpj: backend.pessoaJuridica?.cnpj || '',
+      rg: backend.pessoaFisica?.rg || '',
+      isCliente: backend.isCliente || false,
+      isFornecedor: backend.isFornecedor || false,
+      isFuncionario: backend.isFuncionario || false,
+      isTransportadora: backend.isTransportadora || false,
+      isComissionado: backend.isComissionado || false,
+      isAgencia: backend.isAgenciaBancaria || false,
+      isFinanceira: backend.isInstituicaoFinanceira || false,
+      isFilial: backend.isFilial || false,
+      isObra: backend.isObra || false,
+      isRepresentante: backend.isRepresentante || false,
+      isOutro: backend.isOutro || false,
+      isProspecto: backend.isProspecto || false,
+      isContador: backend.isContador || false,
+      isAluno: backend.isAluno || false,
+      isProfessor: backend.isProfessor || false,
+      isIntermediador: backend.isIntermediadorComercial || false,
+      inscricaoEstadual: backend.inscricaoEstadual || '',
+      inscricaoMunicipal: backend.inscricaoMunicipal || '',
+      inscricaoSuframa: backend.inscricaoSuframa || '',
+      emailPrincipal: backend.email || '',
+      emailNfe: backend.emailNFE || '',
+      emailFinanceiro: backend.emailFinanceiro || '',
+      emailVendas: backend.emailVenda || '',
+      emailCompras: backend.emailCompra || '',
+      homePage: backend.homePage || '',
+      enderecos: (backend.enderecos || []).map((end: any) => ({
+        id: end.idEntidadeEndereco,
+        tipo: end.tipoEndereco === 1 ? 'ComercialResidencial' :
+              end.tipoEndereco === 2 ? 'Comercial' :
+              end.tipoEndereco === 3 ? 'Residencial' :
+              end.tipoEndereco === 4 ? 'Entrega' :
+              end.tipoEndereco === 5 ? 'Cobranca' : 'Outro',
+        logradouro: end.logradouro || '',
+        numero: String(end.numero || ''),
+        bairro: end.bairro?.nome || '',
+        cidade: end.cidade?.nome || '',
+        uf: end.cidade?.estado?.sigla || '',
+        cep: end.cep || ''
+      })),
+    } as IEntidadeForm;
+  }
+
+  /** Transforma o formulário plano no DTO esperado pela API */
+  override mapFormToBackend(form: IEntidadeForm): any {
+    return {
+      nome: form.razaoSocial || '',
+      apelido: form.apelido || '',
+      email: form.emailPrincipal || '',
+      emailNFE: form.emailNfe || '',
+      emailFinanceiro: form.emailFinanceiro || '',
+      emailVenda: form.emailVendas || '',
+      emailCompra: form.emailCompras || '',
+      homePage: form.homePage || '',
+      observacao: (form as any).observacao || '',
+      inscricaoEstadual: form.inscricaoEstadual || '',
+      inscricaoMunicipal: form.inscricaoMunicipal || '',
+      inscricaoSuframa: form.inscricaoSuframa || '',
+      ativo: form.ativo,
+      tipoPessoa: Number(form.tipoPessoa),
+      cpf: form.cpf || '',
+      cnpj: form.cnpj || '',
+      rg: form.rg || '',
+      isCliente: form.isCliente || false,
+      isFornecedor: form.isFornecedor || false,
+      isFuncionario: form.isFuncionario || false,
+      isTransportadora: form.isTransportadora || false,
+      isComissionado: form.isComissionado || false,
+      isAgencia: form.isAgencia || false,
+      isFinanceira: form.isFinanceira || false,
+      isFilial: form.isFilial || false,
+      isObra: form.isObra || false,
+      isRepresentante: form.isRepresentante || false,
+      isOutro: form.isOutro || false,
+      isProspecto: form.isProspecto || false,
+      isContador: form.isContador || false,
+      isAluno: form.isAluno || false,
+      isProfessor: form.isProfessor || false,
+      isIntermediador: form.isIntermediador || false,
+      enderecos: (form.enderecos || []).map((end: any) => ({
+        id: end.id || 0,
+        tipo: end.tipo || 'ComercialResidencial',
+        logradouro: end.logradouro || '',
+        numero: end.numero || '',
+        cep: end.cep || ''
+      }))
+    };
+  }
+
   getColunas(): IColunaConfig<IEntidadeForm>[] {
     return [
       {
