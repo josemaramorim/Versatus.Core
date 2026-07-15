@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node start-prod.cjs",
+    "dev": "vite",
+    "start": "npm run build && npx serve -s dist -l 3020",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
