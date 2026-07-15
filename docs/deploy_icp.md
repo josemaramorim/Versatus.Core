@@ -41,6 +41,13 @@ Defina as seguintes chaves de configuração na seção de variáveis de ambient
 | `ASPNETCORE_ENVIRONMENT` | `Production` | Define o ambiente de execução da aplicação ASP.NET Core (ex: `Production` ou `Development`). |
 | `ASPNETCORE_URLS` | `http://+:8080` | Define a porta e host em que o Kestrel escutará (caso queira trocar para a porta `5105`, defina como `http://+:5105`). |
 
+> 💡 **Dica de Preenchimento para a `CONNECTIONSTRINGS__DEFAULTCONNECTION` no ICP:**
+> * **Opção Recomendada (Conexão Interna Docker):**
+>   `Server=sql-server-2022;Database=versatus;User Id=sa;Password=V#v070804S;TrustServerCertificate=True;`
+> * **Opção Alternativa (IP Externo da VPS):**
+>   `Server=IP_DO_SEU_SERVIDOR_VPS;Database=versatus;User Id=sa;Password=V#v070804S;TrustServerCertificate=True;`
+> * ⚠️ *Atenção à senha: no ICP a senha é configurada com **S** maiúsculo (`V#v070804S`), diferentemente da senha local.*
+
 ---
 
 ## 🎨 3. Deploy do Frontend (React + Vite)
