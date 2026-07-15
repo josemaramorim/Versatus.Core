@@ -30,7 +30,7 @@ export function useCrudListState<T>(
   const [selectedRecord, setSelectedRecord] = useState<T>(config.getDefaultValues());
 
   const isModalOpen = modalMode !== 'none';
-  const isEntidade = config.getApiEndpoint() === '/api/entidade';
+  const isEntidade = config.getApiEndpoint().toLowerCase().includes('/api/entidade');
 
   // --- Mapeadores de Entidade (Front <-> API) ---
   const mapBackendToForm = useCallback((backend: any): any => {
