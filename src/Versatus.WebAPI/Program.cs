@@ -18,7 +18,8 @@ using Versatus.Infra.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Connection String
-const string connectionString = "Server=localhost\\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Server=localhost\\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;";
 
 // DbContexts
 builder.Services.AddDbContext<AcessoGlobalDbContext>(options =>
