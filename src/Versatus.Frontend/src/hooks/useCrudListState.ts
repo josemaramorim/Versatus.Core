@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BaseCadastroConfig } from '../types/cadastro';
 import type { ISortConfig, CadastroModalMode } from '../types/cadastro';
+import { getApiHeaders } from '../config/api';
 
 export function useCrudListState<T>(
   config: BaseCadastroConfig<T>,
@@ -149,7 +150,9 @@ export function useCrudListState<T>(
         tipoPessoa: filters.tipoPessoa !== undefined && filters.tipoPessoa !== null ? String(filters.tipoPessoa) : ''
       });
 
-      const response = await fetch(`${config.getApiEndpoint()}/paginado?${params.toString()}`);
+      const response = await fetch(`${config.getApiEndpoint()}/paginado?${params.toString()}`, {
+        headers: getApiHeaders()
+      });
       if (!response.ok) {
         throw new Error('Erro ao buscar dados na API');
       }
@@ -250,7 +253,9 @@ export function useCrudListState<T>(
         return;
       }
 
-      const response = await fetch(`${config.getApiEndpoint()}/completo/${id}`);
+      const response = await fetch(`${config.getApiEndpoint()}/completo/${id}`, {
+        headers: getApiHeaders()
+      });
       if (!response.ok) {
         throw new Error('Erro ao buscar detalhes da entidade');
       }
@@ -291,9 +296,7 @@ export function useCrudListState<T>(
 
       const response = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: getApiHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(body)
       });
 
@@ -327,7 +330,8 @@ export function useCrudListState<T>(
     try {
       const id = (selectedRecord as any).idEntidade || (selectedRecord as any).id;
       const response = await fetch(`${config.getApiEndpoint()}/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getApiHeaders()
       });
 
       if (!response.ok) {

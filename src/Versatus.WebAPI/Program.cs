@@ -61,6 +61,20 @@ builder.Services.AddAuthentication(x =>
 });
 
 // Controladores dos módulos como Application Parts
+// CORS: lê origens permitidas de configuração (suporta múltiplas origens separadas por vírgula)
+var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"] ?? "http://localhost:5173")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("VersatusPolicy", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -117,7 +131,7 @@ if (app.Environment.IsDevelopment() || true) // Habilita em todos os ambientes n
     });
 }
 
-app.UseHttpsRedirection();
+app.UseCors("VersatusPolicy");
 
 app.UseAuthentication();
 
