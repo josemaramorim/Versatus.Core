@@ -6,6 +6,8 @@ import { BaseCadastroConfig } from '../../types/cadastro';
 import type { IEntidadeForm } from './types';
 import { defaultValues } from './types';
 import { entidadeSchema } from './schema';
+import { buildApiEndpoint } from '../../config/api';
+
 
 function formatCpfCnpj(value: string | undefined): string {
   if (!value) return '';
@@ -25,7 +27,7 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
   }
 
   getApiEndpoint(): string {
-    return '/api/entidade';
+    return buildApiEndpoint('/api/entidade');
   }
 
   getDefaultValues(): IEntidadeForm {
