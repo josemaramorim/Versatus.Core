@@ -178,9 +178,17 @@ export function useCrudListState<T>(
   const onSave = async (recordData: T) => {
     setLoading(true);
     try {
-      const processedRecord = config.beforeSave(recordData);
+      // Mescla o estado original (selectedRecord) com as alterações do formulário (recordData)
+      // para preservar idEntidade, id, e outras propriedades internas não expostas na tela.
+      const mergedRecord = modalMode === 'edit'
+        ? { ...selectedRecord, ...recordData }
+        : recordData;
+
+      const processedRecord = config.beforeSave(mergedRecord);
+      
+      const id = (processedRecord as any).idEntidade || (processedRecord as any).id;
       const url = modalMode === 'edit' 
-        ? `${config.getApiEndpoint()}/${(processedRecord as any).idEntidade}`
+        ? `${config.getApiEndpoint()}/${id}`
         : config.getApiEndpoint();
 
       const method = modalMode === 'edit' ? 'PUT' : 'POST';
