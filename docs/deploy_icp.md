@@ -26,6 +26,7 @@ Crie uma aplicação Standalone no painel ICP (**Aplicações -> Standalone**):
 * **Repositório:** `josemaramorim/Versatus.Core`
 * **Branch:** `develop`
 * **Pasta do Projeto:** `src/Versatus.WebAPI` *(Certifique-se de incluir o **I** no final, pois o nome é WebAPI e não WebAP)*
+* **Comando de Build:** `dotnet publish src/Versatus.WebAPI/Versatus.WebAPI.csproj -c Release -o /app` *(se o painel solicitar)*
 * **Script de Execução:** `dotnet /app/Versatus.WebAPI.dll` *(ou `dotnet Versatus.WebAPI.dll`, caso a saída não seja mapeada para /app)*
 * **Porta da Aplicação / Porta Externa:** `8080` (Porta padrão do .NET Core em contêineres) ou `5105` (se desejar manter a porta de desenvolvimento local).
 
