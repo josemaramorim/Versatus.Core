@@ -9,7 +9,7 @@ Este guia documenta o passo a passo para a publicação da API (Back-end .NET 10
 2. [Deploy da API (Back-end)](#2-deploy-da-api-back-end)
    * [Variáveis de Ambiente Necessárias (API)](#variáveis-de-ambiente-necessárias-api)
 3. [Deploy do Frontend (React + Vite)](#3-deploy-do-frontend-react--vite)
-   * [Variáveis de Ambiente do Frontend (Opcional)](#variáveis-de-ambiente-do-frontend-opcional)
+   * [Variáveis de Ambiente Obrigatórias do Frontend](#variáveis-de-ambiente-obrigatórias-do-frontend)
 4. [Como Testar e Validar a API (Swagger)](#4-como-testar-e-validar-a-api-swagger)
 
 ---
@@ -48,6 +48,7 @@ Defina as seguintes chaves de configuração na seção de variáveis de ambient
 | :--- | :--- | :--- |
 | `CONNECTIONSTRINGS__DEFAULTCONNECTION` | `Server=localhost\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;` | String de conexão para o banco de dados SQL Server remoto no iContainer. |
 | `SECURITY__STRANGLERAPIKEY` | `SUA_CHAVE_SUPER_SECRETA_DE_INTEGRACAO_2026` | API Key de segurança para autenticação das integrações de microsserviços. |
+| `CORS__ALLOWEDORIGINS` | `http://localhost:5173,http://localhost:3000` | Origens permitidas pela política de CORS. **Em produção, adicione o domínio do Frontend** (ex: `https://versatus-dev.versatusapp.com.br`). Múltiplos domínios separados por vírgula. |
 | `ASPNETCORE_ENVIRONMENT` | `Production` | Define o ambiente de execução da aplicação ASP.NET Core (ex: `Production` ou `Development`). |
 | `ASPNETCORE_URLS` | `http://+:8080` | Define a porta e host em que o Kestrel escutará (caso queira trocar para a porta `5105`, defina como `http://+:5105`). |
 
@@ -82,9 +83,16 @@ Crie uma aplicação Standalone no painel ICP (**Aplicações -> Standalone**):
   ```
 * **Porta da Aplicação / Porta Externa:** `3000`
 
-### 🌐 Variáveis de Ambiente do Frontend (Opcional)
-* Em ambientes baseados em contêineres, as chamadas para a API (ex: `/api/entidade`) são comumente redirecionadas através do Proxy do próprio servidor web (Nginx/Apache) configurado no painel ICP.
-* Mapeie a rota `/api` do domínio do Frontend (`app.seudominio.com/api`) para apontar diretamente para o endereço da API (`https://api.seudominio.com/api`).
+### 🌐 Variáveis de Ambiente Obrigatórias do Frontend
+
+O frontend utiliza variáveis do Vite (`VITE_*`) que são **embutidas no JavaScript durante o build**. É obrigatório configurá-las **antes** de disparar o deploy.
+
+| Nome da Variável | Valor em Produção | Descrição |
+| :--- | :--- | :--- |
+| `VITE_API_BASE_URL` | `https://erp-api-dev.versatusapp.com.br` | URL base completa da API. Todas as chamadas de dados serão prefixadas com este valor. Em desenvolvimento local, deixe vazio. |
+| `VITE_API_KEY` | `SUA_CHAVE_SUPER_SECRETA_DE_INTEGRACAO_2026` | API Key enviada automaticamente no cabeçalho `X-Api-Key` em todas as requisições ao back-end. Deve ter o mesmo valor que `SECURITY__STRANGLERAPIKEY` na API. |
+
+> ⚠️ **Atenção:** Como as variáveis `VITE_*` são injetadas **no momento do build**, qualquer alteração nelas exige um **novo deploy completo** para ter efeito. Não basta reiniciar o contêiner.
 
 ---
 
