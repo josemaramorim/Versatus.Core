@@ -89,9 +89,19 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+    {
+        Description = "Insira a chave de integração API Key no cabeçalho X-Api-Key",
+        Name = "X-Api-Key",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "ApiKey"
+    });
+
     c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>()
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>(),
+        [new OpenApiSecuritySchemeReference("ApiKey", document)] = new List<string>()
     });
 });
 
