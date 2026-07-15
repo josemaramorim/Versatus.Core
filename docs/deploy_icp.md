@@ -36,8 +36,8 @@ Defina as seguintes chaves de configuração na seção de variáveis de ambient
 
 | Nome da Variável | Valor Padrão (Local Fallback) | Descrição |
 | :--- | :--- | :--- |
-| `ConnectionStrings__DefaultConnection` | `Server=localhost\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;` | String de conexão para o banco de dados SQL Server remoto no iContainer. |
-| `Security__StranglerApiKey` | `SUA_CHAVE_SUPER_SECRETA_DE_INTEGRACAO_2026` | API Key de segurança para autenticação das integrações de microsserviços. |
+| `CONNECTIONSTRINGS__DEFAULTCONNECTION` | `Server=localhost\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;` | String de conexão para o banco de dados SQL Server remoto no iContainer. |
+| `SECURITY__STRANGLERAPIKEY` | `SUA_CHAVE_SUPER_SECRETA_DE_INTEGRACAO_2026` | API Key de segurança para autenticação das integrações de microsserviços. |
 | `ASPNETCORE_ENVIRONMENT` | `Production` | Define o ambiente de execução da aplicação ASP.NET Core (ex: `Production` ou `Development`). |
 | `ASPNETCORE_URLS` | `http://+:8080` | Define a porta e host em que o Kestrel escutará (caso queira trocar para a porta `5105`, defina como `http://+:5105`). |
 
