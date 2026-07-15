@@ -20,25 +20,29 @@ namespace Versatus.WebAPI.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // 1. Bypass para chamadas originárias do próprio servidor local (localhost/loopback)
+            // 1. Bypass para chamadas locais ou documentação do Swagger
             var remoteIp = context.Connection.RemoteIpAddress;
-            bool isLocal = false;
+            bool bypassAuth = false;
 
-            if (remoteIp != null)
+            if (remoteIp != null && IPAddress.IsLoopback(remoteIp))
             {
-                if (IPAddress.IsLoopback(remoteIp))
-                {
-                    isLocal = true;
-                }
+                bypassAuth = true;
+            }
+
+            var path = context.Request.Path.Value ?? string.Empty;
+            if (path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase))
+            {
+                bypassAuth = true;
             }
 
             // 2. Verifica se o cabeçalho X-Api-Key contém a chave configurada
-            if (!isLocal)
+            if (!bypassAuth)
             {
                 if (!context.Request.Headers.TryGetValue("X-Api-Key", out var extractedApiKey) ||
                     !string.Equals(_configuredApiKey, extractedApiKey))
                 {
                     context.Response.StatusCode = 401;
+                    context.Response.ContentType = "text/plain; charset=utf-8";
                     await context.Response.WriteAsync("Acesso não autorizado via API Key.");
                     return;
                 }
