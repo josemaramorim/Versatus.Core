@@ -7,7 +7,8 @@ import {
   Button, 
   IconButton,
   Typography,
-  Box
+  Box,
+  LinearProgress
 } from '@mui/material';
 import { X, Save, RotateCcw, Trash2 } from 'lucide-react';
 import type { CadastroModalMode } from '../../types/cadastro';
@@ -21,6 +22,7 @@ export interface ICrudModalProps {
   onDeleteConfirm: () => void;
   onUndo?: () => void;
   children: React.ReactNode;
+  loading?: boolean;
 }
 
 export const CrudModal: React.FC<ICrudModalProps> = ({
@@ -31,7 +33,8 @@ export const CrudModal: React.FC<ICrudModalProps> = ({
   onSave,
   onDeleteConfirm,
   onUndo,
-  children
+  children,
+  loading = false
 }) => {
   const getModalTitle = () => {
     switch (mode) {
@@ -56,10 +59,21 @@ export const CrudModal: React.FC<ICrudModalProps> = ({
       fullWidth
       slotProps={{
         paper: {
-          sx: { borderRadius: 2, overflow: 'hidden' }
+          sx: { borderRadius: 2, overflow: 'hidden', position: 'relative' }
         }
       }}
     >
+      {loading && (
+        <LinearProgress 
+          sx={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            zIndex: 10 
+          }} 
+        />
+      )}
       {/* Cabeçalho do Modal */}
       <DialogTitle 
         sx={{ 
@@ -79,6 +93,7 @@ export const CrudModal: React.FC<ICrudModalProps> = ({
         <IconButton
           aria-label="close"
           onClick={onClose}
+          disabled={loading}
           sx={{
             color: 'text.secondary',
             '&:hover': { bgcolor: 'action.hover' }
@@ -103,8 +118,9 @@ export const CrudModal: React.FC<ICrudModalProps> = ({
               color="primary"
               startIcon={<Save size={16} />}
               onClick={onSave}
+              disabled={loading}
             >
-              Salvar
+              {loading ? 'Salvando...' : 'Salvar'}
             </Button>
             {onUndo && (
               <Button
@@ -112,6 +128,7 @@ export const CrudModal: React.FC<ICrudModalProps> = ({
                 color="inherit"
                 startIcon={<RotateCcw size={16} />}
                 onClick={onUndo}
+                disabled={loading}
                 sx={{ borderColor: 'divider' }}
               >
                 Desfazer
@@ -121,6 +138,7 @@ export const CrudModal: React.FC<ICrudModalProps> = ({
               variant="outlined"
               color="inherit"
               onClick={onClose}
+              disabled={loading}
               sx={{ borderColor: 'divider' }}
             >
               Cancelar
@@ -135,13 +153,15 @@ export const CrudModal: React.FC<ICrudModalProps> = ({
               color="error"
               startIcon={<Trash2 size={16} />}
               onClick={onDeleteConfirm}
+              disabled={loading}
             >
-              Confirmar Exclusão
+              {loading ? 'Excluindo...' : 'Confirmar Exclusão'}
             </Button>
             <Button
               variant="outlined"
               color="inherit"
               onClick={onClose}
+              disabled={loading}
               sx={{ borderColor: 'divider' }}
             >
               Cancelar

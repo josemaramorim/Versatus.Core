@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Versatus.AcessoGlobal.Domain.Entities;
 using Versatus.AcessoGlobal.Domain.DTOs;
 using Versatus.Framework.Pagination;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -47,6 +48,7 @@ public interface IEntidadeService
         string direcaoOrdenacao, 
         string termoBusca, 
         string papelFiltro, 
+        int? tipoPessoa = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -57,12 +59,12 @@ public interface IEntidadeService
     /// <summary>
     /// Salva a entidade completa com transação explícita de "tudo ou nada".
     /// </summary>
-    Task<Entidade> SalvarCompletoAsync(SalvarEntidadeDto dto, CancellationToken cancellationToken = default);
+    Task<Result<Entidade>> SalvarCompletoAsync(SalvarEntidadeDto dto, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Atualiza a entidade completa com transação explícita de "tudo ou nada".
     /// </summary>
-    Task<Entidade> AtualizarCompletoAsync(int id, SalvarEntidadeDto dto, CancellationToken cancellationToken = default);
+    Task<Result<Entidade>> AtualizarCompletoAsync(int id, SalvarEntidadeDto dto, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Exclui uma entidade e seus papéis vinculados.

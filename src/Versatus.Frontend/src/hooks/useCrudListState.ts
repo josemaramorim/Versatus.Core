@@ -4,7 +4,11 @@ import type { ISortConfig, CadastroModalMode } from '../types/cadastro';
 
 export function useCrudListState<T>(
   config: BaseCadastroConfig<T>,
-  initialRecords: T[] = []
+  initialRecords: T[] = [],
+  options?: {
+    onError?: (message: string) => void;
+    onSuccess?: (message: string) => void;
+  }
 ) {
   const [records, setRecords] = useState<T[]>(initialRecords);
   const [totalRecords, setTotalRecords] = useState<number>(initialRecords.length);
@@ -31,9 +35,9 @@ export function useCrudListState<T>(
   const mapBackendToForm = useCallback((backend: any): any => {
     return {
       idEntidade: backend.idEntidade,
-      codigo: `ENT-${String(backend.idEntidade).padStart(4, '0')}`,
-      razaoSocial: backend.pessoaJuridica?.razaoSocial || backend.nome || '',
-      apelido: backend.nome || '',
+      codigo: String(backend.idEntidade),
+      razaoSocial: backend.nome || '',
+      apelido: backend.pessoaJuridica?.razaoSocial || '',
       tipoPessoa: backend.tipoPessoa || 1,
       ativo: backend.ativo ?? true,
       cpf: backend.pessoaFisica?.cpf || '',
@@ -140,8 +144,9 @@ export function useCrudListState<T>(
         limit: String(rowsPerPage),
         sortBy: sortConfig.column,
         sortOrder: sortConfig.direction,
-        search: filters.termoBusca || '',
-        role: filters.role || ''
+        search: filters.razaoSocial || filters.codigo || filters.apelido || filters.termoBusca || '',
+        role: Array.isArray(filters.role) ? filters.role.join(',') : (filters.role || ''),
+        tipoPessoa: filters.tipoPessoa !== undefined && filters.tipoPessoa !== null ? String(filters.tipoPessoa) : ''
       });
 
       const response = await fetch(`${config.getApiEndpoint()}/paginado?${params.toString()}`);
@@ -294,14 +299,24 @@ export function useCrudListState<T>(
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || 'Erro ao persistir entidade');
+        const mainMessage = errData.message || 'Erro ao persistir entidade.';
+        const techDetail = errData.error || '';
+        const combinedMessage = techDetail 
+          ? `${mainMessage}\n\n[Detalhe técnico para o suporte: ${techDetail}]`
+          : mainMessage;
+        throw new Error(combinedMessage);
       }
 
       setModalMode('none');
       await fetchRecords();
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'Erro ao persistir registro.');
+      const msg = err.message || 'Erro ao persistir registro.';
+      if (options?.onError) {
+        options.onError(msg);
+      } else {
+        alert(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -316,14 +331,25 @@ export function useCrudListState<T>(
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao excluir registro');
+        const errData = await response.json().catch(() => ({}));
+        const mainMessage = errData.message || 'Erro ao excluir registro.';
+        const techDetail = errData.error || '';
+        const combinedMessage = techDetail 
+          ? `${mainMessage}\n\n[Detalhe técnico para o suporte: ${techDetail}]`
+          : mainMessage;
+        throw new Error(combinedMessage);
       }
 
       setModalMode('none');
       await fetchRecords();
     } catch (err) {
       console.error(err);
-      alert('Erro ao excluir registro.');
+      const msg = err.message || 'Erro ao excluir registro.';
+      if (options?.onError) {
+        options.onError(msg);
+      } else {
+        alert(msg);
+      }
     } finally {
       setLoading(false);
     }

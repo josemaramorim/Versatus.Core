@@ -9,7 +9,9 @@ import {
   Select, 
   MenuItem, 
   Button, 
-  Stack
+  Stack,
+  LinearProgress,
+  Checkbox
 } from '@mui/material';
 import { X, SlidersHorizontal, Trash2, Search } from 'lucide-react';
 import type { IFiltroConfig } from '../../types/cadastro';
@@ -22,6 +24,7 @@ export interface ICrudFilterDrawerProps {
   onFilterChange: (field: string, value: any) => void;
   onApplyFilters: () => void;
   onClearFilters: () => void;
+  loading?: boolean;
 }
 
 export const CrudFilterDrawer: React.FC<ICrudFilterDrawerProps> = ({
@@ -31,7 +34,8 @@ export const CrudFilterDrawer: React.FC<ICrudFilterDrawerProps> = ({
   filterValues,
   onFilterChange,
   onApplyFilters,
-  onClearFilters
+  onClearFilters,
+  loading = false
 }) => {
   return (
     <Drawer 
@@ -47,11 +51,22 @@ export const CrudFilterDrawer: React.FC<ICrudFilterDrawerProps> = ({
             width: { xs: '100%', sm: 380 }, 
             display: 'flex', 
             flexDirection: 'column', 
-            height: '100%' 
+            height: '100%'
           }
         }
       }}
     >
+      {loading && (
+        <LinearProgress 
+          sx={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            zIndex: 10 
+          }} 
+        />
+      )}
       {/* 1. Cabeçalho da Gaveta */}
       <Box 
         sx={{ 
@@ -89,15 +104,30 @@ export const CrudFilterDrawer: React.FC<ICrudFilterDrawerProps> = ({
                 {filtro.type === 'select' ? (
                   <FormControl fullWidth size="small">
                     <Select
-                      value={val}
+                      multiple={filtro.multiple}
+                      value={filtro.multiple ? (Array.isArray(val) ? val : []) : val}
                       onChange={(e) => onFilterChange(filtro.field, e.target.value)}
-                      displayEmpty
+                      displayEmpty={!filtro.multiple}
+                      renderValue={filtro.multiple ? (selected) => {
+                        const arr = selected as any[];
+                        if (arr.length === 0) return <em>Todos / Nenhum</em>;
+                        return arr.map(v => filtro.options?.find(o => o.value === v)?.label || v).join(', ');
+                      } : undefined}
                     >
-                      <MenuItem value="">
-                        <em>Todos / Nenhum</em>
-                      </MenuItem>
+                      {!filtro.multiple && (
+                        <MenuItem value="">
+                          <em>Todos / Nenhum</em>
+                        </MenuItem>
+                      )}
                       {filtro.options?.map((opt, oIdx) => (
                         <MenuItem key={oIdx} value={opt.value}>
+                          {filtro.multiple && (
+                            <Checkbox 
+                              size="small" 
+                              checked={(Array.isArray(val) ? val : []).indexOf(opt.value) > -1} 
+                              sx={{ mr: 0.5, p: 0.5 }}
+                            />
+                          )}
                           {opt.label}
                         </MenuItem>
                       ))}
@@ -135,8 +165,9 @@ export const CrudFilterDrawer: React.FC<ICrudFilterDrawerProps> = ({
             color="primary"
             startIcon={<Search size={16} />}
             onClick={onApplyFilters}
+            disabled={loading}
           >
-            Filtrar
+            {loading ? 'Filtrando...' : 'Filtrar'}
           </Button>
           <Button
             fullWidth
@@ -144,6 +175,7 @@ export const CrudFilterDrawer: React.FC<ICrudFilterDrawerProps> = ({
             color="inherit"
             startIcon={<Trash2 size={16} />}
             onClick={onClearFilters}
+            disabled={loading}
             sx={{ borderColor: 'divider' }}
           >
             Limpar Filtros

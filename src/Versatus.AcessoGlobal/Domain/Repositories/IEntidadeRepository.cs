@@ -44,6 +44,7 @@ public interface IEntidadeRepository : IRepositorio<Entidade>
         string direcaoOrdenacao, 
         string termoBusca, 
         string papelFiltro, 
+        int? tipoPessoa = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

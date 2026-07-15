@@ -2,7 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Versatus.AcessoGlobal.DependencyInjection;
 using Versatus.AcessoGlobal.Infrastructure;
 using Versatus.Framework.Context;
@@ -12,6 +12,7 @@ using Versatus.GestaoTributo.Infrastructure;
 using Versatus.WebAPI.Context;
 using Versatus.WebAPI.Services;
 using Versatus.WebAPI.Middleware;
+using Versatus.Infra.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +22,7 @@ const string connectionString = "Server=localhost\\SQLEXPRESS2008;Database=versa
 
 // DbContexts
 builder.Services.AddDbContext<AcessoGlobalDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString).EnableSensitiveDataLogging());
 
 builder.Services.AddDbContext<TributoDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -33,7 +34,10 @@ builder.Services.AddGestaoTributo();
 // Suporte a HttpContext e Contexto de Execução com Claims
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IContextoExecucao, ClaimsContextoExecucao>();
-builder.Services.AddSingleton<IGeradorSequencial, FakeGeradorSequencial>();
+
+// Registrar gerador sequencial e infraestrutura real do banco de dados
+builder.Services.AddVersatusInfraData(connectionString);
+builder.Services.AddScoped<IGeradorSequencial, GeradorSequencialService>();
 
 // Autenticação JWT
 var key = Encoding.ASCII.GetBytes("SuperSecretKeyForVersatusWebAPIDemonstrator2026");
@@ -84,19 +88,9 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>()
     });
 });
 

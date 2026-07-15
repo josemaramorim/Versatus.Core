@@ -37,14 +37,16 @@ public class EntidadeServiceTests
             _parametroRepositoryMock.Object,
             _geradorMock.Object,
             _contextoMock.Object,
-            _loggerMock.Object);
+            _loggerMock.Object,
+            null!,
+            new Mock<IServiceProvider>().Object);
     }
 
     [Fact]
     public async Task CriarAsync_DeveGerarIdEntidade_QuandoSucesso()
     {
         // Arrange
-        var entidade = new Entidade { Nome = "Teste" };
+        var entidade = new Entidade { Nome = "Teste", IsCliente = true };
         _geradorMock.Setup(g => g.ProximoAsync("Entidade", SequencialTipo.Geral, It.IsAny<CancellationToken>()))
             .ReturnsAsync(123);
         _contextoMock.Setup(c => c.IdUsuario).Returns(1);
@@ -68,6 +70,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste", 
+            IsCliente = true,
             PessoaFisica = new DadosPessoaFisica { Cpf = cpf } 
         };
         
@@ -90,6 +93,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste", 
+            IsCliente = true,
             PessoaJuridica = new DadosPessoaJuridica { Cnpj = cnpj } 
         };
         
@@ -112,6 +116,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste", 
+            IsCliente = true,
             PessoaFisica = new DadosPessoaFisica { Cpf = cpf } 
         };
         
@@ -137,6 +142,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste", 
+            IsCliente = true,
             PessoaFisica = new DadosPessoaFisica { Cpf = cpf } 
         };
         
@@ -162,6 +168,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste", 
+            IsCliente = true,
             PessoaFisica = new DadosPessoaFisica { Cpf = cpf } 
         };
         
@@ -186,6 +193,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste Juridico", 
+            IsCliente = true,
             TipoPessoa = EntidadeTipoPessoa.Juridica,
             PessoaJuridica = new DadosPessoaJuridica { RazaoSocial = "AB" } // Curta (< 3)
         };
@@ -209,6 +217,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste Fisica", 
+            IsCliente = true,
             TipoPessoa = EntidadeTipoPessoa.Fisica,
             PessoaFisica = new DadosPessoaFisica { Cpf = cpfInvalido } 
         };
@@ -234,6 +243,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste Fisica", 
+            IsCliente = true,
             TipoPessoa = EntidadeTipoPessoa.Fisica,
             PessoaFisica = new DadosPessoaFisica { Cpf = cpfInvalido } 
         };
@@ -258,6 +268,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste Fisica", 
+            IsCliente = true,
             TipoPessoa = EntidadeTipoPessoa.Fisica,
             PessoaFisica = new DadosPessoaFisica { Cpf = "" } 
         };
@@ -280,6 +291,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste Fisica", 
+            IsCliente = true,
             TipoPessoa = EntidadeTipoPessoa.Fisica,
             PessoaFisica = new DadosPessoaFisica { Cpf = "" } 
         };
@@ -304,6 +316,7 @@ public class EntidadeServiceTests
         var entidade = new Entidade 
         { 
             Nome = "Teste Estrangeiro", 
+            IsCliente = true,
             TipoPessoa = EntidadeTipoPessoa.Fisica,
             PessoaFisica = new DadosPessoaFisica { Cpf = cpfInvalido } 
         };

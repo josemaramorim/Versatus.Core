@@ -40,6 +40,7 @@ export interface IFiltroConfig {
   label: string;
   type: 'text' | 'select' | 'date' | 'boolean';
   options?: { label: string; value: any }[];
+  multiple?: boolean;
 }
 
 // Classe abstrata para configuração de qualquer tela de cadastro no ERP (OOP)

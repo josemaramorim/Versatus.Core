@@ -73,12 +73,19 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
         string direcaoOrdenacao, 
         string termoBusca, 
         string papelFiltro, 
+        int? tipoPessoa = null,
         CancellationToken cancellationToken = default)
     {
         var query = Context.Entidades
             .Include(e => e.PessoaFisica)
             .Include(e => e.PessoaJuridica)
             .AsQueryable();
+
+        if (tipoPessoa.HasValue)
+        {
+            var tipoEnum = (EntidadeTipoPessoa)tipoPessoa.Value;
+            query = query.Where(e => e.TipoPessoa == tipoEnum);
+        }
 
         if (!string.IsNullOrWhiteSpace(termoBusca))
         {
@@ -93,24 +100,30 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
 
         if (!string.IsNullOrWhiteSpace(papelFiltro))
         {
-            switch (papelFiltro.ToLower())
+            var papeis = papelFiltro.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(p => p.Trim().ToLower())
+                                    .ToList();
+
+            if (papeis.Any())
             {
-                case "iscliente": query = query.Where(e => e.IsCliente); break;
-                case "isfornecedor": query = query.Where(e => e.IsFornecedor); break;
-                case "isfuncionario": query = query.Where(e => e.IsFuncionario); break;
-                case "istransportadora": query = query.Where(e => e.IsTransportadora); break;
-                case "iscomissionado": query = query.Where(e => e.IsComissionado); break;
-                case "isagencia": query = query.Where(e => e.IsAgenciaBancaria); break;
-                case "isfinanceira": query = query.Where(e => e.IsInstituicaoFinanceira); break;
-                case "isfilial": query = query.Where(e => e.IsFilial); break;
-                case "isobra": query = query.Where(e => e.IsObra); break;
-                case "isrepresentante": query = query.Where(e => e.IsRepresentante); break;
-                case "isoutro": query = query.Where(e => e.IsOutro); break;
-                case "isprospecto": query = query.Where(e => e.IsProspecto); break;
-                case "iscontador": query = query.Where(e => e.IsContador); break;
-                case "isaluno": query = query.Where(e => e.IsAluno); break;
-                case "isprofessor": query = query.Where(e => e.IsProfessor); break;
-                case "isintermediador": query = query.Where(e => e.IsIntermediadorComercial); break;
+                query = query.Where(e =>
+                    (papeis.Contains("iscliente") && e.IsCliente) ||
+                    (papeis.Contains("isfornecedor") && e.IsFornecedor) ||
+                    (papeis.Contains("isfuncionario") && e.IsFuncionario) ||
+                    (papeis.Contains("istransportadora") && e.IsTransportadora) ||
+                    (papeis.Contains("iscomissionado") && e.IsComissionado) ||
+                    (papeis.Contains("isagencia") && e.IsAgenciaBancaria) ||
+                    (papeis.Contains("isfinanceira") && e.IsInstituicaoFinanceira) ||
+                    (papeis.Contains("isfilial") && e.IsFilial) ||
+                    (papeis.Contains("isobra") && e.IsObra) ||
+                    (papeis.Contains("isrepresentante") && e.IsRepresentante) ||
+                    (papeis.Contains("isoutro") && e.IsOutro) ||
+                    (papeis.Contains("isprospecto") && e.IsProspecto) ||
+                    (papeis.Contains("iscontador") && e.IsContador) ||
+                    (papeis.Contains("isaluno") && e.IsAluno) ||
+                    (papeis.Contains("isprofessor") && e.IsProfessor) ||
+                    (papeis.Contains("isintermediador") && e.IsIntermediadorComercial)
+                );
             }
         }
 
@@ -142,10 +155,13 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
 
         var total = await query.CountAsync(cancellationToken);
         
-        var items = await query
+        // Carrega os dados na memória primeiro devido à limitação do SQL Server 2008 R2 (não suporta OFFSET/FETCH)
+        var allItems = await query.ToListAsync(cancellationToken);
+        
+        var items = allItems
             .Skip((pagina - 1) * registrosPorPagina)
             .Take(registrosPorPagina)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         return new PagedResult<Entidade>(items, total);
     }

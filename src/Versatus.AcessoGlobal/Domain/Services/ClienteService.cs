@@ -57,7 +57,7 @@ public class ClienteService : IClienteService
 
         if (dto.IdEntidade.HasValue)
         {
-            entidade = await _entidadeRepository.GetByIdAsync(dto.IdEntidade.Value, cancellationToken);
+            entidade = await _entidadeRepository.GetCompletoPorIdAsync(dto.IdEntidade.Value, cancellationToken);
             if (entidade == null)
             {
                 throw new InvalidOperationException($"Entidade base com ID {dto.IdEntidade.Value} não encontrada.");

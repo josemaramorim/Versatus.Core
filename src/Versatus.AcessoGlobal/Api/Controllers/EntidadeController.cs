@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Versatus.AcessoGlobal.Domain.Entities;
 using Versatus.AcessoGlobal.Domain.Services;
 using Versatus.AcessoGlobal.Domain.DTOs;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Api.Controllers;
 
@@ -33,9 +34,10 @@ public class EntidadeController : ControllerBase
         [FromQuery] string sortBy = "codigo",
         [FromQuery] string sortOrder = "asc",
         [FromQuery] string search = "",
-        [FromQuery] string role = "")
+        [FromQuery] string role = "",
+        [FromQuery] int? tipoPessoa = null)
     {
-        var resultado = await _entidadeService.ListarPaginadoAsync(page, limit, sortBy, sortOrder, search, role);
+        var resultado = await _entidadeService.ListarPaginadoAsync(page, limit, sortBy, sortOrder, search, role, tipoPessoa);
         return Ok(resultado);
     }
 
@@ -70,16 +72,18 @@ public class EntidadeController : ControllerBase
     {
         try
         {
-            var criada = await _entidadeService.SalvarCompletoAsync(dto);
+            var result = await _entidadeService.SalvarCompletoAsync(dto);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
+            var criada = result.Value!;
             return CreatedAtAction(nameof(ObterPorId), new { id = criada.IdEntidade }, criada);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Erro interno ao salvar entidade.", error = ex.Message });
+            return TratarException(ex, "salvar");
         }
     }
 
@@ -88,17 +92,58 @@ public class EntidadeController : ControllerBase
     {
         try
         {
-            var atualizada = await _entidadeService.AtualizarCompletoAsync(id, dto);
+            var result = await _entidadeService.AtualizarCompletoAsync(id, dto);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
+            var atualizada = result.Value!;
             return Ok(atualizada);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "Erro interno ao atualizar entidade.", error = ex.Message });
+            return TratarException(ex, "atualizar");
         }
+    }
+
+    private IActionResult TratarException(Exception ex, string acao)
+    {
+        var msg = ex.Message;
+        
+        // Verificar se é erro do EF Core de rastreamento
+        if (msg.Contains("tracked") || msg.Contains("same key value") || msg.Contains("attaching existing entities"))
+        {
+            return BadRequest(new
+            {
+                message = "Conflito de identificador interno no banco de dados. Por favor, tente novamente ou contate o suporte.",
+                error = msg
+            });
+        }
+
+        if (msg.Contains("foreign key") || msg.Contains("constraint") || msg.Contains("FK_"))
+        {
+            return BadRequest(new
+            {
+                message = "Erro de integridade de dados. O registro faz referência a outra informação que não existe ou está inválida no sistema.",
+                error = msg
+            });
+        }
+
+        if (msg.Contains("duplicate key") || msg.Contains("index") || msg.Contains("duplicado"))
+        {
+            return BadRequest(new
+            {
+                message = "Erro de duplicidade. Um registro com estas informações já está cadastrado.",
+                error = msg
+            });
+        }
+
+        return StatusCode(500, new 
+        { 
+            message = $"Erro interno ao {acao} entidade. Por favor, contate o suporte.", 
+            error = msg 
+        });
     }
 
     [HttpDelete("{id}")]

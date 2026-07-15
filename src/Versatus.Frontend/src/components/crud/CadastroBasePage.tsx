@@ -11,9 +11,10 @@ import {
   Badge,
   Chip,
   TablePagination,
-  Stack
+  Stack,
+  LinearProgress
 } from '@mui/material';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, Plus } from 'lucide-react';
 import { BaseCadastroConfig } from '../../types/cadastro';
 import type { CadastroModalMode } from '../../types/cadastro';
 import { useCrudListState } from '../../hooks/useCrudListState';
@@ -35,6 +36,7 @@ export function CadastroBasePage<T>({
   const {
     records,
     totalRecords,
+    loading,
     filters,
     tempFilters,
     isFilterDrawerOpen,
@@ -59,7 +61,10 @@ export function CadastroBasePage<T>({
     onSave,
     onDeleteConfirm,
     setIsFilterDrawerOpen
-  } = useCrudListState<T>(config, initialRecords);
+  } = useCrudListState<T>(config, initialRecords, {
+    onError: (msg) => showToast(msg, 'error'),
+    onSuccess: (msg) => showToast(msg, 'success')
+  });
 
   const [toast, setToast] = React.useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -73,12 +78,10 @@ export function CadastroBasePage<T>({
 
   const handleSaveWrapper = (data: T) => {
     onSave(data);
-    showToast('Registro salvo com sucesso!', 'success');
   };
 
   const handleDeleteConfirmWrapper = () => {
     onDeleteConfirm();
-    showToast('Registro excluído com sucesso!', 'success');
   };
 
   const activeFilters = config.getFiltros();
@@ -90,6 +93,13 @@ export function CadastroBasePage<T>({
     if (!filterConfig) return `${key}: ${value}`;
 
     if (filterConfig.type === 'select') {
+      if (Array.isArray(value)) {
+        const labels = value.map(val => {
+          const selectedOption = filterConfig.options?.find((o) => o.value === val);
+          return selectedOption ? selectedOption.label : val;
+        });
+        return `${filterConfig.label}: ${labels.join(', ')}`;
+      }
       const selectedOption = filterConfig.options?.find((o) => o.value === value);
       return `${filterConfig.label}: ${selectedOption ? selectedOption.label : value}`;
     }
@@ -157,6 +167,7 @@ export function CadastroBasePage<T>({
           <Button
             variant="contained"
             color="primary"
+            startIcon={<Plus size={16} />}
             onClick={onAdicionarClick}
           >
             Novo
@@ -198,7 +209,19 @@ export function CadastroBasePage<T>({
       )}
 
       {/* 4. Grade Principal de Dados */}
-      <Card sx={{ p: 3, borderRadius: 1.5, boxShadow: 'rgba(145, 158, 171, 0.08) 0px 0px 2px 0px, rgba(145, 158, 171, 0.08) 0px 12px 24px -4px' }}>
+      <Card sx={{ p: 3, borderRadius: 1.5, boxShadow: 'rgba(145, 158, 171, 0.08) 0px 0px 2px 0px, rgba(145, 158, 171, 0.08) 0px 12px 24px -4px', position: 'relative' }}>
+        {loading && (
+          <LinearProgress 
+            sx={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              borderTopLeftRadius: 'inherit', 
+              borderTopRightRadius: 'inherit' 
+            }} 
+          />
+        )}
         <CrudTable
           records={records}
           colunas={config.getColunas()}
@@ -232,6 +255,7 @@ export function CadastroBasePage<T>({
         onFilterChange={handleFilterChange}
         onApplyFilters={handleApplyFilters}
         onClearFilters={handleClearFilters}
+        loading={loading}
       />
 
       {/* 6. Modal Genérico de Inserção / Edição / Exclusão */}
@@ -253,6 +277,7 @@ export function CadastroBasePage<T>({
             resetBtn.click();
           }
         }}
+        loading={loading}
       >
         {isModalOpen && renderForm(modalMode, selectedRecord, handleSaveWrapper)}
       </CrudModal>

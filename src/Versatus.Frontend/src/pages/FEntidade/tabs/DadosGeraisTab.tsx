@@ -10,7 +10,8 @@ import {
   Checkbox, 
   FormControlLabel, 
   Card, 
-  Typography
+  Typography,
+  FormHelperText
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, ITabProps } from '../types';
@@ -33,6 +34,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
               <TextField 
                 {...register('cpf')}
                 fullWidth 
+                required
                 label="CPF" 
                 disabled={isBrowse} 
                 error={!!errors.cpf}
@@ -94,7 +96,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                 name="sexo"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                  <FormControl fullWidth disabled={isBrowse} error={!!errors.sexo}>
                     <InputLabel>Sexo</InputLabel>
                     <Select 
                       {...field}
@@ -104,6 +106,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                       <MenuItem value="F">Feminino</MenuItem>
                       <MenuItem value="O">Outro</MenuItem>
                     </Select>
+                    {errors.sexo && (
+                      <FormHelperText>{errors.sexo.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -113,7 +118,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                 name="estadoCivil"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                  <FormControl fullWidth disabled={isBrowse} error={!!errors.estadoCivil}>
                     <InputLabel>Estado Civil</InputLabel>
                     <Select 
                       {...field}
@@ -124,6 +129,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                       <MenuItem value="Divorciado">Divorciado(a)</MenuItem>
                       <MenuItem value="Viuvo">Viúvo(a)</MenuItem>
                     </Select>
+                    {errors.estadoCivil && (
+                      <FormHelperText>{errors.estadoCivil.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -143,7 +151,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                 name="grauInstrucao"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                  <FormControl fullWidth disabled={isBrowse} error={!!errors.grauInstrucao}>
                     <InputLabel>Grau Instrução</InputLabel>
                     <Select 
                       {...field}
@@ -154,6 +162,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                       <MenuItem value="Superior">Ensino Superior</MenuItem>
                       <MenuItem value="Pos">Pós-Graduação</MenuItem>
                     </Select>
+                    {errors.grauInstrucao && (
+                      <FormHelperText>{errors.grauInstrucao.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -235,7 +246,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                     name="contribuinteIcms"
                     control={control}
                     render={({ field }) => (
-                      <FormControl fullWidth size="small" disabled={isBrowse}>
+                      <FormControl fullWidth size="small" required disabled={isBrowse} error={!!errors.contribuinteIcms}>
                         <InputLabel>Contribuinte ICMS</InputLabel>
                         <Select 
                           {...field}
@@ -245,6 +256,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                           <MenuItem value="Nao">Não</MenuItem>
                           <MenuItem value="Isento">Isento</MenuItem>
                         </Select>
+                        {errors.contribuinteIcms && (
+                          <FormHelperText>{errors.contribuinteIcms.message}</FormHelperText>
+                        )}
                       </FormControl>
                     )}
                   />
@@ -261,6 +275,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
               <TextField 
                 {...register('cnpj')}
                 fullWidth 
+                required
                 label="CNPJ" 
                 disabled={isBrowse} 
                 error={!!errors.cnpj}
@@ -308,7 +323,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                 name="contribuinteIcms"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                  <FormControl fullWidth required disabled={isBrowse} error={!!errors.contribuinteIcms}>
                     <InputLabel>Contribuinte ICMS</InputLabel>
                     <Select 
                       {...field}
@@ -318,6 +333,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                       <MenuItem value="Nao">Não</MenuItem>
                       <MenuItem value="Isento">Isento</MenuItem>
                     </Select>
+                    {errors.contribuinteIcms && (
+                      <FormHelperText>{errors.contribuinteIcms.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -327,7 +345,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                 name="regimeTributario"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                  <FormControl fullWidth required disabled={isBrowse} error={!!errors.regimeTributario}>
                     <InputLabel>Regime Tributário</InputLabel>
                     <Select 
                       {...field}
@@ -337,6 +355,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                       <MenuItem value={2}>Lucro Presumido</MenuItem>
                       <MenuItem value={3}>Lucro Real</MenuItem>
                     </Select>
+                    {errors.regimeTributario && (
+                      <FormHelperText>{errors.regimeTributario.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -346,7 +367,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                 name="naturezaJuridica"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                  <FormControl fullWidth required disabled={isBrowse} error={!!errors.naturezaJuridica}>
                     <InputLabel>Natureza Jurídica</InputLabel>
                     <Select 
                       {...field}
@@ -355,6 +376,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                       <MenuItem value={1}>Sociedade Limitada</MenuItem>
                       <MenuItem value={2}>Empresário Individual</MenuItem>
                     </Select>
+                    {errors.naturezaJuridica && (
+                      <FormHelperText>{errors.naturezaJuridica.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -364,7 +388,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                 name="enquadramento"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                  <FormControl fullWidth required disabled={isBrowse} error={!!errors.enquadramento}>
                     <InputLabel>Enquadramento</InputLabel>
                     <Select 
                       {...field}
@@ -374,6 +398,9 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
                       <MenuItem value="EPP">EPP</MenuItem>
                       <MenuItem value="Demais">Demais</MenuItem>
                     </Select>
+                    {errors.enquadramento && (
+                      <FormHelperText>{errors.enquadramento.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />

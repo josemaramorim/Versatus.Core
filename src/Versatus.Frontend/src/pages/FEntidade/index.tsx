@@ -13,7 +13,8 @@ import {
   Tab, 
   Typography,
   Snackbar,
-  Alert
+  Alert,
+  FormHelperText
 } from '@mui/material';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -388,7 +389,7 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                 )}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid size={{ xs: 12, sm: tipoPessoa === 2 ? 4 : 7 }}>
               <Controller
                 name="razaoSocial"
                 control={control}
@@ -396,7 +397,7 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                   <TextField
                     {...field}
                     fullWidth
-                    label="Nome / Razão Social"
+                    label="Nome / Nome Fantasia"
                     disabled={isBrowse}
                     required
                     error={!!error}
@@ -405,28 +406,31 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                 )}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: 3 }}>
-              <Controller
-                name="apelido"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Apelido / Nome Fantasia"
-                    disabled={isBrowse}
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                )}
-              />
-            </Grid>
+            {tipoPessoa === 2 && (
+              <Grid size={{ xs: 12, sm: 3 }}>
+                <Controller
+                  name="apelido"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label="Razão Social"
+                      disabled={isBrowse}
+                      required
+                      error={!!error}
+                      helperText={error?.message}
+                    />
+                  )}
+                />
+              </Grid>
+            )}
             <Grid size={{ xs: 12, sm: 3 }}>
               <Controller
                 name="tipoEspecificoEntidade"
                 control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                render={({ field, fieldState: { error } }) => (
+                  <FormControl fullWidth required disabled={isBrowse} error={!!error}>
                     <InputLabel>Tipo Específico</InputLabel>
                     <Select
                       {...field}
@@ -437,6 +441,9 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                       <MenuItem value="OrgaoPublico">Órgão Público</MenuItem>
                       <MenuItem value="Microempreendedor">Microempreendedor (MEI)</MenuItem>
                     </Select>
+                    {error && (
+                      <FormHelperText>{error.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />
@@ -464,8 +471,14 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 9 }}>
-              <Box sx={{ p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 1.5, bgcolor: 'background.default' }}>
-                <Typography variant="caption" sx={{ display: 'block', mb: 1, color: 'text.secondary', fontWeight: 600 }}>
+              <Box sx={{ 
+                p: 1.5, 
+                border: '1px solid', 
+                borderColor: (errors.isCliente && !watch('isCliente')) ? 'error.main' : 'divider', 
+                borderRadius: 1.5, 
+                bgcolor: 'background.default' 
+              }}>
+                <Typography variant="caption" sx={{ display: 'block', mb: 1, color: (errors.isCliente && !watch('isCliente')) ? 'error.main' : 'text.secondary', fontWeight: 600 }}>
                   Papéis Corporativos
                 </Typography>
                 <Grid container spacing={1}>
@@ -509,6 +522,9 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                     </Grid>
                   ))}
                 </Grid>
+                {errors.isCliente && !watch('isCliente') && (
+                  <FormHelperText error sx={{ mt: 1 }}>{errors.isCliente.message}</FormHelperText>
+                )}
               </Box>
             </Grid>
           </Grid>

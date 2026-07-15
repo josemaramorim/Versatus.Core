@@ -13,6 +13,7 @@ using Versatus.AcessoGlobal.Domain.Repositories;
 using Versatus.AcessoGlobal.Domain.DTOs;
 using Versatus.AcessoGlobal.Infrastructure;
 using Versatus.Framework.Pagination;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -88,7 +89,11 @@ public class EntidadeService : IEntidadeService
     public async Task<Entidade> CriarAsync(Entidade entidade, CancellationToken cancellationToken = default)
     {
         // 1. Validações completas
-        await ValidarEntidadeAsync(entidade, isNew: true, cancellationToken);
+        var validation = await ValidarEntidadeAsync(entidade, isNew: true, cancellationToken);
+        if (!validation.IsValid)
+        {
+            throw new InvalidOperationException(validation.Errors[0].Mensagem);
+        }
 
         // 2. Geração de Sequencial (Padrão legado: Tabela "Entidade")
         entidade.IdEntidade = await _geradorSequencial.ProximoAsync("Entidade", SequencialTipo.Geral, cancellationToken);
@@ -110,7 +115,11 @@ public class EntidadeService : IEntidadeService
     public async Task AtualizarAsync(Entidade entidade, CancellationToken cancellationToken = default)
     {
         // 1. Validações completas
-        await ValidarEntidadeAsync(entidade, isNew: false, cancellationToken);
+        var validation = await ValidarEntidadeAsync(entidade, isNew: false, cancellationToken);
+        if (!validation.IsValid)
+        {
+            throw new InvalidOperationException(validation.Errors[0].Mensagem);
+        }
 
         // 2. Auditoria Alteração
         entidade.IdUsuarioAlteracao = _contexto.IdUsuario;
@@ -124,8 +133,103 @@ public class EntidadeService : IEntidadeService
         _logger.LogInformation("Entidade {IdEntidade} atualizada com sucesso.", entidade.IdEntidade);
     }
 
-    private async Task ValidarEntidadeAsync(Entidade entidade, bool isNew, CancellationToken cancellationToken)
+    private async Task<ValidationResult> ValidarEntidadeAsync(Entidade entidade, bool isNew, CancellationToken cancellationToken)
     {
+        var errors = new List<ValidationError>();
+
+        // 0. Validações Legadas e Obrigatórias
+        var temPapel = 
+            entidade.IsCliente || entidade.IsFornecedor || entidade.IsTransportadora || entidade.IsComissionado ||
+            entidade.IsAgenciaBancaria || entidade.IsInstituicaoFinanceira || entidade.IsFilial || entidade.IsFuncionario ||
+            entidade.IsObra || entidade.IsRepresentante || entidade.IsOutro || entidade.IsProspecto ||
+            entidade.IsContador || entidade.IsAluno || entidade.IsProfessor || entidade.IsIntermediadorComercial;
+
+        if (!temPapel)
+        {
+            errors.Add(new ValidationError("IsCliente", "Pelo menos um tipo de entidade (papel) deve ser selecionado."));
+        }
+
+        if (entidade.IsFilial)
+        {
+            if (entidade.TipoPessoa == EntidadeTipoPessoa.Fisica && (entidade.PessoaFisica == null || entidade.PessoaFisica.FisicaTipoJuridica != true))
+            {
+                errors.Add(new ValidationError("FisicaTipoJuridica", "Para entidade do tipo 'Filial' definida como pessoa 'Física', deve estar marcado 'Pessoa física com característica de jurídica'."));
+            }
+        }
+
+        if (entidade.IsFuncionario)
+        {
+            if (entidade.TipoPessoa == EntidadeTipoPessoa.Juridica || (entidade.PessoaFisica != null && entidade.PessoaFisica.FisicaTipoJuridica == true))
+            {
+                errors.Add(new ValidationError("IsFuncionario", "Para a entidade do tipo 'Funcionário', deve ser pessoa física e não possuir característica de pessoa jurídica."));
+            }
+        }
+
+        if (entidade.IsIntermediadorComercial)
+        {
+            if (entidade.TipoPessoa == EntidadeTipoPessoa.Fisica)
+            {
+                errors.Add(new ValidationError("TipoPessoa", "Para a entidade do tipo 'Intermediador', deve ser SOMENTE pessoa definida como jurídica."));
+            }
+
+            if (entidade.PessoaJuridica == null || string.IsNullOrWhiteSpace(entidade.PessoaJuridica.Cnpj))
+            {
+                errors.Add(new ValidationError("Cnpj", "Para a entidade do tipo 'Intermediador', deve ser informado o CNPJ."));
+            }
+
+            var idFilialLogada = _contexto.IdFilial;
+            var filial = await _repository.GetByIdAsync(idFilialLogada, cancellationToken);
+            if (filial != null && filial.PessoaJuridica != null && !string.IsNullOrEmpty(filial.PessoaJuridica.Cnpj) &&
+                entidade.PessoaJuridica != null && !string.IsNullOrEmpty(entidade.PessoaJuridica.Cnpj))
+            {
+                var cleanCnpjFilial = new string(filial.PessoaJuridica.Cnpj.Where(char.IsDigit).ToArray());
+                var cleanCnpjEntidade = new string(entidade.PessoaJuridica.Cnpj.Where(char.IsDigit).ToArray());
+                if (cleanCnpjFilial.Equals(cleanCnpjEntidade))
+                {
+                    errors.Add(new ValidationError("Cnpj", "Para a entidade do tipo 'Intermediador', deve ser informado CNPJ DIFERENTE do CNPJ da filial logada."));
+                }
+            }
+        }
+
+        if (entidade.ContribuinteICMS == IndicadorContribuinteICMS.ContribuinteIsento)
+        {
+            entidade.InscricaoEstadual = "ISENTO";
+        }
+
+        if (!string.IsNullOrWhiteSpace(entidade.InscricaoEstadual) && entidade.InscricaoEstadual.ToUpper() != "ISENTO")
+        {
+            var cleanIE = new string(entidade.InscricaoEstadual.Where(char.IsDigit).ToArray());
+            if (string.IsNullOrEmpty(cleanIE))
+            {
+                errors.Add(new ValidationError("InscricaoEstadual", "Deve ser informado para inscrição estadual somente caracteres numéricos."));
+            }
+            if (cleanIE.Length < 2 || cleanIE.Length > 14)
+            {
+                errors.Add(new ValidationError("InscricaoEstadual", "Deve ser informado no mínimo 2 e no máximo 14 caracteres numéricos para inscrição estadual."));
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(entidade.InscricaoSuframa))
+        {
+            var cleanSuframa = new string(entidade.InscricaoSuframa.Where(char.IsDigit).ToArray());
+            if (string.IsNullOrEmpty(cleanSuframa))
+            {
+                errors.Add(new ValidationError("InscricaoSuframa", "Deve ser informado para inscrição SUFRAMA somente caracteres numéricos."));
+            }
+            if (cleanSuframa.Length != 9)
+            {
+                errors.Add(new ValidationError("InscricaoSuframa", "Deve ser informado 9 caracteres numéricos para inscrição SUFRAMA."));
+            }
+            if (cleanSuframa.StartsWith("00"))
+            {
+                errors.Add(new ValidationError("InscricaoSuframa", "Os dois primeiros caracteres da inscrição SUFRAMA, NÃO pode ser '00'."));
+            }
+            if (!ValidarSuframaModulo11(cleanSuframa))
+            {
+                errors.Add(new ValidationError("InscricaoSuframa", "O dígito verificador da inscrição SUFRAMA NÃO é válido."));
+            }
+        }
+
         // 1. Validação de Razão Social
         if (entidade.TipoPessoa == EntidadeTipoPessoa.Juridica && entidade.PessoaJuridica != null)
         {
@@ -135,7 +239,7 @@ public class EntidadeService : IEntidadeService
                 var cleanRazao = string.Join(" ", razaoSocial.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
                 if (cleanRazao.Length < 3)
                 {
-                    throw new InvalidOperationException("A razão social deve ter no mínimo 3 caracteres válidos.");
+                    errors.Add(new ValidationError("RazaoSocial", "A razão social deve ter no mínimo 3 caracteres válidos."));
                 }
             }
         }
@@ -160,7 +264,7 @@ public class EntidadeService : IEntidadeService
         // Se o país for estrangeiro (diferente da filial), ignora todas as validações de CPF/CNPJ
         if (entidadePaisId.HasValue && entidadePaisId.Value != filialPaisId)
         {
-            return;
+            return errors.Count > 0 ? ValidationResult.Fail(errors.ToArray()) : ValidationResult.Ok();
         }
 
         // 3. Validação de Obrigatoriedade (CPFCNPJOBRIGATORIO)
@@ -192,13 +296,13 @@ public class EntidadeService : IEntidadeService
             string sCampo = (entidade.PessoaJuridica != null || entidade.TipoPessoa == EntidadeTipoPessoa.Juridica) ? "CNPJ" : "CPF";
             if (obrigatorioBloquear)
             {
-                throw new InvalidOperationException($"Deve ser informado o {sCampo}.");
+                errors.Add(new ValidationError(sCampo == "CNPJ" ? "Cnpj" : "Cpf", $"Deve ser informado o {sCampo}."));
             }
             else if (obrigatorioAvisar)
             {
                 _logger.LogWarning("AVISO: Para a entidade é aconselhável preenchimento do {Campo}.", sCampo);
             }
-            return; // Se não foi informado e não bloqueou, não há valor para validar matemática ou unicidade
+            return errors.Count > 0 ? ValidationResult.Fail(errors.ToArray()) : ValidationResult.Ok();
         }
 
         // 4. Validação Matemática de Dígitos (ACEITACNPJCPFINVALIDO)
@@ -212,7 +316,7 @@ public class EntidadeService : IEntidadeService
             {
                 if (!ValidarCPF(cpf))
                 {
-                    throw new InvalidOperationException("CPF inválido.");
+                    errors.Add(new ValidationError("Cpf", "CPF inválido."));
                 }
             }
             
@@ -220,7 +324,7 @@ public class EntidadeService : IEntidadeService
             {
                 if (!ValidarCNPJ(cnpj))
                 {
-                    throw new InvalidOperationException("CNPJ inválido.");
+                    errors.Add(new ValidationError("Cnpj", "CNPJ inválido."));
                 }
             }
         }
@@ -243,7 +347,7 @@ public class EntidadeService : IEntidadeService
                         string msg = $"Já existe uma entidade cadastrada com o CPF {cpf}.";
                         if (bloquearDuplicado)
                         {
-                            throw new InvalidOperationException(msg);
+                            errors.Add(new ValidationError("Cpf", msg));
                         }
                         else
                         {
@@ -260,7 +364,7 @@ public class EntidadeService : IEntidadeService
                         string msg = $"Já existe uma entidade cadastrada com o CNPJ {cnpj}.";
                         if (bloquearDuplicado)
                         {
-                            throw new InvalidOperationException(msg);
+                            errors.Add(new ValidationError("Cnpj", msg));
                         }
                         else
                         {
@@ -270,6 +374,8 @@ public class EntidadeService : IEntidadeService
                 }
             }
         }
+
+        return errors.Count > 0 ? ValidationResult.Fail(errors.ToArray()) : ValidationResult.Ok();
     }
 
     private static bool ValidarCPF(string cpf)
@@ -332,6 +438,25 @@ public class EntidadeService : IEntidadeService
         return cleanCnpj.EndsWith($"{digit1}{digit2}");
     }
 
+    private static bool ValidarSuframaModulo11(string suframa)
+    {
+        if (suframa.Length != 9) return false;
+        
+        int sum = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            int digit = suframa[i] - '0';
+            int weight = 9 - i;
+            sum += digit * weight;
+        }
+
+        int remainder = sum % 11;
+        int dv = 11 - remainder;
+        if (dv >= 10) dv = 0;
+
+        return dv == (suframa[8] - '0');
+    }
+
     public async Task<PagedResult<Entidade>> ListarPaginadoAsync(
         int pagina, 
         int registrosPorPagina, 
@@ -339,9 +464,10 @@ public class EntidadeService : IEntidadeService
         string direcaoOrdenacao, 
         string termoBusca, 
         string papelFiltro, 
+        int? tipoPessoa = null,
         CancellationToken cancellationToken = default)
     {
-        return await _repository.ListarPaginadoAsync(pagina, registrosPorPagina, ordenarPor, direcaoOrdenacao, termoBusca, papelFiltro, cancellationToken);
+        return await _repository.ListarPaginadoAsync(pagina, registrosPorPagina, ordenarPor, direcaoOrdenacao, termoBusca, papelFiltro, tipoPessoa, cancellationToken);
     }
 
     public async Task<Entidade?> ObterCompletoPorIdAsync(int id, CancellationToken cancellationToken = default)
@@ -349,7 +475,7 @@ public class EntidadeService : IEntidadeService
         return await _repository.GetCompletoPorIdAsync(id, cancellationToken);
     }
 
-    public async Task<Entidade> SalvarCompletoAsync(SalvarEntidadeDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<Entidade>> SalvarCompletoAsync(SalvarEntidadeDto dto, CancellationToken cancellationToken = default)
     {
         using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
@@ -357,7 +483,9 @@ public class EntidadeService : IEntidadeService
             var tipoEnum = dto.TipoPessoa == 2 ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
             var entidade = new Entidade
             {
-                Nome = dto.Nome,
+                Nome = (tipoEnum == EntidadeTipoPessoa.Juridica && !string.IsNullOrWhiteSpace(dto.Apelido)) 
+                    ? dto.Apelido 
+                    : dto.Nome,
                 Email = dto.Email,
                 EmailNFE = dto.EmailNFE,
                 EmailFinanceiro = dto.EmailFinanceiro,
@@ -420,7 +548,12 @@ public class EntidadeService : IEntidadeService
 
             SincronizarEnderecos(entidade, dto.Enderecos, defaultCidadeId, defaultLogradouroId);
 
-            await ValidarEntidadeAsync(entidade, isNew: true, cancellationToken);
+            var validation = await ValidarEntidadeAsync(entidade, isNew: true, cancellationToken);
+            if (!validation.IsValid)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return Result<Entidade>.Fail(validation.Errors.ToArray());
+            }
 
             await _repository.AddAsync(entidade, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
@@ -428,7 +561,7 @@ public class EntidadeService : IEntidadeService
             await ProcessarPapeisAsync(entidade.IdEntidade, dto, isNew: true, cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
-            return entidade;
+            return Result<Entidade>.Ok(entidade);
         }
         catch (Exception ex)
         {
@@ -438,7 +571,7 @@ public class EntidadeService : IEntidadeService
         }
     }
 
-    public async Task<Entidade> AtualizarCompletoAsync(int id, SalvarEntidadeDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<Entidade>> AtualizarCompletoAsync(int id, SalvarEntidadeDto dto, CancellationToken cancellationToken = default)
     {
         using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
@@ -451,7 +584,9 @@ public class EntidadeService : IEntidadeService
 
             var tipoEnum = dto.TipoPessoa == 2 ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
 
-            entidade.Nome = dto.Nome;
+            entidade.Nome = (tipoEnum == EntidadeTipoPessoa.Juridica && !string.IsNullOrWhiteSpace(dto.Apelido)) 
+                ? dto.Apelido 
+                : dto.Nome;
             entidade.Email = dto.Email;
             entidade.EmailNFE = dto.EmailNFE;
             entidade.EmailFinanceiro = dto.EmailFinanceiro;
@@ -514,7 +649,12 @@ public class EntidadeService : IEntidadeService
 
             SincronizarEnderecos(entidade, dto.Enderecos, defaultCidadeId, defaultLogradouroId);
 
-            await ValidarEntidadeAsync(entidade, isNew: false, cancellationToken);
+            var validation = await ValidarEntidadeAsync(entidade, isNew: false, cancellationToken);
+            if (!validation.IsValid)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return Result<Entidade>.Fail(validation.Errors.ToArray());
+            }
 
             await _repository.UpdateAsync(entidade, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
@@ -522,7 +662,7 @@ public class EntidadeService : IEntidadeService
             await ProcessarPapeisAsync(entidade.IdEntidade, dto, isNew: false, cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
-            return entidade;
+            return Result<Entidade>.Ok(entidade);
         }
         catch (Exception ex)
         {
@@ -540,23 +680,21 @@ public class EntidadeService : IEntidadeService
             var entidade = await _repository.GetByIdAsync(id, cancellationToken);
             if (entidade == null) return;
 
-            using var scope = _serviceProvider.CreateScope();
-            
-            var clienteRepo = scope.ServiceProvider.GetRequiredService<IClienteRepository>();
+            var clienteRepo = _serviceProvider.GetRequiredService<IClienteRepository>();
             var cliente = await clienteRepo.GetByIdAsync(id, cancellationToken);
-            if (cliente != null) await scope.ServiceProvider.GetRequiredService<IClienteService>().ExcluirAsync(id, cancellationToken);
+            if (cliente != null) await _serviceProvider.GetRequiredService<IClienteService>().ExcluirAsync(id, cancellationToken);
 
-            var fornecedorRepo = scope.ServiceProvider.GetRequiredService<IFornecedorRepository>();
+            var fornecedorRepo = _serviceProvider.GetRequiredService<IFornecedorRepository>();
             var fornecedor = await fornecedorRepo.GetByIdAsync(id, cancellationToken);
-            if (fornecedor != null) await scope.ServiceProvider.GetRequiredService<IFornecedorService>().ExcluirAsync(id, cancellationToken);
+            if (fornecedor != null) await _serviceProvider.GetRequiredService<IFornecedorService>().ExcluirAsync(id, cancellationToken);
 
-            var funcionarioRepo = scope.ServiceProvider.GetRequiredService<IFuncionarioRepository>();
+            var funcionarioRepo = _serviceProvider.GetRequiredService<IFuncionarioRepository>();
             var funcionario = await funcionarioRepo.GetByIdAsync(id, cancellationToken);
-            if (funcionario != null) await scope.ServiceProvider.GetRequiredService<IFuncionarioService>().ExcluirAsync(id, cancellationToken);
+            if (funcionario != null) await _serviceProvider.GetRequiredService<IFuncionarioService>().ExcluirAsync(id, cancellationToken);
 
-            var transportadoraRepo = scope.ServiceProvider.GetRequiredService<ITransportadoraRepository>();
+            var transportadoraRepo = _serviceProvider.GetRequiredService<ITransportadoraRepository>();
             var transportadora = await transportadoraRepo.GetByIdAsync(id, cancellationToken);
-            if (transportadora != null) await scope.ServiceProvider.GetRequiredService<ITransportadoraService>().ExcluirAsync(id, cancellationToken);
+            if (transportadora != null) await _serviceProvider.GetRequiredService<ITransportadoraService>().ExcluirAsync(id, cancellationToken);
 
             await _repository.DeleteAsync(entidade, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
@@ -630,10 +768,8 @@ public class EntidadeService : IEntidadeService
 
     private async Task ProcessarPapeisAsync(int id, SalvarEntidadeDto dto, bool isNew, CancellationToken cancellationToken)
     {
-        using var scope = _serviceProvider.CreateScope();
-        
-        var clienteService = scope.ServiceProvider.GetRequiredService<IClienteService>();
-        var clienteRepo = scope.ServiceProvider.GetRequiredService<IClienteRepository>();
+        var clienteService = _serviceProvider.GetRequiredService<IClienteService>();
+        var clienteRepo = _serviceProvider.GetRequiredService<IClienteRepository>();
         var clienteExistente = await clienteRepo.GetByIdAsync(id, cancellationToken);
 
         if (dto.IsCliente)
@@ -658,8 +794,8 @@ public class EntidadeService : IEntidadeService
             await clienteService.ExcluirAsync(id, cancellationToken);
         }
 
-        var fornecedorService = scope.ServiceProvider.GetRequiredService<IFornecedorService>();
-        var fornecedorRepo = scope.ServiceProvider.GetRequiredService<IFornecedorRepository>();
+        var fornecedorService = _serviceProvider.GetRequiredService<IFornecedorService>();
+        var fornecedorRepo = _serviceProvider.GetRequiredService<IFornecedorRepository>();
         var fornecedorExistente = await fornecedorRepo.GetByIdAsync(id, cancellationToken);
 
         if (dto.IsFornecedor)
@@ -683,8 +819,8 @@ public class EntidadeService : IEntidadeService
             await fornecedorService.ExcluirAsync(id, cancellationToken);
         }
 
-        var funcionarioService = scope.ServiceProvider.GetRequiredService<IFuncionarioService>();
-        var funcionarioRepo = scope.ServiceProvider.GetRequiredService<IFuncionarioRepository>();
+        var funcionarioService = _serviceProvider.GetRequiredService<IFuncionarioService>();
+        var funcionarioRepo = _serviceProvider.GetRequiredService<IFuncionarioRepository>();
         var funcionarioExistente = await funcionarioRepo.GetByIdAsync(id, cancellationToken);
 
         if (dto.IsFuncionario)
@@ -708,8 +844,8 @@ public class EntidadeService : IEntidadeService
             await funcionarioService.ExcluirAsync(id, cancellationToken);
         }
 
-        var transportadoraService = scope.ServiceProvider.GetRequiredService<ITransportadoraService>();
-        var transportadoraRepo = scope.ServiceProvider.GetRequiredService<ITransportadoraRepository>();
+        var transportadoraService = _serviceProvider.GetRequiredService<ITransportadoraService>();
+        var transportadoraRepo = _serviceProvider.GetRequiredService<ITransportadoraRepository>();
         var transportadoraExistente = await transportadoraRepo.GetByIdAsync(id, cancellationToken);
 
         if (dto.IsTransportadora)

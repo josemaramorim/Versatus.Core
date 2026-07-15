@@ -63,6 +63,25 @@ export function isValidCNPJ(cnpj: string): boolean {
   return true;
 }
 
+export function isValidSuframa(suframa: string): boolean {
+  const cleanSuframa = suframa.replace(/[^\d]/g, '');
+  if (cleanSuframa.length !== 9) return false;
+  if (cleanSuframa.startsWith('00')) return false;
+
+  let sum = 0;
+  for (let i = 0; i < 8; i++) {
+    const digit = parseInt(cleanSuframa.charAt(i), 10);
+    const weight = 9 - i;
+    sum += digit * weight;
+  }
+
+  const remainder = sum % 11;
+  let dv = 11 - remainder;
+  if (dv >= 10) dv = 0;
+
+  return dv === parseInt(cleanSuframa.charAt(8), 10);
+}
+
 // Sub-schemas para tabelas vinculadas
 export const enderecoSchema = z.object({
   tipo: z.string(),
@@ -222,13 +241,13 @@ export const entidadeSchema = z.object({
   inscricaoMunicipal: z.string().optional().default(''),
   inscricaoSuframa: z.string().optional().default(''),
   inscricaoRural: z.string().optional().default(''),
-  contribuinteIcms: z.string(),
+  contribuinteIcms: z.string().optional().default('Sim'),
 
   // Pessoa Jurídica
   cnpj: z.string().optional().default(''),
-  regimeTributario: z.number(),
-  naturezaJuridica: z.number(),
-  enquadramento: z.string(),
+  regimeTributario: z.number().optional().default(1),
+  naturezaJuridica: z.number().optional().default(1),
+  enquadramento: z.string().optional().default('ME'),
 
   // E-mail / Internet
   emailPrincipal: z.string().email('E-mail principal inválido').or(z.literal('')).optional().default(''),
@@ -237,7 +256,7 @@ export const entidadeSchema = z.object({
   emailFinanceiro: z.string().email('E-mail financeiro inválido').or(z.literal('')).optional().default(''),
   emailNfe: z.string().email('E-mail NFe inválido').or(z.literal('')).optional().default(''),
   homePage: z.string().optional().default(''),
-  anexarBoleto: z.boolean(),
+  anexarBoleto: z.boolean().optional().default(false),
 
   // Auditoria
   usuarioInclusao: z.string().optional().default(''),
@@ -264,9 +283,9 @@ export const entidadeSchema = z.object({
   limiteCredito: z.number().min(0, 'Limite de crédito deve ser positivo').optional().default(0),
   cliImovel: z.string().optional().default(''),
   cliValorAluguel: z.number().min(0).optional().default(0),
-  cliItemFinanceiroPadrao: z.boolean(),
-  cliEnviarCND: z.boolean(),
-  cliObrigatorioPedidoB2B: z.boolean(),
+  cliItemFinanceiroPadrao: z.boolean().optional().default(false),
+  cliEnviarCND: z.boolean().optional().default(false),
+  cliObrigatorioPedidoB2B: z.boolean().optional().default(false),
   idComissionado: z.number().optional().default(1),
   cliLocalTrabalho: z.string().optional().default(''),
   cliProfissao: z.string().optional().default(''),
@@ -332,7 +351,7 @@ export const entidadeSchema = z.object({
   tipoProprietario: z.number().optional().default(1),
   tipoTransportador: z.number().optional().default(1),
   tipoFretePadrao: z.string().optional().default('CIF'),
-  tAtivo: z.boolean(),
+  tAtivo: z.boolean().optional().default(true),
 
   // Filial fields
   filialCodigoEmpresa: z.string().optional().default(''),
@@ -344,23 +363,23 @@ export const entidadeSchema = z.object({
   filialClassificacaoIndustrial: z.number().optional().default(1),
   filialCarteiraDigital: z.number().optional().default(1),
   filialCodigoServicoFiscal: z.number().optional().default(1),
-  flAtivo: z.boolean(),
-  filialIncentivoFiscal: z.boolean(),
-  filialUsaSituacaoTributariaFornecedor: z.boolean(),
-  filialEnviarInventarioSt: z.boolean(),
+  flAtivo: z.boolean().optional().default(true),
+  filialIncentivoFiscal: z.boolean().optional().default(false),
+  filialUsaSituacaoTributariaFornecedor: z.boolean().optional().default(false),
+  filialEnviarInventarioSt: z.boolean().optional().default(false),
   filialCodigoAtividadeCp: z.string().optional().default(''),
   filialCodigoReceitaCp: z.string().optional().default(''),
   filialTipoEmitenteMdfe: z.number().optional().default(1),
 
   // Representante fields
   idCategoriaRepresentante: z.number().optional().default(1),
-  rAtivo: z.boolean(),
+  rAtivo: z.boolean().optional().default(true),
 
   // Contador fields
   contadorCpf: z.string().optional().default(''),
   contadorNome: z.string().optional().default(''),
   contadorCrc: z.string().optional().default(''),
-  coAtivo: z.boolean(),
+  coAtivo: z.boolean().optional().default(true),
 
   // Comissionado fields
   comissaoNomeComercial: z.string().optional().default(''),
@@ -369,13 +388,13 @@ export const entidadeSchema = z.object({
   tipoComissionado: z.string().optional().default(''),
   idCategoriaComissionado: z.number().optional().default(1),
   idUsuarioVinculado: z.number().optional().default(1),
-  cmAtivo: z.boolean(),
+  cmAtivo: z.boolean().optional().default(true),
 
   // Agência fields
   agenciaBanco: z.number().optional().default(1),
   agenciaNome: z.string().optional().default(''),
   agenciaNumero: z.string().optional().default(''),
-  aAtivo: z.boolean(),
+  aAtivo: z.boolean().optional().default(true),
 
   // Financeira fields
   financeiraNomeResumido: z.string().optional().default(''),
@@ -383,7 +402,7 @@ export const entidadeSchema = z.object({
   financeiraContaCorrente: z.string().optional().default(''),
   financeiraTaxaExtra: z.number().min(0).optional().default(0),
   financeiraDiaVencimento: z.number().min(1).max(31).optional().default(1),
-  fnAtivo: z.boolean(),
+  fnAtivo: z.boolean().optional().default(true),
 
   // Obra fields
   obraIdCliente: z.number().optional().default(1),
@@ -396,8 +415,8 @@ export const entidadeSchema = z.object({
   oDataSituacao: z.string().optional().default(''),
   obraTabelaPreco: z.number().optional().default(1),
   obraCategoria: z.number().optional().default(1),
-  oAtivo: z.boolean(),
-  oReservaEstoque: z.boolean(),
+  oAtivo: z.boolean().optional().default(true),
+  oReservaEstoque: z.boolean().optional().default(false),
   obraIdCentroCusto: z.number().optional().default(1),
   obraIdProjeto: z.number().optional().default(1),
   obraIdOperacaoAtendimento: z.number().optional().default(1),
@@ -405,19 +424,19 @@ export const entidadeSchema = z.object({
 
   // Outro, Prospecto, Aluno, Professor, Intermediador
   idCategoriaOutro: z.number().optional().default(1),
-  ouAtivo: z.boolean(),
+  ouAtivo: z.boolean().optional().default(true),
   idCategoriaProspecto: z.number().optional().default(1),
-  prAtivo: z.boolean(),
+  prAtivo: z.boolean().optional().default(true),
   alTipoResponsavel: z.number().optional().default(1),
   alIdClienteResponsavel: z.number().optional().default(1),
   alDiaPreferenicaPagamento: z.number().min(1).max(31).optional().default(5),
   alDataCadastro: z.string().optional().default(''),
-  alAtivo: z.boolean(),
+  alAtivo: z.boolean().optional().default(true),
   pfDataCadastro: z.string().optional().default(''),
-  pfAtivo: z.boolean(),
+  pfAtivo: z.boolean().optional().default(true),
   iiIdentificacaoIntermediador: z.string().optional().default(''),
   idCategoriaIntermediador: z.number().optional().default(1),
-  icAtivo: z.boolean(),
+  icAtivo: z.boolean().optional().default(true),
 
   // Sub-arrays de Grilhas
   enderecos: z.array(enderecoSchema).default([]),
@@ -438,6 +457,21 @@ export const entidadeSchema = z.object({
   represClientes: z.array(represClienteSchema).default([]),
   filiaisVinculadas: z.array(filialVinculadaSchema).default([]),
 }).superRefine((data, ctx) => {
+  // 0. Validação de Papel Obrigatório
+  const temPapel = 
+    data.isCliente || data.isFornecedor || data.isTransportadora || data.isComissionado ||
+    data.isAgencia || data.isFinanceira || data.isFilial || data.isFuncionario ||
+    data.isObra || data.isRepresentante || data.isOutro || data.isProspecto ||
+    data.isContador || data.isAluno || data.isProfessor || data.isIntermediador;
+
+  if (!temPapel) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Pelo menos um papel deve ser selecionado',
+      path: ['isCliente'],
+    });
+  }
+
   // 1. Validação Condicional de CPF (se Pessoa Física)
   if (data.tipoPessoa === 1) {
     if (!data.cpf) {
@@ -469,6 +503,50 @@ export const entidadeSchema = z.object({
         message: 'CNPJ inválido',
         path: ['cnpj'],
       });
+    }
+
+    if (!data.apelido || data.apelido.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Razão Social é obrigatória para Pessoa Jurídica',
+        path: ['apelido'],
+      });
+    }
+  }
+
+  // Validação Condicional das Características Fiscais (se PJ ou PF com Carac. Jurídica)
+  const temCaracJuridica = data.tipoPessoa === 2 || data.fisicaTipoJuridica;
+  if (temCaracJuridica) {
+    if (!data.contribuinteIcms) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Contribuinte ICMS é obrigatório',
+        path: ['contribuinteIcms'],
+      });
+    }
+    
+    if (data.tipoPessoa === 2) {
+      if (!data.regimeTributario) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Regime Tributário é obrigatório',
+          path: ['regimeTributario'],
+        });
+      }
+      if (!data.naturezaJuridica) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Natureza Jurídica é obrigatória',
+          path: ['naturezaJuridica'],
+        });
+      }
+      if (!data.enquadramento) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Enquadramento é obrigatório',
+          path: ['enquadramento'],
+        });
+      }
     }
   }
 
@@ -549,6 +627,96 @@ export const entidadeSchema = z.object({
         code: z.ZodIssueCode.custom,
         message: 'CPF do contador inválido',
         path: ['contadorCpf'],
+      });
+    }
+  }
+
+  // 8. Validações Condicionais Legadas (Regras de Papel e Inscrições)
+  
+  // Filial Física com Característica Jurídica
+  if (data.isFilial) {
+    if (data.tipoPessoa === 1 && !data.fisicaTipoJuridica) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Para entidade do tipo 'Filial' definida como pessoa 'Física', deve estar marcado 'Pessoa física com característica de jurídica'.",
+        path: ['fisicaTipoJuridica'],
+      });
+    }
+  }
+
+  // Funcionário deve ser Física e sem Característica Jurídica
+  if (data.isFuncionario) {
+    if (data.tipoPessoa === 2 || data.fisicaTipoJuridica) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Para a entidade do tipo 'Funcionário', deve ser pessoa física e não possuir característica de pessoa jurídica.",
+        path: ['isFuncionario'],
+      });
+    }
+  }
+
+  // Intermediador Comercial deve ser Jurídica e ter CNPJ
+  if (data.isIntermediador) {
+    if (data.tipoPessoa === 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Para a entidade do tipo 'Intermediador', deve ser SOMENTE pessoa definida como jurídica.",
+        path: ['tipoPessoa'],
+      });
+    }
+    if (!data.cnpj) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Para a entidade do tipo 'Intermediador', deve ser informado o CNPJ.",
+        path: ['cnpj'],
+      });
+    }
+  }
+
+  // Inscrição Estadual (IE): apenas números, de 2 a 14 dígitos
+  if (data.inscricaoEstadual) {
+    const cleanIE = data.inscricaoEstadual.replace(/[^\d]/g, '');
+    if (!/^\d+$/.test(cleanIE)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Deve ser informado para inscrição estadual somente caracteres numéricos.',
+        path: ['inscricaoEstadual'],
+      });
+    } else if (cleanIE.length < 2 || cleanIE.length > 14) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Deve ser informado no mínimo 2 e no máximo 14 caracteres numéricos para inscrição estadual.',
+        path: ['inscricaoEstadual'],
+      });
+    }
+  }
+
+  // Inscrição SUFRAMA: 9 caracteres numéricos, não inicia com "00", e passa na validação módulo 11
+  if (data.inscricaoSuframa) {
+    const cleanSuframa = data.inscricaoSuframa.replace(/[^\d]/g, '');
+    if (!/^\d+$/.test(cleanSuframa)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Deve ser informado para inscrição SUFRAMA somente caracteres numéricos.',
+        path: ['inscricaoSuframa'],
+      });
+    } else if (cleanSuframa.length !== 9) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Deve ser informado 9 caracteres numéricos para inscrição SUFRAMA.',
+        path: ['inscricaoSuframa'],
+      });
+    } else if (cleanSuframa.startsWith('00')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Os dois primeiros caracteres da inscrição SUFRAMA, NÃO pode ser \'00\'.',
+        path: ['inscricaoSuframa'],
+      });
+    } else if (!isValidSuframa(cleanSuframa)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'O dígito verificador da inscrição SUFRAMA NÃO é válido.',
+        path: ['inscricaoSuframa'],
       });
     }
   }

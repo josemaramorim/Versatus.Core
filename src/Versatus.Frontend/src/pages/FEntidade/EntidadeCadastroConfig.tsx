@@ -45,12 +45,12 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
         sortable: true
       },
       {
-        header: 'Razão Social / Nome',
+        header: 'Nome / Nome Fantasia',
         field: 'razaoSocial',
         sortable: true
       },
       {
-        header: 'Nome Fantasia / Apelido',
+        header: 'Razão Social',
         field: 'apelido',
         sortable: true
       },
@@ -164,6 +164,7 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
         field: 'role',
         label: 'Tipo de Entidade (Papel)',
         type: 'select',
+        multiple: true,
         options: [
           { label: 'Cliente', value: 'isCliente' },
           { label: 'Fornecedor', value: 'isFornecedor' },
