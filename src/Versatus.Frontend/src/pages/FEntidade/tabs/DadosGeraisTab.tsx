@@ -26,7 +26,7 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
 
   return (
     <Box>
-      {tipoPessoa === 1 ? (
+      {tipoPessoa === 2 ? (
         // Pessoa Física
         <Box>
           <Grid container spacing={3}>

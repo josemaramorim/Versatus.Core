@@ -395,7 +395,7 @@ export const defaultValues: IEntidadeForm = {
   razaoSocial: '',
   apelido: '',
   tipoEspecificoEntidade: 'Geral',
-  tipoPessoa: 1,
+  tipoPessoa: 2,
   isCliente: false,
   isFornecedor: false,
   isFuncionario: false,

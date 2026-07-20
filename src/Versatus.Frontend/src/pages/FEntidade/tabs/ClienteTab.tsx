@@ -40,7 +40,7 @@ export const ClienteTab: React.FC<IClienteTabProps> = ({
           <Tab label="4. Bens e Imóveis" />
           <Tab label="5. Cartões" />
           <Tab label="6. Parentesco" />
-          {tipoPessoa === 2 && <Tab label="7. Sócios / QSA" />}
+          {tipoPessoa === 3 && <Tab label="7. Sócios / QSA" />}
         </Tabs>
       </Box>
 
@@ -641,7 +641,7 @@ export const ClienteTab: React.FC<IClienteTabProps> = ({
       )}
 
       {/* Cliente Subtab 7: Sócios / QSA */}
-      {activeClienteTab === 6 && tipoPessoa === 2 && (
+      {activeClienteTab === 6 && tipoPessoa === 3 && (
         <GradeEdicao
           titulo="Quadro de Sócios e Administradores (QSA)"
           name="cliSocios"

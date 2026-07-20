@@ -473,7 +473,7 @@ export const entidadeSchema = z.object({
   }
 
   // 1. Validação Condicional de CPF (se Pessoa Física)
-  if (data.tipoPessoa === 1) {
+  if (data.tipoPessoa === 2) {
     if (!data.cpf) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -490,7 +490,7 @@ export const entidadeSchema = z.object({
   }
 
   // 2. Validação Condicional de CNPJ (se Pessoa Jurídica)
-  if (data.tipoPessoa === 2) {
+  if (data.tipoPessoa === 3) {
     if (!data.cnpj) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -515,7 +515,7 @@ export const entidadeSchema = z.object({
   }
 
   // Validação Condicional das Características Fiscais (se PJ ou PF com Carac. Jurídica)
-  const temCaracJuridica = data.tipoPessoa === 2 || data.fisicaTipoJuridica;
+  const temCaracJuridica = data.tipoPessoa === 3 || data.fisicaTipoJuridica;
   if (temCaracJuridica) {
     if (!data.contribuinteIcms) {
       ctx.addIssue({
@@ -525,7 +525,7 @@ export const entidadeSchema = z.object({
       });
     }
     
-    if (data.tipoPessoa === 2) {
+    if (data.tipoPessoa === 3) {
       if (!data.regimeTributario) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -551,7 +551,7 @@ export const entidadeSchema = z.object({
   }
 
   // 3. Validação Condicional de Inscrição Estadual (se PJ ou PF com Carac. Jurídica)
-  const precisaInscEstadual = data.tipoPessoa === 2 || data.fisicaTipoJuridica;
+  const precisaInscEstadual = data.tipoPessoa === 3 || data.fisicaTipoJuridica;
   if (precisaInscEstadual && data.contribuinteIcms === 'Sim') {
     if (!data.inscricaoEstadual) {
       ctx.addIssue({
@@ -635,7 +635,7 @@ export const entidadeSchema = z.object({
   
   // Filial Física com Característica Jurídica
   if (data.isFilial) {
-    if (data.tipoPessoa === 1 && !data.fisicaTipoJuridica) {
+    if (data.tipoPessoa === 2 && !data.fisicaTipoJuridica) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Para entidade do tipo 'Filial' definida como pessoa 'Física', deve estar marcado 'Pessoa física com característica de jurídica'.",
@@ -646,7 +646,7 @@ export const entidadeSchema = z.object({
 
   // Funcionário deve ser Física e sem Característica Jurídica
   if (data.isFuncionario) {
-    if (data.tipoPessoa === 2 || data.fisicaTipoJuridica) {
+    if (data.tipoPessoa === 3 || data.fisicaTipoJuridica) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Para a entidade do tipo 'Funcionário', deve ser pessoa física e não possuir característica de pessoa jurídica.",
@@ -657,7 +657,7 @@ export const entidadeSchema = z.object({
 
   // Intermediador Comercial deve ser Jurídica e ter CNPJ
   if (data.isIntermediador) {
-    if (data.tipoPessoa === 1) {
+    if (data.tipoPessoa === 2) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "Para a entidade do tipo 'Intermediador', deve ser SOMENTE pessoa definida como jurídica.",

@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEnumOptions } from '../../hooks/useEnums';
 
 import { CadastroBasePage } from '../../components/crud/CadastroBasePage';
 import { EntidadeCadastroConfig } from './EntidadeCadastroConfig';
@@ -58,6 +59,8 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
   record,
   onSave
 }) => {
+  const { options: tipoPessoaOptions, loading: loadingTipoPessoa } = useEnumOptions(1); // 1 = EntidadeFisicaJuridica
+
   const [toast, setToast] = useState<{
     open: boolean;
     message: string;
@@ -389,7 +392,7 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                 )}
               />
             </Grid>
-            <Grid size={{ xs: 12, sm: tipoPessoa === 2 ? 4 : 7 }}>
+            <Grid size={{ xs: 12, sm: tipoPessoa === 3 ? 4 : 7 }}>
               <Controller
                 name="razaoSocial"
                 control={control}
@@ -406,7 +409,7 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                 )}
               />
             </Grid>
-            {tipoPessoa === 2 && (
+            {tipoPessoa === 3 && (
               <Grid size={{ xs: 12, sm: 3 }}>
                 <Controller
                   name="apelido"
@@ -462,9 +465,14 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                     <Select
                       {...field}
                       label="Tipo de Pessoa"
+                      disabled={isBrowse || loadingTipoPessoa}
                     >
-                      <MenuItem value={1}>Física (CPF)</MenuItem>
-                      <MenuItem value={2}>Jurídica (CNPJ)</MenuItem>
+                      {tipoPessoaOptions.map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label === 'Fisica' ? 'Física (CPF)' :
+                           opt.label === 'Juridica' ? 'Jurídica (CNPJ)' : opt.label}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 )}
