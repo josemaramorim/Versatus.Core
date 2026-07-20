@@ -78,6 +78,7 @@ Use exatamente este modelo (copie, substitua e envie):
 
 ```
 Migrar formulário: [NomeDoFormulario]
+Módulo: [NomeDoModulo] (ex: AcessoGlobal, GestaoTributo, Faturamento)
 
 Entidade legada (.cs):
 [cole aqui o conteúdo completo do arquivo de entidade]
@@ -93,6 +94,7 @@ Observações extras (opcional):
 
 ```
 Migrar formulário: CondicaoPagamento
+Módulo: GestaoTributo
 
 Entidade legada (.cs):
 public class CondicaoPagamento : ObjetoNegocio

@@ -11,7 +11,7 @@ Este skill guia o agente através do pipeline de migração de formulários do E
 
 ## 1. Ritual de Início (Fase 1: Analista de Esquema)
 
-Quando o usuário solicitar a migração de um formulário fornecendo o nome e os arquivos `.cs` legados:
+Quando o usuário solicitar a migração de um formulário fornecendo o nome, o módulo (ex: AcessoGlobal, GestaoTributo) e os arquivos `.cs` legados:
 1. Localize a fase do formulário no arquivo `specs/00-INDICE-GERAL.md`.
 2. Leia atentamente as Regras Anti-Alucinação em `specs/03-REGRAS-ANTI-ALUCINACAO.md`.
 3. Leia a SPEC do módulo correspondente em `specs/modulos/MOD-0X-[MODULO].md`.
@@ -26,10 +26,10 @@ Quando o usuário solicitar a migração de um formulário fornecendo o nome e o
 ## 2. Geração de Back-end (Fase 2: Arquiteto Back-end)
 
 Após aprovação da Spec Funcional pelo usuário:
-1. Crie os arquivos DTO em `src/Versatus.AcessoGlobal/Domain/DTOs/[Nome]Dto.cs` contendo as classes de persistência/leitura (`Salvar[Nome]Dto`, `Obter[Nome]Dto`).
-2. Crie a interface de serviço em `src/Versatus.AcessoGlobal/Domain/Services/I[Nome]Service.cs`.
-3. Crie a implementação do serviço em `src/Versatus.AcessoGlobal/Domain/Services/[Nome]Service.cs` incorporando as validações, regras de negócio e campos de auditoria idênticos ao legado.
-4. Crie o controlador REST em `src/Versatus.AcessoGlobal/Api/Controllers/[Nome]Controller.cs` com suporte a paginação, filtros, inserção, atualização e exclusão, usando como modelo `references/BACKEND/EntidadeController.cs`.
+1. Crie os arquivos DTO em `src/Versatus.[Modulo]/Domain/DTOs/[Nome]Dto.cs` contendo as classes de persistência/leitura (`Salvar[Nome]Dto`, `Obter[Nome]Dto`).
+2. Crie a interface de serviço em `src/Versatus.[Modulo]/Domain/Services/I[Nome]Service.cs`.
+3. Crie a implementação do serviço em `src/Versatus.[Modulo]/Domain/Services/[Nome]Service.cs` incorporando as validações, regras de negócio e campos de auditoria idênticos ao legado.
+4. Crie o controlador REST em `src/Versatus.[Modulo]/Api/Controllers/[Nome]Controller.cs` com suporte a paginação, filtros, inserção, atualização e exclusão, usando como modelo `references/BACKEND/EntidadeController.cs`.
 5. Execute `dotnet build` na pasta raiz do projeto de API para verificar erros de compilação. Corrija-os imediatamente.
 6. Crie o commit: `git add -A && git commit -m "Feat(backend): Add [Nome] DTOs, Service and Controller"`.
 
