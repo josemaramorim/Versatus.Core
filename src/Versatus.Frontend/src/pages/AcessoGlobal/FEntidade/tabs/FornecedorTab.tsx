@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IFornecedorTabProps } from '../types';
-import { GradeEdicao } from '../../../components/common/GradeEdicao';
+import { GradeEdicao } from '../../../../components/common/GradeEdicao';
 
 export const FornecedorTab: React.FC<IFornecedorTabProps> = ({
   isBrowse,
@@ -285,3 +285,4 @@ export const FornecedorTab: React.FC<IFornecedorTabProps> = ({
     </Box>
   );
 };
+

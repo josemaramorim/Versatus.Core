@@ -3,8 +3,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, AppBar, Toolbar, Typography, Tab, Tabs } from '@mui/material';
 import { theme } from './theme';
-import { FEntidade } from './pages/FEntidade';
-import { FParametro } from './pages/FParametro';
+import { FEntidade } from './pages/AcessoGlobal/FEntidade';
+import { FParametro } from './pages/AcessoGlobal/FParametro';
 
 function App() {
   const [tabIndex, setTabIndex] = useState(1); // Inicia na aba de Parâmetros por padrão

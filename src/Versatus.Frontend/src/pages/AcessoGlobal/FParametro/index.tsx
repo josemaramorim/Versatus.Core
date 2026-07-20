@@ -11,9 +11,9 @@ import {
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CadastroBasePage } from '../../components/crud/CadastroBasePage';
+import { CadastroBasePage } from '../../../components/crud/CadastroBasePage';
 import { ParametroCadastroConfig } from './ParametroCadastroConfig';
-import type { CadastroModalMode } from '../../types/cadastro';
+import type { CadastroModalMode } from '../../../types/cadastro';
 import type { IParametroForm } from './types';
 import { parametroSchema } from './schema';
 

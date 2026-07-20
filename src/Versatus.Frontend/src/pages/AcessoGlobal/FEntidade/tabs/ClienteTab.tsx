@@ -14,8 +14,8 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IClienteTabProps } from '../types';
-import { CPFMask, TelefoneMask } from '../../../components/common/TextMasks';
-import { GradeEdicao } from '../../../components/common/GradeEdicao';
+import { CPFMask, TelefoneMask } from '../../../../components/common/TextMasks';
+import { GradeEdicao } from '../../../../components/common/GradeEdicao';
 
 export const ClienteTab: React.FC<IClienteTabProps> = ({
   isBrowse,
@@ -721,3 +721,4 @@ export const ClienteTab: React.FC<IClienteTabProps> = ({
     </Box>
   );
 };
+

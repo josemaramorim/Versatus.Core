@@ -281,3 +281,4 @@ export const ObraTab: React.FC<IObraTabProps> = ({
     </Box>
   );
 };
+

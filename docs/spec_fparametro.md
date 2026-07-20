@@ -95,10 +95,10 @@ Os valores de configuração dos tipos suportados pelo legado são mapeados conf
 
 ## 8. Arquivos Relacionados
 
-- **Types e defaultValues:** [types.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FParametro/types.ts)
-- **Validação Zod:** [schema.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FParametro/schema.ts)
-- **Config OOP:** [ParametroCadastroConfig.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FParametro/ParametroCadastroConfig.tsx)
-- **Formulário / View:** [index.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FParametro/index.tsx)
+- **Types e defaultValues:** [types.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FParametro/types.ts)
+- **Validação Zod:** [schema.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FParametro/schema.ts)
+- **Config OOP:** [ParametroCadastroConfig.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FParametro/ParametroCadastroConfig.tsx)
+- **Formulário / View:** [index.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FParametro/index.tsx)
 - **Controller C#:** [ParametroController.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.AcessoGlobal/Api/Controllers/ParametroController.cs)
 - **DTOs C#:** [ParametroDtos.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.AcessoGlobal/Domain/DTOs/ParametroDtos.cs)
 - **Serviço C#:** [ParametroService.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.AcessoGlobal/Domain/Services/ParametroService.cs)

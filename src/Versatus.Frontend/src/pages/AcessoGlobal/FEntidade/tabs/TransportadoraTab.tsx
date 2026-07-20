@@ -13,8 +13,8 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, ITabProps } from '../types';
-import { PlacaMask } from '../../../components/common/TextMasks';
-import { GradeEdicao } from '../../../components/common/GradeEdicao';
+import { PlacaMask } from '../../../../components/common/TextMasks';
+import { GradeEdicao } from '../../../../components/common/GradeEdicao';
 
 export const TransportadoraTab: React.FC<ITabProps> = ({
   isBrowse
@@ -219,3 +219,4 @@ export const TransportadoraTab: React.FC<ITabProps> = ({
     </Box>
   );
 };
+

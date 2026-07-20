@@ -13,8 +13,8 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, ITabProps } from '../types';
-import { CPFMask } from '../../../components/common/TextMasks';
-import { GradeEdicao } from '../../../components/common/GradeEdicao';
+import { CPFMask } from '../../../../components/common/TextMasks';
+import { GradeEdicao } from '../../../../components/common/GradeEdicao';
 
 // CONTADOR TAB
 export const ContadorTab: React.FC<ITabProps> = ({ isBrowse }) => {
@@ -745,3 +745,4 @@ export const IntermediadorTab: React.FC<ITabProps> = ({ isBrowse }) => {
     </Grid>
   );
 };
+

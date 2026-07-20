@@ -18,6 +18,7 @@ Este arquivo define as regras e restrições fundamentais que guiam todos os age
 - Toda listagem e formulário CRUD deve herdar e estender a infraestrutura orientada a objetos (`BaseCadastroConfig<T>`).
 - **Proibido:** Inserir lógica hardcoded do backend, endpoints ou mapeamentos específicos dentro de componentes ou hooks reutilizáveis como `useCrudListState.ts`.
 - **Obrigatorio:** Sobrescrever os métodos `mapBackendToForm` e `mapFormToBackend` no arquivo `[Nome]CadastroConfig.tsx` do formulário quando houver diferenças de enums ou estrutura de dados entre o legado/API e o formulário do React.
+- **Obrigatorio:** Organizar as páginas do frontend em subpastas por módulo correspondente ao backend (ex.: `src/pages/[Modulo]/F[Nome]/`), em vez de manter uma estrutura plana diretamente em `src/pages/`. Isso espelha a modularização de negócio do sistema.
 
 ## 4. Estratégia Git e Proteção de Branches
 - **Proibido:** A IA nunca deve fazer commits ou push diretamente nas branches estáveis `main` ou `develop`.

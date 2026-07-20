@@ -1,12 +1,12 @@
 
 import { Box, Chip, Tooltip } from '@mui/material';
 import type { ZodTypeAny } from 'zod';
-import type { IColunaConfig, IFiltroConfig } from '../../types/cadastro';
-import { BaseCadastroConfig } from '../../types/cadastro';
+import type { IColunaConfig, IFiltroConfig } from '../../../types/cadastro';
+import { BaseCadastroConfig } from '../../../types/cadastro';
 import type { IEntidadeForm } from './types';
 import { defaultValues } from './types';
 import { entidadeSchema } from './schema';
-import { buildApiEndpoint } from '../../config/api';
+import { buildApiEndpoint } from '../../../config/api';
 
 
 function formatCpfCnpj(value: string | undefined): string {
