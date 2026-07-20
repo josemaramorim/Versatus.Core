@@ -53,6 +53,7 @@ public class AcessoGlobalDbContext : DbContext
     public DbSet<SerieDocumentoFilial> SeriesDocumentoFilial => Set<SerieDocumentoFilial>();
     public DbSet<Parametro> Parametros => Set<Parametro>();
     public DbSet<ParametroValor> ParametroValores => Set<ParametroValor>();
+    public DbSet<TipoEnumerado> TiposEnumerados => Set<TipoEnumerado>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

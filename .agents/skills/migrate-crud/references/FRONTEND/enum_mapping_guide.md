@@ -76,3 +76,37 @@ Sempre que criar um arquivo `[Nome]CadastroConfig.tsx`, avalie se as propriedade
 - Use o `mapBackendToForm` para converter de tipos complexos legados/aninhados (ex: `pessoaFisica.cpf`) para campos planos do formulário (ex: `cpf`).
 - Use o `mapFormToBackend` para construir o DTO de salvamento estruturado (ex: aninhar `cpf` dentro de `pessoaFisica: { cpf }` se a API assim exigir).
 - Nunca faça essa transformação de mapeamento dentro do componente React principal ou do hook de estado da lista para manter a arquitetura limpa (OOP).
+
+---
+
+## 4. Uso Dinâmico no Frontend (React)
+
+Para enums cujos valores são carregados do banco de dados (tabela `GloTipoEnumerado`), o componente de formulário React (`index.tsx`) deve consumir o hook `useEnumOptions` passando o `idPai` do grupo enumerado correspondente:
+
+```tsx
+import { useEnumOptions } from '../../hooks/useEnums';
+
+// Dentro do componente de formulário:
+const { options: tipoPessoaOptions, loading } = useEnumOptions(1); // 1 = EntidadeFisicaJuridica
+
+return (
+  <Controller
+    name="tipoPessoa"
+    control={control}
+    render={({ field }) => (
+      <TextField
+        select
+        label="Tipo de Pessoa"
+        {...field}
+        disabled={loading}
+      >
+        {tipoPessoaOptions.map((opt) => (
+          <MenuItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </MenuItem>
+        ))}
+      </TextField>
+    )}
+  />
+);
+```
