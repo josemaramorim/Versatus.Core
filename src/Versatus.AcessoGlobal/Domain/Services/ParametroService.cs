@@ -116,15 +116,23 @@ public class ParametroService : IParametroService
                 break;
         }
 
-        var itemsRaw = await query
+        // Carrega os dados na memória primeiro devido à limitação do SQL Server 2008 (não suporta OFFSET/FETCH)
+        var allItems = await query.ToListAsync(cancellationToken);
+
+        var itemsRaw = allItems
             .Skip((page - 1) * limit)
             .Take(limit)
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         var paramIds = itemsRaw.Select(p => p.IdParam).ToList();
-        var paramValores = await _context.ParametroValores
-            .Where(pv => paramIds.Contains(pv.IdParametro ?? 0))
-            .ToListAsync(cancellationToken);
+        
+        var paramValores = new List<ParametroValor>();
+        if (paramIds.Any())
+        {
+            paramValores = await _context.ParametroValores
+                .Where(pv => pv.IdParametro.HasValue && paramIds.Contains(pv.IdParametro.Value))
+                .ToListAsync(cancellationToken);
+        }
 
         var items = itemsRaw.Select(p => {
             var val = paramValores.FirstOrDefault(pv => pv.IdParametro == p.IdParam)?.Valor;
