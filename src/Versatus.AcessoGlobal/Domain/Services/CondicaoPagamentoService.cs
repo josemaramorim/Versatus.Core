@@ -11,6 +11,7 @@ using Versatus.AcessoGlobal.Infrastructure;
 using Versatus.Framework.Context;
 using Versatus.Framework.Pagination;
 using Versatus.Framework.Sequences;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -79,10 +80,13 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
         return cp == null ? null : MapToResponseDto(cp);
     }
 
-    public async Task<CondicaoPagamentoResponseDto> CriarAsync(CriarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<CondicaoPagamentoResponseDto>> CriarAsync(CriarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default)
     {
-        // Validar dados antes de salvar
-        ValidateCondicao(dto);
+        var validation = ValidateCondicao(dto);
+        if (!validation.IsValid)
+        {
+            return Result<CondicaoPagamentoResponseDto>.Fail(validation.Errors.ToArray());
+        }
 
         var idCp = await _geradorSequencial.ProximoAsync("CondicaoPagamento", SequencialTipo.Geral, cancellationToken);
 
@@ -148,15 +152,18 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
         _context.CondicoesPagamento.Add(cp);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return MapToResponseDto(cp);
+        return Result<CondicaoPagamentoResponseDto>.Ok(MapToResponseDto(cp));
     }
 
     public async Task RazorFixCompilacaoBugAsync() => await Task.CompletedTask;
 
-    public async Task AtualizarAsync(int id, EditarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<CondicaoPagamentoResponseDto>> AtualizarAsync(int id, EditarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default)
     {
-        // Validar dados antes de salvar
-        ValidateCondicao(dto);
+        var validation = ValidateCondicao(dto);
+        if (!validation.IsValid)
+        {
+            return Result<CondicaoPagamentoResponseDto>.Fail(validation.Errors.ToArray());
+        }
 
         var cp = await _context.CondicoesPagamento
             .Include(x => x.Regras)
@@ -164,7 +171,7 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
 
         if (cp == null)
         {
-            throw new InvalidOperationException($"Condição de pagamento com ID {id} não encontrada.");
+            return Result<CondicaoPagamentoResponseDto>.Fail(new ValidationError("IdCondicaoPagamento", $"Condição de pagamento com ID {id} não encontrada."));
         }
 
         // Atualizar campos
@@ -227,6 +234,7 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+        return Result<CondicaoPagamentoResponseDto>.Ok(MapToResponseDto(cp));
     }
 
     public async Task ExcluirAsync(int id, CancellationToken cancellationToken = default)
@@ -263,15 +271,17 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
     }
 
     #region Validações e Limpeza de Campos
-    private void ValidateCondicao(CriarCondicaoPagamentoDto dto)
+    private ValidationResult ValidateCondicao(CriarCondicaoPagamentoDto dto)
     {
+        var errors = new List<ValidationError>();
+
         if (dto.IdTipoCondicaoPagto == CondicaoPagtoTipo.Semanal)
         {
             if (dto.IdDiaSemana == 0)
             {
-                throw new InvalidOperationException("Para condição semanal, o dia da semana é obrigatório.");
+                errors.Add(new ValidationError("IdDiaSemana", "Para condição semanal, o dia da semana é obrigatório."));
             }
-            return;
+            return errors.Count > 0 ? ValidationResult.Fail(errors.ToArray()) : ValidationResult.Ok();
         }
 
         if (dto.IdTipoCondicaoPagto == CondicaoPagtoTipo.Parcelada)
@@ -280,17 +290,17 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
             {
                 if (dto.QuantidadeParcela <= 0)
                 {
-                    throw new InvalidOperationException("Deve ser informada a quantidade de parcelas.");
+                    errors.Add(new ValidationError("QuantidadeParcela", "Deve ser informada a quantidade de parcelas."));
                 }
 
                 if (dto.Regras.Count == 0)
                 {
-                    throw new InvalidOperationException("Deve ser configurada ao menos uma parcela na grade.");
+                    errors.Add(new ValidationError("Regras", "Deve ser configurada ao menos uma parcela na grade."));
                 }
 
                 if (dto.Regras.Count != dto.QuantidadeParcela)
                 {
-                    throw new InvalidOperationException($"A grade de parcelas deve possuir exatamente {dto.QuantidadeParcela} parcelas.");
+                    errors.Add(new ValidationError("Regras", $"A grade de parcelas deve possuir exatamente {dto.QuantidadeParcela} parcelas."));
                 }
 
                 if (dto.TipoDivisaoParcelamento == DivisaoParcelamentoTipo.Percentual)
@@ -298,7 +308,7 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
                     var somaPercentuais = dto.Regras.Sum(r => r.PercentualDivisao);
                     if (somaPercentuais != 100)
                     {
-                        throw new InvalidOperationException("A soma dos percentuais das parcelas deve ser exatamente 100%.");
+                        errors.Add(new ValidationError("Regras", "A soma dos percentuais das parcelas deve ser exatamente 100%."));
                     }
                 }
             }
@@ -307,17 +317,17 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
                 // Validações de Condição Livre
                 if (dto.IdParcelaArredondamento != ParcelamentoArredondamento.Ultima)
                 {
-                    throw new InvalidOperationException("Para condição livre, o arredondamento deve ser definido como 'Última parcela'.");
+                    errors.Add(new ValidationError("IdParcelaArredondamento", "Para condição livre, o arredondamento deve ser definido como 'Última parcela'."));
                 }
 
                 if (dto.TipoDivisaoParcelamento == DivisaoParcelamentoTipo.Percentual)
                 {
-                    throw new InvalidOperationException("Para condição livre, o tipo da divisão deve ser definido como 'Quantidade'.");
+                    errors.Add(new ValidationError("TipoDivisaoParcelamento", "Para condição livre, o tipo da divisão deve ser definido como 'Quantidade'."));
                 }
 
                 if (dto.IdParcelamentoTipo == ParcelamentoTipo.DiasUteis)
                 {
-                    throw new InvalidOperationException("Para condição livre, não é permitido o tipo de parcelamento 'Dias úteis'.");
+                    errors.Add(new ValidationError("IdParcelamentoTipo", "Para condição livre, não é permitido o tipo de parcelamento 'Dias úteis'."));
                 }
             }
 
@@ -325,17 +335,17 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
             {
                 if (dto.IdParcelamentoTipo != ParcelamentoTipo.DiasEntreParcela)
                 {
-                    throw new InvalidOperationException("Para usar mês comercial, o parcelamento deve ser do tipo 'Dias entre parcelas'.");
+                    errors.Add(new ValidationError("UsarMesComercial", "Para usar mês comercial, o parcelamento deve ser do tipo 'Dias entre parcelas'."));
                 }
                 if (dto.DiasParcelamento != 30)
                 {
-                    throw new InvalidOperationException("Para usar mês comercial, o número de dias entre parcelas deve ser igual a 30.");
+                    errors.Add(new ValidationError("DiasParcelamento", "Para usar mês comercial, o número de dias entre parcelas deve ser igual a 30."));
                 }
             }
 
             if (dto.PrimeiraParcelaAVista && dto.IdParcelamentoTipo != ParcelamentoTipo.DiasEntreParcela)
             {
-                throw new InvalidOperationException("Para marcar 1ª parcela à vista, o tipo do parcelamento deve ser do tipo 'Dias entre parcelas'.");
+                errors.Add(new ValidationError("PrimeiraParcelaAVista", "Para marcar 1ª parcela à vista, o tipo do parcelamento deve ser do tipo 'Dias entre parcelas'."));
             }
         }
 
@@ -343,7 +353,7 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
         {
             if (dto.Regras.Count == 0)
             {
-                throw new InvalidOperationException("Devem ser informadas as faixas para o cálculo.");
+                errors.Add(new ValidationError("Regras", "Devem ser informadas as faixas para o cálculo."));
             }
 
             // Validar ordem das faixas e cruzamento de limites
@@ -351,18 +361,20 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
             {
                 if (r.DiaFinal < r.DiaInicial)
                 {
-                    throw new InvalidOperationException("O dia final da faixa não pode ser inferior ao dia inicial.");
+                    errors.Add(new ValidationError("Regras", "O dia final da faixa não pode ser inferior ao dia inicial."));
                 }
                 if (r.NumeroDias < 1 || r.NumeroDias > 31)
                 {
-                    throw new InvalidOperationException("O dia do vencimento da faixa deve estar entre 1 e 31.");
+                    errors.Add(new ValidationError("Regras", "O dia do vencimento da faixa deve estar entre 1 e 31."));
                 }
                 if (r.NumeroDias >= r.DiaInicial && r.NumeroDias <= r.DiaFinal)
                 {
-                    throw new InvalidOperationException("O dia do vencimento não pode estar dentro do intervalo da própria faixa.");
+                    errors.Add(new ValidationError("Regras", "O dia do vencimento não pode estar dentro do intervalo da própria faixa."));
                 }
             }
         }
+
+        return errors.Count > 0 ? ValidationResult.Fail(errors.ToArray()) : ValidationResult.Ok();
     }
 
     private void LimparCamposInativos(CondicaoPagamento cp)

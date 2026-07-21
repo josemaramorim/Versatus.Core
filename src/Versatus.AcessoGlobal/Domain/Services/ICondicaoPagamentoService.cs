@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Versatus.AcessoGlobal.Domain.DTOs;
 using Versatus.Framework.Pagination;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -18,9 +19,9 @@ public interface ICondicaoPagamentoService
 
     Task<CondicaoPagamentoResponseDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);
 
-    Task<CondicaoPagamentoResponseDto> CriarAsync(CriarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default);
+    Task<Result<CondicaoPagamentoResponseDto>> CriarAsync(CriarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default);
 
-    Task AtualizarAsync(int id, EditarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default);
+    Task<Result<CondicaoPagamentoResponseDto>> AtualizarAsync(int id, EditarCondicaoPagamentoDto dto, CancellationToken cancellationToken = default);
 
     Task ExcluirAsync(int id, CancellationToken cancellationToken = default);
 

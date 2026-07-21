@@ -47,12 +47,14 @@ public class CondicaoPagamentoController : ControllerBase
     {
         try
         {
-            var criada = await _condicaoPagamentoService.CriarAsync(dto, cancellationToken);
+            var result = await _condicaoPagamentoService.CriarAsync(dto, cancellationToken);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
+            var criada = result.Value!;
             return CreatedAtAction(nameof(ObterPorId), new { id = criada.IdCondicaoPagamento }, criada);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -65,12 +67,13 @@ public class CondicaoPagamentoController : ControllerBase
     {
         try
         {
-            await _condicaoPagamentoService.AtualizarAsync(id, dto, cancellationToken);
-            return Ok();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
+            var result = await _condicaoPagamentoService.AtualizarAsync(id, dto, cancellationToken);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
+            return Ok(result.Value);
         }
         catch (Exception ex)
         {
