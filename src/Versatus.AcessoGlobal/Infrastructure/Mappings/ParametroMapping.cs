@@ -44,11 +44,11 @@ public class ParametroMapping : IEntityTypeConfiguration<Parametro>
             .IsRequired();
 
         builder.Property(p => p.IdRotina)
-            .HasColumnName("IdRotina")
+            .HasColumnName("IDGLOROTINA")
             .IsRequired(false);
 
         builder.Property(p => p.TipoParametro)
-            .HasColumnName("TipoParametro")
+            .HasColumnName("IDTIPOPARAMETRO")
             .IsRequired(false);
     }
 }

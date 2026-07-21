@@ -224,4 +224,18 @@ public class ParametroController : ControllerBase
             return StatusCode(500, new { message = "Erro interno ao salvar valores dos parâmetros.", error = ex.Message });
         }
     }
+
+    [HttpGet("perfis")]
+    public async Task<IActionResult> ListarPerfis()
+    {
+        try
+        {
+            var perfis = await _parametroService.ListarPerfisAsync();
+            return Ok(perfis);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Erro interno ao buscar perfis.", error = ex.Message });
+        }
+    }
 }

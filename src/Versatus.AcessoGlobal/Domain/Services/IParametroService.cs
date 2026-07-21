@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Versatus.AcessoGlobal.Domain.Configuration;
 using Versatus.AcessoGlobal.Domain.DTOs;
+using Versatus.AcessoGlobal.Domain.Security;
 using Versatus.Framework.Pagination;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
@@ -28,5 +29,6 @@ public interface IParametroService
 
     Task<List<ParametroPaginadoDto>> ListarPorEscopoAsync(int tipoParametro, int? idPerfil, CancellationToken cancellationToken = default);
     Task SalvarValoresLoteAsync(SalvarValoresParametrosDto dto, CancellationToken cancellationToken = default);
+    Task<List<Perfil>> ListarPerfisAsync(CancellationToken cancellationToken = default);
 }
 

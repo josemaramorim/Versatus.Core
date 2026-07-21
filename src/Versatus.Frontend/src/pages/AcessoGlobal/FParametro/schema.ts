@@ -15,4 +15,11 @@ export const parametroSchema = z.object({
     .optional()
     .default(''),
   tipo: z.number().default(155),
+  agrupador: z.number().optional().default(0),
+  visivel: z.boolean().optional().default(true),
+  idRotina: z.number().optional(),
+  tipoParametro: z.number().optional(),
+  idParametroValor: z.number().optional(),
+  valorConfigurado: z.string().optional(),
+  marcado: z.boolean().optional().default(false),
 });

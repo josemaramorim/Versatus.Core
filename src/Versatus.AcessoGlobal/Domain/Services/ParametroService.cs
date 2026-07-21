@@ -11,6 +11,7 @@ using Versatus.AcessoGlobal.Domain.Entities;
 using Versatus.Framework.Pagination;
 using Versatus.Framework.Sequences;
 using Versatus.Framework.Context;
+using Versatus.AcessoGlobal.Domain.Security;
 using Versatus.AcessoGlobal.Infrastructure;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
@@ -413,5 +414,12 @@ public class ParametroService : IParametroService
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<List<Perfil>> ListarPerfisAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Perfis
+            .OrderBy(p => p.Descricao)
+            .ToListAsync(cancellationToken);
     }
 }
