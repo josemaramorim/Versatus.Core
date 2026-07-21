@@ -8,7 +8,9 @@ import {
   FormControl, 
   InputLabel, 
   Select, 
-  MenuItem 
+  MenuItem,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IFuncionarioTabProps } from '../types';
@@ -40,6 +42,26 @@ export const FuncionarioTab: React.FC<IFuncionarioTabProps> = ({
       {/* Funcionário Subtab 1: Ficha de Registro */}
       {activeFuncionarioTab === 0 && (
         <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 3 }}>
+            <Controller
+              name="funcAtivo"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value ?? true}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={isBrowse}
+                      color="primary"
+                    />
+                  }
+                  label="Funcionário Ativo"
+                  sx={{ mt: 0.5 }}
+                />
+              )}
+            />
+          </Grid>
           <Grid size={{ xs: 12, sm: 3 }}>
             <TextField 
               {...register('funcionarioMatricula')}

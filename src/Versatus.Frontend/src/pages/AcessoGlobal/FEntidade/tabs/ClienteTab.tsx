@@ -10,7 +10,8 @@ import {
   Select, 
   MenuItem, 
   FormControlLabel, 
-  Checkbox 
+  Checkbox,
+  Switch
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IClienteTabProps } from '../types';
@@ -47,6 +48,26 @@ export const ClienteTab: React.FC<IClienteTabProps> = ({
       {/* Cliente Subtab 1: Venda */}
       {activeClienteTab === 0 && (
         <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Controller
+              name="cliAtivo"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value ?? true}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={isBrowse}
+                      color="primary"
+                    />
+                  }
+                  label="Cliente Ativo"
+                  sx={{ mt: 0.5 }}
+                />
+              )}
+            />
+          </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Controller
               name="idRotaVenda"
@@ -190,6 +211,22 @@ export const ClienteTab: React.FC<IClienteTabProps> = ({
       {activeClienteTab === 1 && (
         <Box>
           <Grid container spacing={3}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Controller
+                name="situacaoClienteSpc"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth size="small" disabled={isBrowse}>
+                    <InputLabel>Situação do Cliente (SPC/Serasa)</InputLabel>
+                    <Select {...field} label="Situação do Cliente (SPC/Serasa)">
+                      <MenuItem value={892}>Normal</MenuItem>
+                      <MenuItem value={893}>Restrição</MenuItem>
+                      <MenuItem value={894}>Negativado</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
+            </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <Controller
                 name="idPortador"

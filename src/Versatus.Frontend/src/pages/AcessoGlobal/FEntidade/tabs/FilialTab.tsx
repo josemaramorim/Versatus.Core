@@ -10,7 +10,8 @@ import {
   Select, 
   MenuItem, 
   FormControlLabel, 
-  Checkbox, 
+  Checkbox,
+  Switch,
   Stack 
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
@@ -40,6 +41,26 @@ export const FilialTab: React.FC<IFilialTabProps> = ({
       {/* Filial Subtab 1: Geral */}
       {activeFilialTab === 0 && (
         <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Controller
+              name="flAtivo"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value ?? true}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={isBrowse}
+                      color="primary"
+                    />
+                  }
+                  label="Filial Ativa"
+                  sx={{ mt: 0.5 }}
+                />
+              )}
+            />
+          </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <TextField 
               {...register('filialCodigoEmpresa')}

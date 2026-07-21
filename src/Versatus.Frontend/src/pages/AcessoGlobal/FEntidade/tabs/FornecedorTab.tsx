@@ -10,7 +10,8 @@ import {
   Select, 
   MenuItem, 
   FormControlLabel, 
-  Checkbox 
+  Checkbox,
+  Switch
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IFornecedorTabProps } from '../types';
@@ -39,6 +40,26 @@ export const FornecedorTab: React.FC<IFornecedorTabProps> = ({
       {/* Fornecedor Subtab 1: Geral */}
       {activeFornecedorTab === 0 && (
         <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Controller
+              name="fornAtivo"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value ?? true}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={isBrowse}
+                      color="primary"
+                    />
+                  }
+                  label="Fornecedor Ativo"
+                  sx={{ mt: 0.5 }}
+                />
+              )}
+            />
+          </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Controller
               name="idCategoriaFornecedor"

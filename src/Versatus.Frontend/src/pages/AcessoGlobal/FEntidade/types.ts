@@ -218,6 +218,10 @@ export interface IEntidadeForm {
   cliItemFinanceiroPadrao: boolean;
   cliEnviarCND: boolean;
   cliObrigatorioPedidoB2B: boolean;
+  cliAtivo: boolean;
+  situacaoClienteSpc: number;
+  fornAtivo: boolean;
+  funcAtivo: boolean;
   idComissionado: number;
   cliLocalTrabalho: string;
   cliProfissao: string;
@@ -464,6 +468,8 @@ export const defaultValues: IEntidadeForm = {
   cliItemFinanceiroPadrao: false,
   cliEnviarCND: false,
   cliObrigatorioPedidoB2B: false,
+  cliAtivo: true,
+  situacaoClienteSpc: 892,
   idComissionado: 1,
   cliLocalTrabalho: '',
   cliProfissao: '',
@@ -474,6 +480,8 @@ export const defaultValues: IEntidadeForm = {
   idCondicaoPagamentoFornecedor: 1,
   fornNumAlternativo: '',
   fornCotacaoProd: false,
+  fornAtivo: true,
+  funcAtivo: true,
   idCentroCusto: 1,
   idProjeto: 1,
   funcionarioMatricula: '',

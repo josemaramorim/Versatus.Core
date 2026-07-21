@@ -9,6 +9,7 @@ import {
   MenuItem, 
   FormControlLabel, 
   Checkbox,
+  Switch,
   Tabs,
   Tab
 } from '@mui/material';
@@ -37,6 +38,26 @@ export const ObraTab: React.FC<IObraTabProps> = ({
       {/* Obra Subtab 1: Geral */}
       {activeObraTab === 0 && (
         <Grid container spacing={3}>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Controller
+              name="oAtivo"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={field.value ?? true}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      disabled={isBrowse}
+                      color="primary"
+                    />
+                  }
+                  label="Obra Ativa"
+                  sx={{ mt: 0.5 }}
+                />
+              )}
+            />
+          </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Controller
               name="obraIdCliente"

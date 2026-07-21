@@ -9,6 +9,7 @@ import {
   MenuItem, 
   FormControlLabel, 
   Checkbox, 
+  Switch,
   Divider 
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
@@ -24,6 +25,26 @@ export const TransportadoraTab: React.FC<ITabProps> = ({
   return (
     <Box>
       <Grid container spacing={3}>
+        <Grid size={{ xs: 12, sm: 4 }}>
+          <Controller
+            name="tAtivo"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={field.value ?? true}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    disabled={isBrowse}
+                    color="primary"
+                  />
+                }
+                label="Transportadora Ativa"
+                sx={{ mt: 0.5 }}
+              />
+            )}
+          />
+        </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <Controller
             name="idCategoriaTransportadora"
