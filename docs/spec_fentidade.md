@@ -167,10 +167,10 @@ Cada papel ativo no cabeçalho exibe uma aba dedicada com seus campos específic
 
 | Papel | Arquivo |
 |---|---|
-| Tipos e defaultValues | [types.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FEntidade/types.ts) |
-| Validação Zod | [schema.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FEntidade/schema.ts) |
-| Config OOP (colunas, filtros, mapeamento) | [EntidadeCadastroConfig.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FEntidade/EntidadeCadastroConfig.tsx) |
-| Formulário / View | [index.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/FEntidade/index.tsx) |
+| Tipos e defaultValues | [types.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FEntidade/types.ts) |
+| Validação Zod | [schema.ts](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FEntidade/schema.ts) |
+| Config OOP (colunas, filtros, mapeamento) | [EntidadeCadastroConfig.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FEntidade/EntidadeCadastroConfig.tsx) |
+| Formulário / View | [index.tsx](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.Frontend/src/pages/AcessoGlobal/FEntidade/index.tsx) |
 | Controller C# | [EntidadeController.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.AcessoGlobal/Api/Controllers/EntidadeController.cs) |
 | DTOs C# | [EntidadeDto.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.AcessoGlobal/Domain/DTOs/EntidadeDto.cs) |
 | Serviço C# (regras de negócio) | [EntidadeService.cs](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/src/Versatus.AcessoGlobal/Domain/Services/EntidadeService.cs) |

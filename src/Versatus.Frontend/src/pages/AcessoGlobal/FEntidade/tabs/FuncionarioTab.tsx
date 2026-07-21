@@ -12,8 +12,8 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IFuncionarioTabProps } from '../types';
-import { CPFMask } from '../../../components/common/TextMasks';
-import { GradeEdicao } from '../../../components/common/GradeEdicao';
+import { CPFMask } from '../../../../components/common/TextMasks';
+import { GradeEdicao } from '../../../../components/common/GradeEdicao';
 
 export const FuncionarioTab: React.FC<IFuncionarioTabProps> = ({
   isBrowse,
@@ -674,3 +674,4 @@ export const FuncionarioTab: React.FC<IFuncionarioTabProps> = ({
     </Box>
   );
 };
+

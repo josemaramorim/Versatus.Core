@@ -18,10 +18,10 @@ Este documento serve como referência rápida para planejar e guiar a IA (como A
 Para cada nova tela de cadastro (CRUD), a estrutura de arquivos e responsabilidades **deve seguir exatamente o modelo implementado no cadastro de Entidade**:
 
 ### Estrutura do Frontend (React + TS + Vite)
-* **`src/pages/F[Nome]/index.tsx`**: Contém apenas a camada de apresentação visual (Layout, Tabs, Componentes Material UI).
-* **`src/pages/F[Nome]/types.ts`**: Define o schema de dados da interface do formulário e os valores padrões (`defaultValues`).
-* **`src/pages/F[Nome]/schema.ts`**: Contém o schema do **Zod** para validação em tempo real dos campos.
-* **`src/pages/F[Nome]/[Nome]CadastroConfig.tsx`**: Estende `BaseCadastroConfig<T>`. É a única classe que define o título, a URL da API, as colunas da listagem, os filtros e, principalmente, as funções de tradução de dados:
+* **`src/pages/[Modulo]/F[Nome]/index.tsx`**: Contém apenas a camada de apresentação visual (Layout, Tabs, Componentes Material UI).
+* **`src/pages/[Modulo]/F[Nome]/types.ts`**: Define o schema de dados da interface do formulário e os valores padrões (`defaultValues`).
+* **`src/pages/[Modulo]/F[Nome]/schema.ts`**: Contém o schema do **Zod** para validação em tempo real dos campos.
+* **`src/pages/[Modulo]/F[Nome]/[Nome]CadastroConfig.tsx`**: Estende `BaseCadastroConfig<T>`. É a única classe que define o título, a URL da API, as colunas da listagem, os filtros e, principalmente, as funções de tradução de dados:
   * `mapBackendToForm(backend: any)`: Traduz enums e dados aninhados da API para o formulário.
   * `mapFormToBackend(form: T)`: Traduz o formulário plano de volta no formato esperado pela API.
 

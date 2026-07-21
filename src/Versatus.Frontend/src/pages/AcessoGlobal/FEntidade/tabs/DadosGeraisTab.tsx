@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, ITabProps } from '../types';
-import { CPFMask, CNPJMask } from '../../../components/common/TextMasks';
+import { CPFMask, CNPJMask } from '../../../../components/common/TextMasks';
 
 export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
   const { register, control, watch, formState: { errors } } = useFormContext<IEntidadeForm>();
@@ -421,3 +421,4 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
     </Box>
   );
 };
+

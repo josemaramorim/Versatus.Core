@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IFilialTabProps } from '../types';
-import { GradeEdicao } from '../../../components/common/GradeEdicao';
+import { GradeEdicao } from '../../../../components/common/GradeEdicao';
 
 export const FilialTab: React.FC<IFilialTabProps> = ({
   isBrowse,
@@ -322,3 +322,4 @@ export const FilialTab: React.FC<IFilialTabProps> = ({
     </Box>
   );
 };
+

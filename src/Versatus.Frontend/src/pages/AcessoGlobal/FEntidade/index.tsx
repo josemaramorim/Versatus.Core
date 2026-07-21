@@ -18,11 +18,11 @@ import {
 } from '@mui/material';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEnumOptions } from '../../hooks/useEnums';
+import { useEnumOptions } from '../../../hooks/useEnums';
 
-import { CadastroBasePage } from '../../components/crud/CadastroBasePage';
+import { CadastroBasePage } from '../../../components/crud/CadastroBasePage';
 import { EntidadeCadastroConfig } from './EntidadeCadastroConfig';
-import type { CadastroModalMode } from '../../types/cadastro';
+import type { CadastroModalMode } from '../../../types/cadastro';
 
 import type { IEntidadeForm } from './types';
 import { entidadeSchema } from './schema';

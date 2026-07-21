@@ -11,8 +11,8 @@ import {
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import type { IEntidadeForm, IInfoGeraisTabProps } from '../types';
-import { CEPMask, TelefoneMask } from '../../../components/common/TextMasks';
-import { GradeEdicao } from '../../../components/common/GradeEdicao';
+import { CEPMask, TelefoneMask } from '../../../../components/common/TextMasks';
+import { GradeEdicao } from '../../../../components/common/GradeEdicao';
 
 export const InfoGeraisTab: React.FC<IInfoGeraisTabProps> = ({
   isBrowse,
@@ -372,3 +372,4 @@ export const InfoGeraisTab: React.FC<IInfoGeraisTabProps> = ({
     </Box>
   );
 };
+

@@ -118,8 +118,10 @@ Este log serve para que a próxima instância da IA saiba exatamente onde o trab
 | **MOD-08** | 🔄 Em progresso | Segurança (MOD-08) | `feat/seguranca-integracao-strangler` | Implementada autenticação via API Key com bypass de localhost na API e no legado. |
 | **MOD-07** | 🔄 Em progresso | 4.3 (Fase 4) | `feat/mod-02-demo` | Concluída Fase 4 (ICMS, Substituição Tributária, Mapeamentos, Regimes e Vigências). Fase 5 (SPED) aguarda análise — ver `specs/prompts-execucao/MOD-07-FASE5-ANALISE-SPED.md`. |
 | **MOD-03** | 🔄 Em progresso | Fases 1-3 prontas | `develop` | Prompts de execução criados em `specs/prompts-execucao/`. Iniciar por `MOD-03-FASES1-3-EXECUTION-PROMPT.md`. |
+| **MOD-02 (Parametro)** | ✅ Concluído | Migração e Reorganização | `feat/migrate-parametro` | Migrado formulário Parametro (C# e React) e reorganizadas as páginas do frontend por módulo correspondente ao backend. |
 
 ### Histórico Recente de Decisões:
+- **2026-07-20 (AcessoGlobal):** Migrado o formulário legado `Parametro` e valores `ParametroValor` para a arquitetura .NET Core + React. Implementada a regra de organização de pastas por módulo no frontend (`src/pages/[Modulo]/F[Nome]/`), movendo `FEntidade` e `FParametro` para `AcessoGlobal/` e ajustando importações. Commits adicionados na branch `feat/migrate-parametro`.
 - **2026-06-12 (Seguranca):** Implementada a segurança via API Key no helper legado e middleware de validação com loopback bypass no .NET 8, conforme especificado em DEC-006 e MOD-08. Commits adicionados na branch `feat/seguranca-integracao-strangler`.
 - **2026-06-12 (GestaoFinanceira):** Concluído o estrangulamento de validações e parâmetros das entidades `Documento` e `DocumentoFinanceiroBase` no projeto legado. Criado o projeto `Servidor.Strangler` sob a estrutura de pastas recomendada. Alterações mescladas na branch `develop`.
 - **2026-06-11 (Governança):** Criada pasta `specs/prompts-execucao/` com 6 prompts autocontidos para execução do MOD-03 e análise do MOD-07 SPED. Cada prompt inclui regras Git obrigatórias (branch `feat/` ou `docs/`, nunca commitar em `develop`).

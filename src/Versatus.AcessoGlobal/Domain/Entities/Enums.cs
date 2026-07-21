@@ -98,3 +98,24 @@ public enum FormaPagtoTipo
     PixDinamico = 1963
 }
 
+public enum ParametroValorTipo
+{
+    Int = 153,
+    Numeric = 154,
+    String = 155,
+    Smallint = 156,
+    DateTime = 157,
+    Lookup = 233,
+    Enumerado = 234,
+    Automatico = 374,
+    LookupMulti = 1325
+}
+
+public enum ParametroTipo
+{
+    Sistema = 159,
+    Filial = 160,
+    Perfil = 161,
+    Grupo = 350,
+    Empresa = 351
+}
