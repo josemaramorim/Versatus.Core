@@ -165,4 +165,5 @@ Após o build limpo do frontend:
 4. Execute `npm run build` novamente para confirmar que a rota integrada não gerou quebras.
 5. Crie o commit: `git commit -m "feat(route): Register F[Nome] in App.tsx navigation"`.
 6. Envie: `git push origin feat/migrate-[nome]`.
-7. Apresente um resumo detalhado dos arquivos criados/alterados e informe que a branch está pronta para revisão e merge manual.
+7. Apresente um resumo detalhado dos arquivos criados/alterados e faça o merge para a branch `develop`.
+8. **[OBRIGATÓRIO] Limpeza de Branch:** Após o merge para `develop`, PERGUNTE AO USUÁRIO se ele deseja excluir a branch de recurso local e remota (`feat/migrate-[nome]`) para manter o repositório limpo e evitar confusão.

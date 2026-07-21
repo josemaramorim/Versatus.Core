@@ -23,8 +23,9 @@ Este arquivo define as regras e restrições fundamentais que guiam todos os age
 
 ## 4. Estratégia Git e Proteção de Branches
 - **Proibido:** A IA nunca deve fazer commits ou push diretamente nas branches estáveis main ou develop.
-- **Obrigatorio:** Todo desenvolvimento deve ser isolado em uma branch de recurso (eat/migrate-[nome]).
+- **Obrigatorio:** Todo desenvolvimento deve ser isolado em uma branch de recurso (`feat/migrate-[nome]`).
 - Os commits devem ser granulares por fase (Spec, Backend, Frontend, Rota) com mensagens padronizadas.
+- **Obrigatorio:** Após o merge bem-sucedido de uma branch de recurso para a branch `develop`, a IA DEVE obrigatoriamente perguntar ao usuário se deseja excluir a branch de recurso (local e remota) e alternar o ambiente de trabalho para `develop`.
 - O merge de develop para main é estritamente manual e de responsabilidade exclusiva do usuário.
 
 ## 5. Validação com Builds
