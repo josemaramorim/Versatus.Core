@@ -483,6 +483,7 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
                         size="small"
                         type="number"
                         label="Ordem de Consulta"
+                        required
                         disabled={isBrowse}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                         error={!!error}
