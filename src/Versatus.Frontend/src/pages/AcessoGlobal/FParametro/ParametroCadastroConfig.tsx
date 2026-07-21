@@ -30,6 +30,13 @@ export class ParametroCadastroConfig extends BaseCadastroConfig<IParametroForm> 
       descricao: backend.descricao || '',
       valor: backend.valor || '',
       tipo: backend.tipo ?? 155,
+      agrupador: backend.agrupador ?? 0,
+      visivel: backend.visivel ?? true,
+      idRotina: backend.idRotina,
+      tipoParametro: backend.tipoParametro,
+      idParametroValor: backend.idParametroValor,
+      valorConfigurado: backend.valorConfigurado || '',
+      marcado: backend.marcado ?? false,
     };
   }
 
@@ -40,6 +47,13 @@ export class ParametroCadastroConfig extends BaseCadastroConfig<IParametroForm> 
       descricao: form.descricao,
       valor: form.valor,
       tipo: form.tipo,
+      agrupador: form.agrupador,
+      visivel: form.visivel,
+      idRotina: form.idRotina,
+      tipoParametro: form.tipoParametro,
+      idParametroValor: form.idParametroValor,
+      valorConfigurado: form.valorConfigurado,
+      marcado: form.marcado,
     };
   }
 
