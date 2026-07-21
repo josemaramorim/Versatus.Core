@@ -119,3 +119,54 @@ public enum ParametroTipo
     Grupo = 350,
     Empresa = 351
 }
+
+public enum CondicaoPagtoTipo
+{
+    Parcelada = 36,
+    FaixaDias = 37,
+    Semanal = 38
+}
+
+public enum ParcelamentoArredondamento
+{
+    Primeira = 46,
+    Ultima = 47
+}
+
+public enum Disponibilidade
+{
+    Pagamento = 56,
+    Recebimento = 57,
+    Ambas = 101
+}
+
+public enum VencimentoTipo
+{
+    Normal = 59,
+    AntecipaDiaUtil = 60,
+    ProrrogaDiaUtil = 61
+}
+
+public enum ParcelamentoTipo
+{
+    DiaFixo = 119,
+    DiasEntreParcela = 120,
+    DiasUteis = 693
+}
+
+public enum DiaSemana
+{
+    Domingo = 164,
+    Segunda = 165,
+    Terca = 166,
+    Quarta = 167,
+    Quinta = 168,
+    Sexta = 169,
+    Sabado = 170
+}
+
+public enum DivisaoParcelamentoTipo
+{
+    Percentual = 603,
+    Quantidade = 604
+}
