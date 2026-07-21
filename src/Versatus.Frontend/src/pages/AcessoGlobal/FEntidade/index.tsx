@@ -14,7 +14,8 @@ import {
   Typography,
   Snackbar,
   Alert,
-  FormHelperText
+  FormHelperText,
+  Switch
 } from '@mui/material';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -448,6 +449,26 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                       <FormHelperText>{error.message}</FormHelperText>
                     )}
                   </FormControl>
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 2 }}>
+              <Controller
+                name="ativo"
+                control={control}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={field.value ?? true}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        disabled={isBrowse}
+                        color="primary"
+                      />
+                    }
+                    label="Ativo"
+                    sx={{ mt: 0.5 }}
+                  />
                 )}
               />
             </Grid>

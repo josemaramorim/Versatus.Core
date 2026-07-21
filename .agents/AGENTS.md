@@ -14,6 +14,7 @@ Este arquivo define as regras e restrições fundamentais que guiam todos os age
 - A IA não deve inventar ou otimizar funcionalidades além do que está documentado na Spec e no código legado.
 - Nomes de tabelas e colunas são sagrados: mantenha a nomenclatura idêntica ao legado (ex: EntCliente em vez de pluralizações como Clientes).
 - **Obrigatorio:** Antes de gerar a spec, mapear **todas** as propriedades da entidade legada e verificar se cada uma tem correspondência no C# atual (entidade + DTO + mapping EF). Propriedades ignoradas causam retrabalho.
+- **Obrigatorio (Auditoria de Propriedades vs UI):** É proibido deixar propriedades editáveis da entidade (como `Ativo`/`Situacao`, flags, observações) de fora da interface gráfica (JSX/Form). Toda propriedade do DTO deve obrigatoriamente ter seu componente de entrada no formulário React, salvo campos puramente internos de auditoria/sistema.
 
 ## 3. Arquitetura do Frontend (React/TypeScript)
 - Toda listagem e formulário CRUD deve herdar e estender a infraestrutura orientada a objetos (BaseCadastroConfig<T>).
