@@ -10,6 +10,7 @@ using Versatus.AcessoGlobal.Domain.DTOs;
 using Versatus.AcessoGlobal.Domain.Entities;
 using Versatus.Framework.Pagination;
 using Versatus.Framework.Sequences;
+using Versatus.Framework.Context;
 using Versatus.AcessoGlobal.Infrastructure;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
@@ -23,15 +24,18 @@ public class ParametroService : IParametroService
     private readonly IParametroRepository _parametroRepository;
     private readonly AcessoGlobalDbContext _context;
     private readonly IGeradorSequencial _geradorSequencial;
+    private readonly IContextoExecucao _contexto;
 
     public ParametroService(
         IParametroRepository parametroRepository,
         AcessoGlobalDbContext context,
-        IGeradorSequencial geradorSequencial)
+        IGeradorSequencial geradorSequencial,
+        IContextoExecucao contexto)
     {
         _parametroRepository = parametroRepository;
         _context = context;
         _geradorSequencial = geradorSequencial;
+        _contexto = contexto;
     }
 
     public async Task<IEnumerable<Parametro>> ListarTodosAsync(CancellationToken cancellationToken = default)
@@ -135,13 +139,20 @@ public class ParametroService : IParametroService
         }
 
         var items = itemsRaw.Select(p => {
-            var val = paramValores.FirstOrDefault(pv => pv.IdParametro == p.IdParam)?.Valor;
+            var pv = paramValores.FirstOrDefault(v => v.IdParametro == p.IdParam);
             return new ParametroPaginadoDto(
                 p.IdParam,
                 p.Chave,
                 p.Descricao,
-                val,
-                p.Tipo
+                p.Valor,
+                p.Tipo,
+                p.Agrupador,
+                p.Visivel,
+                p.IdRotina,
+                p.TipoParametro,
+                pv?.IdParametroValor,
+                pv?.Valor,
+                pv != null
             );
         }).ToList();
 
@@ -153,17 +164,23 @@ public class ParametroService : IParametroService
         var param = await _parametroRepository.GetByIdAsync(id, cancellationToken);
         if (param == null) return null;
 
-        var valor = await _context.ParametroValores
-            .Where(pv => pv.IdParametro == param.IdParam)
-            .Select(pv => pv.Valor)
+        var pv = await _context.ParametroValores
+            .Where(v => v.IdParametro == param.IdParam)
             .FirstOrDefaultAsync(cancellationToken);
 
         return new ParametroPaginadoDto(
             param.IdParam,
             param.Chave,
             param.Descricao,
-            valor,
-            param.Tipo
+            param.Valor,
+            param.Tipo,
+            param.Agrupador,
+            param.Visivel,
+            param.IdRotina,
+            param.TipoParametro,
+            pv?.IdParametroValor,
+            pv?.Valor,
+            pv != null
         );
     }
 
@@ -182,7 +199,11 @@ public class ParametroService : IParametroService
             IdParam = idParam,
             Chave = dto.Chave,
             Descricao = dto.Descricao,
-            Tipo = dto.Tipo
+            Tipo = dto.Tipo,
+            Agrupador = dto.Agrupador,
+            Visivel = dto.Visivel,
+            IdRotina = dto.IdRotina,
+            TipoParametro = dto.TipoParametro
         };
 
         await _parametroRepository.AddAsync(param, cancellationToken);
@@ -207,14 +228,16 @@ public class ParametroService : IParametroService
             param.IdParam,
             param.Chave,
             param.Descricao,
+            param.Valor,
+            param.Tipo,
+            param.Agrupador,
+            param.Visivel,
+            param.IdRotina,
+            param.TipoParametro,
+            null,
             valorSalvo,
-            param.Tipo
+            valorSalvo != null
         );
-    }
-
-    public async Task PinkAtualizarAsync(int id, SalvarParametroDto dto, CancellationToken cancellationToken = default)
-    {
-        // Placeholder para conformidade - mudado abaixo para AtualizarAsync
     }
 
     public async Task AtualizarAsync(int id, SalvarParametroDto dto, CancellationToken cancellationToken = default)
@@ -227,6 +250,10 @@ public class ParametroService : IParametroService
 
         param.Descricao = dto.Descricao;
         param.Tipo = dto.Tipo;
+        param.Agrupador = dto.Agrupador;
+        param.Visivel = dto.Visivel;
+        param.IdRotina = dto.IdRotina;
+        param.TipoParametro = dto.TipoParametro;
 
         await _parametroRepository.UpdateAsync(param, cancellationToken);
         await _parametroRepository.SaveChangesAsync(cancellationToken);
@@ -273,5 +300,118 @@ public class ParametroService : IParametroService
 
         await _parametroRepository.DeleteAsync(param, cancellationToken);
         await _parametroRepository.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<List<ParametroPaginadoDto>> ListarPorEscopoAsync(int tipoParametro, int? idPerfil, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Parametros.AsQueryable();
+
+        var parametros = await query
+            .Where(p => p.Visivel && p.TipoParametro == tipoParametro)
+            .OrderBy(p => p.Agrupador)
+            .ThenBy(p => p.Chave)
+            .ToListAsync(cancellationToken);
+
+        var paramIds = parametros.Select(p => p.IdParam).ToList();
+
+        var paramValoresQuery = _context.ParametroValores.AsQueryable();
+
+        if (tipoParametro == (int)ParametroTipo.Perfil)
+        {
+            paramValoresQuery = paramValoresQuery.Where(pv => pv.IdPerfil == idPerfil);
+        }
+        else
+        {
+            paramValoresQuery = paramValoresQuery.Where(pv => pv.IdPerfil == null);
+        }
+
+        if (paramIds.Any())
+        {
+            paramValoresQuery = paramValoresQuery.Where(pv => pv.IdParametro.HasValue && paramIds.Contains(pv.IdParametro.Value));
+        }
+        else
+        {
+            return new List<ParametroPaginadoDto>();
+        }
+
+        var paramValores = await paramValoresQuery.ToListAsync(cancellationToken);
+
+        var resultado = parametros.Select(p =>
+        {
+            var pv = paramValores.FirstOrDefault(v => v.IdParametro == p.IdParam);
+            return new ParametroPaginadoDto(
+                p.IdParam,
+                p.Chave,
+                p.Descricao,
+                p.Valor,
+                p.Tipo,
+                p.Agrupador,
+                p.Visivel,
+                p.IdRotina,
+                p.TipoParametro,
+                pv?.IdParametroValor,
+                pv?.Valor,
+                pv != null
+            );
+        }).ToList();
+
+        return resultado;
+    }
+
+    public async Task SalvarValoresLoteAsync(SalvarValoresParametrosDto dto, CancellationToken cancellationToken = default)
+    {
+        int? idGrupo = 1;
+        int? idEmpresa = _contexto.IdEmpresa;
+        int? idFilial = _contexto.IdFilial;
+
+        foreach (var item in dto.Valores)
+        {
+            var pvQuery = _context.ParametroValores
+                .Where(pv => pv.IdParametro == item.IdParametro);
+
+            if (dto.TipoParametro == (int)ParametroTipo.Perfil)
+            {
+                pvQuery = pvQuery.Where(pv => pv.IdPerfil == dto.IdPerfil);
+            }
+            else
+            {
+                pvQuery = pvQuery.Where(pv => pv.IdPerfil == null);
+            }
+
+            var pv = await pvQuery.FirstOrDefaultAsync(cancellationToken);
+
+            if (!item.Marcado)
+            {
+                if (pv != null)
+                {
+                    _context.ParametroValores.Remove(pv);
+                }
+            }
+            else
+            {
+                if (pv == null)
+                {
+                    var idParamValor = await _geradorSequencial.ProximoAsync("ParametroValor", SequencialTipo.Geral, cancellationToken);
+                    pv = new ParametroValor
+                    {
+                        IdParametroValor = idParamValor,
+                        IdParametro = item.IdParametro,
+                        Valor = item.ValorConfigurado ?? string.Empty,
+                        IdPerfil = dto.TipoParametro == (int)ParametroTipo.Perfil ? dto.IdPerfil : null,
+                        IdFilial = (dto.TipoParametro == (int)ParametroTipo.Filial || dto.TipoParametro == (int)ParametroTipo.Perfil) ? idFilial : null,
+                        IdEmpresa = (dto.TipoParametro == (int)ParametroTipo.Empresa || dto.TipoParametro == (int)ParametroTipo.Filial || dto.TipoParametro == (int)ParametroTipo.Perfil) ? idEmpresa : null,
+                        IdGrupo = idGrupo
+                    };
+                    _context.ParametroValores.Add(pv);
+                }
+                else
+                {
+                    pv.Valor = item.ValorConfigurado ?? string.Empty;
+                    _context.ParametroValores.Update(pv);
+                }
+            }
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

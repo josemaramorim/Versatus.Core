@@ -25,5 +25,8 @@ public interface IParametroService
     Task<ParametroPaginadoDto> CriarAsync(SalvarParametroDto dto, CancellationToken cancellationToken = default);
     Task AtualizarAsync(int id, SalvarParametroDto dto, CancellationToken cancellationToken = default);
     Task ExcluirAsync(int id, CancellationToken cancellationToken = default);
+
+    Task<List<ParametroPaginadoDto>> ListarPorEscopoAsync(int tipoParametro, int? idPerfil, CancellationToken cancellationToken = default);
+    Task SalvarValoresLoteAsync(SalvarValoresParametrosDto dto, CancellationToken cancellationToken = default);
 }
 

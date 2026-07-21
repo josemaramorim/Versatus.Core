@@ -194,4 +194,34 @@ public class ParametroController : ControllerBase
             return StatusCode(500, new { message = "Erro interno ao excluir parâmetro.", error = ex.Message });
         }
     }
+
+    [HttpGet("escopo")]
+    public async Task<IActionResult> ListarPorEscopo(
+        [FromQuery] int tipoParametro,
+        [FromQuery] int? idPerfil = null)
+    {
+        try
+        {
+            var resultado = await _parametroService.ListarPorEscopoAsync(tipoParametro, idPerfil);
+            return Ok(resultado);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Erro interno ao buscar parâmetros por escopo.", error = ex.Message });
+        }
+    }
+
+    [HttpPut("salvar-valores")]
+    public async Task<IActionResult> SalvarValoresLote([FromBody] SalvarValoresParametrosDto dto)
+    {
+        try
+        {
+            await _parametroService.SalvarValoresLoteAsync(dto);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Erro interno ao salvar valores dos parâmetros.", error = ex.Message });
+        }
+    }
 }

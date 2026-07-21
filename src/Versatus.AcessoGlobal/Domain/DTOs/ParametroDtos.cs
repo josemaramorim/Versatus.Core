@@ -7,16 +7,45 @@ public record SalvarParametroDto(
     string Chave,
     string? Descricao,
     string? Valor,
-    int? Tipo
+    int? Tipo,
+    int Agrupador,
+    bool Visivel,
+    int? IdRotina,
+    int? TipoParametro
 );
 
 /// <summary>
-/// DTO para retorno de dados do parâmetro, incluindo seu valor configurado.
+/// DTO para retorno de dados do parâmetro, incluindo seu valor configurado e escopo.
 /// </summary>
 public record ParametroPaginadoDto(
     int Id,
     string Chave,
     string? Descricao,
-    string? Valor,
-    int? Tipo
+    string? Valor, // Valor padrão do parâmetro (Objeto no legado)
+    int? Tipo,
+    int Agrupador,
+    bool Visivel,
+    int? IdRotina,
+    int? TipoParametro,
+    int? IdParametroValor,
+    string? ValorConfigurado,
+    bool Marcado
+);
+
+/// <summary>
+/// DTO de item para salvar valor do parâmetro.
+/// </summary>
+public record SalvarValorParametroDto(
+    int IdParametro,
+    string? ValorConfigurado,
+    bool Marcado
+);
+
+/// <summary>
+/// DTO principal para salvar valores de parâmetros em lote.
+/// </summary>
+public record SalvarValoresParametrosDto(
+    int TipoParametro,
+    int? IdPerfil,
+    List<SalvarValorParametroDto> Valores
 );
