@@ -1,4 +1,4 @@
-﻿---
+---
 name: migrate-crud
 description: Pipeline de migração automatizada de formulários legados (C#) para a arquitetura .NET 10 + React OOP.
 ---
@@ -42,19 +42,55 @@ Exemplos: FParametro, FPermissao
 
 ## 1. Ritual de Início (Fase 1: Analista de Esquema)
 
-Quando o usuário solicitar a migração de um formulário fornecendo o nome, o módulo e os arquivos .cs legados:
+### Formato de Solicitação Aceito
+
+O usuário pode fornecer os arquivos legados de **duas formas equivalentes**:
+
+**Forma A — Caminho do arquivo (preferida):**
+```
+Migrar formulário: [Nome]
+Módulo: [NomeDoModulo]
+Branch: feat/migrate-[nome]
+
+Entidade legada:
+c:\Pasta de Trabalho\Projetos\Analises\Versatus\Versatus.Net8\projeto_tag_1906\servidor\objeto de negócio\[modulo]\[Nome].cs
+
+Formulário legado:
+c:\Pasta de Trabalho\Projetos\Analises\Versatus\Versatus.Net8\projeto_tag_1906\cliente\cliente.aplicativo\[modulo]\F[Nome].cs
+
+Observações:
+(opcional — apenas restrições de negócio que não estão no código)
+```
+
+**Forma B — Conteúdo colado:**
+```
+Migrar formulário: [Nome]
+Módulo: [NomeDoModulo]
+
+Entidade legada (.cs):
+[cole EXATAMENTE o conteúdo completo do arquivo, sem simplificar]
+
+Formulário legado (.cs):
+[cole EXATAMENTE o conteúdo completo do arquivo, sem simplificar]
+```
+
+> [!IMPORTANT]
+> Quando o usuário fornecer **caminhos de arquivo**, use a ferramenta `view_file` para ler o conteúdo completo de cada arquivo antes de qualquer análise. Nunca assuma o conteúdo sem ler.
+> Quando o usuário fornecer **conteúdo colado**, verifique se parece completo. Se o código tiver aparência de stub ou simplificado (ex: "// restante do código..."), peça o arquivo real antes de prosseguir.
+
+Quando o usuário solicitar a migração:
 
 1. Localize a fase do formulário no arquivo specs/00-INDICE-GERAL.md.
 2. Leia atentamente as Regras Anti-Alucinação em specs/03-REGRAS-ANTI-ALUCINACAO.md.
 3. Leia a SPEC do módulo correspondente em specs/modulos/MOD-0X-[MODULO].md.
-4. Analise os arquivos .cs legados recebidos.
-5. **[OBRIGATÓRIO] Mapeamento completo de propriedades:** Liste TODAS as propriedades/campos da entidade legada e verifique se cada uma tem mapeamento no C# atual (entidade + DTO + mapping EF). Anote discrepâncias como DÚVIDA: na spec. Propriedades ignoradas causam retrabalho.
+4. **Leia os arquivos legados** via `view_file` (se caminhos) ou analise o conteúdo colado.
+5. **[OBRIGATÓRIO] Mapeamento completo de propriedades:** Liste TODAS as propriedades/campos da entidade legada e verifique se cada uma tem mapeamento no C# atual (entidade + DTO + mapping EF). Anote discrepâncias como `DÚVIDA:` na spec. Propriedades ignoradas causam retrabalho.
 6. Execute a **Classificação Obrigatória** da Seção 0 e documente o resultado.
-7. Gere a Spec Funcional em docs/spec_f[nome].md seguindo rigorosamente o formato de docs/spec_fentidade.md.
-   - Para Padrão B [LOTE]: documente os endpoints /escopo e /salvar-valores, o agrupador, os escopos suportados e as regras de ocultação dos botões.
-8. Use o arquivo eferences/FRONTEND/enum_mapping_guide.md para identificar mapeamentos de enums legados.
-9. Escreva qualquer ponto incerto ou divergente como um item DÚVIDA: no final do arquivo de Spec Funcional.
-10. **PARE E PEÇA APROVAÇÃO DO USUÁRIO.** Não avance para geração de código C# ou React sem que o usuário responda Aprovado.
+7. Gere a Spec Funcional em `docs/spec_f[nome].md` seguindo rigorosamente o formato de `docs/spec_fentidade.md`.
+   - Para Padrão B [LOTE]: documente os endpoints `/escopo` e `/salvar-valores`, o agrupador, os escopos suportados e as regras de ocultação dos botões.
+8. Use o arquivo `references/FRONTEND/enum_mapping_guide.md` para identificar mapeamentos de enums legados.
+9. Escreva qualquer ponto incerto ou divergente como um item `DÚVIDA:` no final do arquivo de Spec Funcional.
+10. **PARE E PEÇA APROVAÇÃO DO USUÁRIO.** Não avance para geração de código C# ou React sem que o usuário responda "Aprovado".
 
 ---
 
