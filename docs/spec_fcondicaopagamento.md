@@ -2,7 +2,7 @@
 
 > **Tipo:** Spec Funcional  
 > **Módulo:** Acesso Global  
-> **Versão:** 1.0  
+> **Versão:** 1.1  
 > **Padrão de Tela:** Padrão A - CRUD Padrão  
 > **Baseado em:** Golden Pattern de CRUD Padrão do Versatus (.NET 10 + React OOP)
 
@@ -18,8 +18,8 @@ Gerenciar o cadastro de Condições de Pagamento, as quais definem como os venci
 
 | Método | Rota | Função |
 |---|---|---|
-| `GET` | `/api/condicaopagamento/paginado?page&limit&sortBy&sortOrder&search` | Listagem paginada com paginação em memória (Compatibilidade SQL Server 2008) |
-| `GET` | `/api/condicaopagamento/{id}` | Obter registro por ID (com a lista de regras/parcelas/faixas) |
+| `GET` | `/api/condicaopagamento/paginado?page&limit&sortBy&sortOrder&search&disponibilidade&ativo` | Listagem paginada com paginação em memória (SQL Server 2008) e filtros dinâmicos |
+| `GET` | `/api/condicaopagamento/{id}` | Obter registro por ID (com a lista de regras/parcelas/faixas via `.Include`) |
 | `POST` | `/api/condicaopagamento` | Criar nova condição de pagamento |
 | `PUT` | `/api/condicaopagamento/{id}` | Atualizar condição de pagamento existente |
 | `DELETE` | `/api/condicaopagamento/{id}` | Remover condição de pagamento |
@@ -83,7 +83,7 @@ O formulário é composto por um painel de dados gerais no cabeçalho e abas con
 |---|---|---|
 | Recebe Acréscimo | Checkbox | Exclusivo com "Recebe Desconto". Se marcado, ativa campo Acréscimo. |
 | Acrescimo (%) | Decimal | Só habilitado se "Recebe Acréscimo" for true. Valor entre 0 e 99.99%. |
-| Recebe Desconto | Checkbox | Exclusivo com "Recebe Acréscimo". Se marcado, ativa campo Desconto. |
+| Recebe Desconto | Checkbox | Exclusivo com "Recebe Desconto". Se marcado, ativa campo Desconto. |
 | Desconto (%) | Decimal | Só habilitado se "Recebe Desconto" for true. Valor entre 0 e 99.99%. |
 
 ---
@@ -146,7 +146,33 @@ O formulário é composto por um painel de dados gerais no cabeçalho e abas con
 
 ---
 
-## 7. Arquivos Criados / Modificados
+## 7. Critérios de Aceite (Cenários de Teste)
+
+### CA-01: Listagem Paginada com Filtros Dinâmicos
+- **Dado que** o usuário está na tela de listagem de Condições de Pagamento,
+- **Quando** ele filtrar por "Disponibilidade = Pagamento" ou "Situação = Ativo",
+- **Então** a API deve filtrar os registros correspondentes no SQL Server 2008 sem erro de paginação e sem `SqlNullValueException`, retornando HTTP `200 OK` com os itens paginados.
+
+### CA-02: Validação de Regras de Negócio (Result Pattern)
+- **Dado que** o usuário tenta cadastrar uma condição do tipo `Semanal`,
+- **E** deixa o campo `Dia da Semana` sem preencher,
+- **Quando** ele enviar a requisição de cadastro (POST/PUT),
+- **Então** o sistema NÃO deve disparar exceção unhandled (`throw`),
+- **E** a API deve retornar HTTP `400 BadRequest` contendo o objeto de `ValidationResult` com a lista estruturada de `ValidationError`.
+
+### CA-03: Tolerância a Colunas Opcionais (Nullability Schema Alignment)
+- **Dado que** o banco legado possui registros antigos onde colunas como `NumeroDias`, `NumeroParcela` ou `PercentualDivisao` estão como `NULL`,
+- **Quando** a API executar a listagem paginada ou a consulta por ID,
+- **Então** o EF Core deve desserializar o modelo POCO sem erros de conversão, e a camada de serviço deve aplicar valores padrão de fallback no DTO.
+
+### CA-04: Exclusividade e Limpeza de Campos por Tipo
+- **Dado que** uma condição era originalmente do tipo "Parcelada" com parcelas associadas,
+- **Quando** o usuário editar a condição alterando seu tipo para "Semanal",
+- **Então** o serviço do backend deve limpar as parcelas existentes e zerar os campos de parcelamento, persistindo apenas as configurações do tipo Semanal.
+
+---
+
+## 8. Arquivos Criados / Modificados
 
 * **Backend**:
   - `src/Versatus.AcessoGlobal/Domain/Finance/CondicaoPagamento.cs` [NEW]
