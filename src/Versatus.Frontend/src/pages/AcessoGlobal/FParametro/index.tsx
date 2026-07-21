@@ -510,7 +510,7 @@ export const FParametro: React.FC = () => {
             .map((agrupadorId) => {
               const items = groupedParametros[agrupadorId];
               return (
-                <Accordion key={agrupadorId} defaultExpanded>
+                <Accordion key={agrupadorId}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                       {getAgrupadorLabel(agrupadorId)} ({items.length} {items.length === 1 ? 'parâmetro' : 'parâmetros'})
@@ -535,13 +535,13 @@ export const FParametro: React.FC = () => {
                             />
                           </Box>
 
-                          {/* Chave e Descrição */}
+                          {/* Descrição e Chave */}
                           <Box sx={{ flex: 1, width: '100%' }}>
                             <Typography variant="body1" sx={{ fontWeight: '600', color: p.marcado ? 'text.primary' : 'text.disabled' }}>
-                              {p.chave}
+                              {p.descricao}
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                              {p.descricao}
+                              {p.chave}
                             </Typography>
                             {p.valor && (
                               <Typography variant="caption" sx={{ color: 'text.disabled', fontStyle: 'italic' }}>
