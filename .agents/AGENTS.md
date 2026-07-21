@@ -66,3 +66,18 @@ Todo formulário migrado deve ser classificado em um dos dois padrões antes de 
 - **Proibido:** A IA não deve lançar exceções (`throw new ...Exception(...)`) para sinalizar falhas de validação de dados ou quebra de regras de negócio esperadas.
 - **Obrigatorio:** Toda validação de negócio e persistência nos serviços do domínio deve utilizar o padrão de retorno funcional `Result<T>` ou `ValidationResult` (do namespace `Versatus.Framework.Validation`) encapsulando erros estruturados em `ValidationError`. Os controladores (Controllers) devem verificar a flag `IsSuccess`, retornando `400 BadRequest` com a lista detalhada de erros caso falhe.
 
+## 9. Sinalização Visual de Campos Obrigatórios (Frontend MUI)
+- **Obrigatorio:** Todo campo marcado como obrigatório na Spec Funcional DEVE receber a prop `required` no componente MUI correspondente (`TextField`, `FormControl`, `Select`).
+- O MUI exibe automaticamente o asterisco vermelho (`*`) no label quando a prop `required` está presente, sinalizando ao usuário que o campo é obrigatório antes mesmo de tentar salvar.
+- **Proibido:** Omitir a prop `required` nos campos obrigatórios, deixando o usuário descobrir a obrigatoriedade apenas após falha de validação no submit.
+- A prop `required` do MUI é puramente cosmética e não substitui a validação Zod/React Hook Form — ambas devem coexistir.
+- Exemplo correto para `TextField`:
+  ```tsx
+  <TextField required label="Descrição" error={!!error} helperText={error?.message} />
+  ```
+- Exemplo correto para `FormControl` (Select):
+  ```tsx
+  <FormControl fullWidth required error={!!errors.idTipoCondicaoPagto}>
+    <InputLabel>Tipo Condição</InputLabel>
+  ```
+

@@ -283,6 +283,7 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
                         fullWidth
                         size="small"
                         label="Descrição"
+                        required
                         disabled={isBrowse}
                         error={!!error}
                         helperText={error?.message}
@@ -313,7 +314,7 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 3 }}>
-                  <FormControl fullWidth size="small" error={!!errors.idTipoCondicaoPagto}>
+                  <FormControl fullWidth size="small" required error={!!errors.idTipoCondicaoPagto}>
                     <InputLabel id="tipo-cond-label">Tipo Condição</InputLabel>
                     <Controller
                       name="idTipoCondicaoPagto"
@@ -338,7 +339,7 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 3 }}>
-                  <FormControl fullWidth size="small" error={!!errors.idDisponibilidade}>
+                  <FormControl fullWidth size="small" required error={!!errors.idDisponibilidade}>
                     <InputLabel id="disp-label">Disponibilidade</InputLabel>
                     <Controller
                       name="idDisponibilidade"
@@ -363,7 +364,7 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
                 </Grid>
 
                 <Grid size={{ xs: 12, sm: 3 }}>
-                  <FormControl fullWidth size="small" error={!!errors.idTipoVencimento}>
+                  <FormControl fullWidth size="small" required error={!!errors.idTipoVencimento}>
                     <InputLabel id="venc-label">Vencimento Dia Útil</InputLabel>
                     <Controller
                       name="idTipoVencimento"

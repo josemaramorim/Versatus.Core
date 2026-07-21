@@ -149,6 +149,7 @@ Após a compilação limpa do backend:
 5. Crie `index.tsx` com a View do formulário:
    - **[CRUD]** Grid paginado + botões Novo/Editar/Excluir usando MUI.
    - **[LOTE]** Accordions **fechados por padrão**, agrupados pelo campo Agrupador. Cada item exibe: (a) Descrição em destaque, (b) Chave técnica como subtexto, (c) campo de edição inline condicionado ao tipo. Botões Novo e Excluir completamente ausentes do JSX.
+   - **[OBRIGATÓRIO] Sinalização visual de obrigatoriedade:** Todo campo definido como obrigatório na Spec (`✅`) DEVE receber a prop `required` no componente MUI (`TextField`, `FormControl`). O MUI exibirá o asterisco `*` automaticamente no label. Omitir `required` é proibido pela Regra 9 do AGENTS.md.
 6. Execute `npm run build` na pasta do frontend. Corrija quaisquer erros ou warnings de tipo.
 7. Crie o commit: `git commit -m "feat(frontend): Add F[Nome] page, schema, types and config"`.
 
