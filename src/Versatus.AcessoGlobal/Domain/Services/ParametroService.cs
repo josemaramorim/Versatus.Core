@@ -13,6 +13,7 @@ using Versatus.Framework.Sequences;
 using Versatus.Framework.Context;
 using Versatus.AcessoGlobal.Domain.Security;
 using Versatus.AcessoGlobal.Infrastructure;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -185,12 +186,12 @@ public class ParametroService : IParametroService
         );
     }
 
-    public async Task<ParametroPaginadoDto> CriarAsync(SalvarParametroDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<ParametroPaginadoDto>> CriarAsync(SalvarParametroDto dto, CancellationToken cancellationToken = default)
     {
         var existente = await _parametroRepository.GetByChaveAsync(dto.Chave, cancellationToken);
         if (existente != null)
         {
-            throw new InvalidOperationException($"Já existe um parâmetro com a chave '{dto.Chave}'.");
+            return Result<ParametroPaginadoDto>.Fail(new ValidationError("Chave", $"Já existe um parâmetro com a chave '{dto.Chave}'."));
         }
 
         var idParam = await _geradorSequencial.ProximoAsync("Parametro", SequencialTipo.Geral, cancellationToken);
@@ -225,7 +226,7 @@ public class ParametroService : IParametroService
             valorSalvo = dto.Valor;
         }
 
-        return new ParametroPaginadoDto(
+        var resultDto = new ParametroPaginadoDto(
             param.IdParam,
             param.Chave,
             param.Descricao,
@@ -239,14 +240,16 @@ public class ParametroService : IParametroService
             valorSalvo,
             valorSalvo != null
         );
+
+        return Result<ParametroPaginadoDto>.Ok(resultDto);
     }
 
-    public async Task AtualizarAsync(int id, SalvarParametroDto dto, CancellationToken cancellationToken = default)
+    public async Task<Result<ParametroPaginadoDto>> AtualizarAsync(int id, SalvarParametroDto dto, CancellationToken cancellationToken = default)
     {
         var param = await _parametroRepository.GetByIdAsync(id, cancellationToken);
         if (param == null)
         {
-            throw new InvalidOperationException($"Parâmetro com ID {id} não encontrado.");
+            return Result<ParametroPaginadoDto>.Fail(new ValidationError("IdParam", $"Parâmetro com ID {id} não encontrado."));
         }
 
         param.Descricao = dto.Descricao;
@@ -283,6 +286,23 @@ public class ParametroService : IParametroService
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        var resultDto = new ParametroPaginadoDto(
+            param.IdParam,
+            param.Chave,
+            param.Descricao,
+            param.Valor,
+            param.Tipo,
+            param.Agrupador,
+            param.Visivel,
+            param.IdRotina,
+            param.TipoParametro,
+            paramValor?.IdParametroValor,
+            paramValor?.Valor,
+            paramValor != null
+        );
+
+        return Result<ParametroPaginadoDto>.Ok(resultDto);
     }
 
     public async Task ExcluirAsync(int id, CancellationToken cancellationToken = default)

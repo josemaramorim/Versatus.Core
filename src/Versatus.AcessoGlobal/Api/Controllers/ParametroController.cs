@@ -96,12 +96,14 @@ public class ParametroController : ControllerBase
     {
         try
         {
-            var criado = await _parametroService.CriarAsync(dto);
+            var result = await _parametroService.CriarAsync(dto);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
+            var criado = result.Value!;
             return CreatedAtAction(nameof(ObterPorId), new { id = criado.Id }, criado);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -114,12 +116,13 @@ public class ParametroController : ControllerBase
     {
         try
         {
-            await _parametroService.AtualizarAsync(id, dto);
+            var result = await _parametroService.AtualizarAsync(id, dto);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
             return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -132,12 +135,13 @@ public class ParametroController : ControllerBase
     {
         try
         {
-            await _parametroService.AtualizarAsync(id, dto);
+            var result = await _parametroService.AtualizarAsync(id, dto);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
             return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -150,12 +154,13 @@ public class ParametroController : ControllerBase
     {
         try
         {
-            await _parametroService.AtualizarAsync(id, dto);
+            var result = await _parametroService.AtualizarAsync(id, dto);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
             return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {
@@ -168,12 +173,13 @@ public class ParametroController : ControllerBase
     {
         try
         {
-            await _parametroService.AtualizarAsync(id, dto);
+            var result = await _parametroService.AtualizarAsync(id, dto);
+            if (!result.IsSuccess)
+            {
+                var firstMessage = result.Errors.Count > 0 ? result.Errors[0].Mensagem : "Erro de validação.";
+                return BadRequest(new { message = firstMessage, errors = result.Errors });
+            }
             return NoContent();
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
         catch (Exception ex)
         {

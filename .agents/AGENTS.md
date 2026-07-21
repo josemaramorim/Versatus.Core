@@ -1,4 +1,4 @@
-﻿# Diretrizes e Leis do Projeto Versatus.Net8
+# Diretrizes e Leis do Projeto Versatus.Net8
 
 Este arquivo define as regras e restrições fundamentais que guiam todos os agentes de IA que atuam neste repositório. O não cumprimento destas regras constitui uma quebra de contrato.
 
@@ -60,4 +60,9 @@ Todo formulário migrado deve ser classificado em um dos dois padrões antes de 
   var total = todos.Count;
   var pagina = todos.Skip((page - 1) * limit).Take(limit).ToList();
   `
+  
+
+## 8. Tratamento de Erros e Validação de Negócio (Result Pattern)
+- **Proibido:** A IA não deve lançar exceções (`throw new ...Exception(...)`) para sinalizar falhas de validação de dados ou quebra de regras de negócio esperadas.
+- **Obrigatorio:** Toda validação de negócio e persistência nos serviços do domínio deve utilizar o padrão de retorno funcional `Result<T>` ou `ValidationResult` (do namespace `Versatus.Framework.Validation`) encapsulando erros estruturados em `ValidationError`. Os controladores (Controllers) devem verificar a flag `IsSuccess`, retornando `400 BadRequest` com a lista detalhada de erros caso falhe.
 
