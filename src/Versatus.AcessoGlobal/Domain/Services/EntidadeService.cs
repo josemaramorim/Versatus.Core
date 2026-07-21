@@ -579,7 +579,7 @@ public class EntidadeService : IEntidadeService
             var entidade = await _repository.GetCompletoPorIdAsync(id, cancellationToken);
             if (entidade == null)
             {
-                throw new InvalidOperationException($"Entidade com ID {id} não encontrada para atualização.");
+                return Result<Entidade>.Fail(new ValidationError("IdEntidade", $"Entidade com ID {id} não encontrada para atualização."));
             }
 
             var tipoEnum = dto.TipoPessoa == 2 ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
