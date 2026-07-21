@@ -5,3 +5,9 @@ body {
   background-color: #F4F6F8;
   font-family: "Public Sans", "Inter", "Outfit", "Roboto", sans-serif;
 }
+
+/* Destaque em vermelho visível para o asterisco (*) de campos obrigatórios MUI */
+.MuiFormLabel-asterisk {
+  color: #d32f2f !important;
+  font-weight: bold;
+}
