@@ -30,5 +30,6 @@ public interface IParametroService
     Task<List<ParametroPaginadoDto>> ListarPorEscopoAsync(int tipoParametro, int? idPerfil, CancellationToken cancellationToken = default);
     Task SalvarValoresLoteAsync(SalvarValoresParametrosDto dto, CancellationToken cancellationToken = default);
     Task<List<Perfil>> ListarPerfisAsync(CancellationToken cancellationToken = default);
+    Task<List<EnumOpcaoDto>> ObterOpcoesEnumAsync(string enumNome, CancellationToken cancellationToken = default);
 }
 

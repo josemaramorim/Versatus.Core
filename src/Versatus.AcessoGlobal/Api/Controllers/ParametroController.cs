@@ -238,4 +238,18 @@ public class ParametroController : ControllerBase
             return StatusCode(500, new { message = "Erro interno ao buscar perfis.", error = ex.Message });
         }
     }
+
+    [HttpGet("enum-opcoes")]
+    public async Task<IActionResult> ObterOpcoesEnum([FromQuery] string enumNome)
+    {
+        try
+        {
+            var resultado = await _parametroService.ObterOpcoesEnumAsync(enumNome);
+            return Ok(resultado);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Erro ao buscar opções de enumeração.", error = ex.Message });
+        }
+    }
 }

@@ -49,3 +49,11 @@ public record SalvarValoresParametrosDto(
     int? IdPerfil,
     List<SalvarValorParametroDto> Valores
 );
+
+/// <summary>
+/// DTO para retorno de opções de enumerado dinâmico.
+/// </summary>
+public record EnumOpcaoDto(
+    string Value,
+    string Label
+);

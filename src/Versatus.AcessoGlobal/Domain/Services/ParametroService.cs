@@ -422,4 +422,43 @@ public class ParametroService : IParametroService
             .OrderBy(p => p.Descricao)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<List<EnumOpcaoDto>> ObterOpcoesEnumAsync(string enumNome, CancellationToken cancellationToken = default)
+    {
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        Type? enumType = null;
+        
+        foreach (var assembly in assemblies)
+        {
+            enumType = assembly.GetType($"Versatus.AcessoGlobal.Domain.Entities.{enumNome}") 
+                       ?? assembly.GetType($"Versatus.AcessoGlobal.Domain.Configuration.{enumNome}")
+                       ?? assembly.GetType($"Versatus.GestaoTributo.Domain.Rules.{enumNome}");
+            
+            if (enumType != null && enumType.IsEnum)
+                break;
+        }
+
+        if (enumType == null || !enumType.IsEnum)
+        {
+            return new List<EnumOpcaoDto>();
+        }
+
+        var values = Enum.GetValues(enumType);
+        var result = new List<EnumOpcaoDto>();
+
+        foreach (var val in values)
+        {
+            var intVal = (int)val;
+            var strVal = val.ToString() ?? "";
+
+            var dbDesc = await _context.TiposEnumerados
+                .Where(t => t.IdTipoEnumerado == intVal)
+                .Select(t => t.Descricao)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            result.Add(new EnumOpcaoDto(strVal, dbDesc ?? strVal));
+        }
+
+        return result;
+    }
 }
