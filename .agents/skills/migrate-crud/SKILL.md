@@ -89,6 +89,7 @@ Quando o usuário solicitar a migração:
    - Verifique o esquema do banco de dados legado (ou campos condicionais do formulário). Propriedades que aceitam `NULL` no banco ou que são preenchidas apenas em determinadas abas/tipos DEVEM ser declaradas como nulas (`int?`, `decimal?`, enums nulos) na entidade C# para evitar exceções de runtime `SqlNullValueException: Data is Null`.
 6. Execute a **Classificação Obrigatória** da Seção 0 e documente o resultado.
 7. Gere a Spec Funcional em `docs/spec_f[nome].md` seguindo rigorosamente o formato de `docs/spec_fentidade.md`.
+   - **[OBRIGATÓRIO] Critérios de Aceite:** Inclua a seção `## 7. Critérios de Aceite (Cenários de Teste)` detalhando o comportamento em cenários felizes (ex: busca/listagem com filtros, retorno `200/201`), cenários de falha via Result Pattern (`400 BadRequest` com `ValidationError`), alinhamento de nulidade e regras de UI/UX.
    - Para Padrão B [LOTE]: documente os endpoints `/escopo` e `/salvar-valores`, o agrupador, os escopos suportados e as regras de ocultação dos botões.
 8. Use o arquivo `references/FRONTEND/enum_mapping_guide.md` para identificar mapeamentos de enums legados.
 9. Escreva qualquer ponto incerto ou divergente como um item `DÚVIDA:` no final do arquivo de Spec Funcional.
