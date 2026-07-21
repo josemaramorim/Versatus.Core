@@ -5,6 +5,7 @@ using Versatus.AcessoGlobal.Domain.Configuration;
 using Versatus.AcessoGlobal.Domain.DTOs;
 using Versatus.AcessoGlobal.Domain.Security;
 using Versatus.Framework.Pagination;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -23,8 +24,8 @@ public interface IParametroService
         CancellationToken cancellationToken = default);
 
     Task<ParametroPaginadoDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);
-    Task<ParametroPaginadoDto> CriarAsync(SalvarParametroDto dto, CancellationToken cancellationToken = default);
-    Task AtualizarAsync(int id, SalvarParametroDto dto, CancellationToken cancellationToken = default);
+    Task<Result<ParametroPaginadoDto>> CriarAsync(SalvarParametroDto dto, CancellationToken cancellationToken = default);
+    Task<Result<ParametroPaginadoDto>> AtualizarAsync(int id, SalvarParametroDto dto, CancellationToken cancellationToken = default);
     Task ExcluirAsync(int id, CancellationToken cancellationToken = default);
 
     Task<List<ParametroPaginadoDto>> ListarPorEscopoAsync(int tipoParametro, int? idPerfil, CancellationToken cancellationToken = default);

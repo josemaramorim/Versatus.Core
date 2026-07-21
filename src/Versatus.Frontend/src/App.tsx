@@ -5,6 +5,7 @@ import { Box, AppBar, Toolbar, Typography, Tab, Tabs } from '@mui/material';
 import { theme } from './theme';
 import { FEntidade } from './pages/AcessoGlobal/FEntidade';
 import { FParametro } from './pages/AcessoGlobal/FParametro';
+import { FCondicaoPagamento } from './pages/AcessoGlobal/FCondicaoPagamento';
 
 function App() {
   const [tabIndex, setTabIndex] = useState(1); // Inicia na aba de Parâmetros por padrão
@@ -21,12 +22,14 @@ function App() {
             <Tabs value={tabIndex} onChange={(_, val) => setTabIndex(val)} aria-label="Navegação de telas">
               <Tab label="Entidades" id="nav-tab-entidade" sx={{ fontWeight: 600 }} />
               <Tab label="Parâmetros" id="nav-tab-parametro" sx={{ fontWeight: 600 }} />
+              <Tab label="Condições de Pagamento" id="nav-tab-condicao-pagamento" sx={{ fontWeight: 600 }} />
             </Tabs>
           </Toolbar>
         </AppBar>
         <Box sx={{ mt: 1 }}>
           {tabIndex === 0 && <FEntidade />}
           {tabIndex === 1 && <FParametro />}
+          {tabIndex === 2 && <FCondicaoPagamento />}
         </Box>
       </Box>
     </ThemeProvider>

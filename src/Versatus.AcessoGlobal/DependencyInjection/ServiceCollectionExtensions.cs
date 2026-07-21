@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILocalizacaoService, LocalizacaoService>();
         services.AddScoped<IFinanceiroService, FinanceiroService>();
         services.AddScoped<IOrganizacaoService, OrganizacaoService>();
+        services.AddScoped<ICondicaoPagamentoService, CondicaoPagamentoService>();
 
         return services;
     }

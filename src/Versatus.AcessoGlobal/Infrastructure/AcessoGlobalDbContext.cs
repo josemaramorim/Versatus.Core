@@ -48,6 +48,10 @@ public class AcessoGlobalDbContext : DbContext
 
     public DbSet<Banco> Bancos => Set<Banco>();
     public DbSet<FormaPagamento> FormasPagamento => Set<FormaPagamento>();
+    public DbSet<FormaCobranca> FormasCobranca => Set<FormaCobranca>();
+    public DbSet<GrupoCondicaoPagamento> GruposCondicaoPagamento => Set<GrupoCondicaoPagamento>();
+    public DbSet<CondicaoPagamento> CondicoesPagamento => Set<CondicaoPagamento>();
+    public DbSet<CondicaoPagtoRegra> CondicoesPagtoRegra => Set<CondicaoPagtoRegra>();
 
     public DbSet<SerieDocumento> SeriesDocumento => Set<SerieDocumento>();
     public DbSet<SerieDocumentoFilial> SeriesDocumentoFilial => Set<SerieDocumentoFilial>();
