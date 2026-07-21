@@ -15,6 +15,8 @@ public interface ICondicaoPagamentoService
         string sortBy,
         string sortOrder,
         string search,
+        int? disponibilidade = null,
+        bool? ativo = null,
         CancellationToken cancellationToken = default);
 
     Task<CondicaoPagamentoResponseDto?> ObterPorIdAsync(int id, CancellationToken cancellationToken = default);

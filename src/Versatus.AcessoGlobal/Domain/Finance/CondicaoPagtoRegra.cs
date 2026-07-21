@@ -11,9 +11,9 @@ public class CondicaoPagtoRegra
     public int IdCondicaoPagtoParcela { get; set; }
     public int IdCondicaoPagamento { get; set; }
     
-    public int NumeroDias { get; set; }
-    public int NumeroParcela { get; set; }
-    public decimal PercentualDivisao { get; set; }
+    public int? NumeroDias { get; set; }
+    public int? NumeroParcela { get; set; }
+    public decimal? PercentualDivisao { get; set; }
 
     // Campos adicionais para Faixas (Aba Faixa)
     public int? DiaInicial { get; set; }

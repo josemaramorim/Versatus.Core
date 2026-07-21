@@ -37,13 +37,27 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
         string sortBy,
         string sortOrder,
         string search,
+        int? disponibilidade = null,
+        bool? ativo = null,
         CancellationToken cancellationToken = default)
     {
-        var query = _context.CondicoesPagamento.AsQueryable();
+        var query = _context.CondicoesPagamento
+            .Include(x => x.Regras)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query.Where(x => x.Descricao.Contains(search));
+        }
+
+        if (disponibilidade.HasValue)
+        {
+            query = query.Where(x => x.IdDisponibilidade.HasValue && (int)x.IdDisponibilidade.Value == disponibilidade.Value);
+        }
+
+        if (ativo.HasValue)
+        {
+            query = query.Where(x => x.Ativo == ativo.Value);
         }
 
         // Ordenação
@@ -382,15 +396,15 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
         switch (cp.IdTipoCondicaoPagto)
         {
             case CondicaoPagtoTipo.Parcelada:
-                cp.IdDiaSemana = 0;
-                cp.QuantidadeFaixa = 0;
+                cp.IdDiaSemana = null;
+                cp.QuantidadeFaixa = null;
                 break;
             case CondicaoPagtoTipo.FaixaDias:
-                cp.IdDiaSemana = 0;
+                cp.IdDiaSemana = null;
                 LimparCamposParcelamento(cp);
                 break;
             case CondicaoPagtoTipo.Semanal:
-                cp.QuantidadeFaixa = 0;
+                cp.QuantidadeFaixa = null;
                 LimparCamposParcelamento(cp);
                 break;
         }
@@ -398,17 +412,17 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
 
     private void LimparCamposParcelamento(CondicaoPagamento cp)
     {
-        cp.QuantidadeParcela = 0;
-        cp.IdParcelamentoTipo = 0;
-        cp.DiasParcelamento = 0;
-        cp.DiasMinimoProximoMes = 0;
-        cp.TipoDivisaoParcelamento = 0;
+        cp.QuantidadeParcela = null;
+        cp.IdParcelamentoTipo = null;
+        cp.DiasParcelamento = null;
+        cp.DiasMinimoProximoMes = null;
+        cp.TipoDivisaoParcelamento = null;
         cp.IdFormaPagamentoVista = null;
-        cp.PrimeiraParcelaAVista = false;
+        cp.PrimeiraParcelaAVista = null;
         cp.AlteraParcelas = false;
-        cp.AlteraNroParcela = false;
-        cp.ObrigatorioFormaPagamento = false;
-        cp.IdParcelaArredondamento = 0;
+        cp.AlteraNroParcela = null;
+        cp.ObrigatorioFormaPagamento = null;
+        cp.IdParcelaArredondamento = null;
     }
     #endregion
 
@@ -419,39 +433,39 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
             IdCondicaoPagamento = cp.IdCondicaoPagamento,
             Descricao = cp.Descricao,
             Ativo = cp.Ativo,
-            IdTipoCondicaoPagto = cp.IdTipoCondicaoPagto,
-            IdDisponibilidade = cp.IdDisponibilidade,
-            IdTipoVencimento = cp.IdTipoVencimento,
+            IdTipoCondicaoPagto = cp.IdTipoCondicaoPagto ?? CondicaoPagtoTipo.Parcelada,
+            IdDisponibilidade = cp.IdDisponibilidade ?? Disponibilidade.Ambas,
+            IdTipoVencimento = cp.IdTipoVencimento ?? VencimentoTipo.Normal,
             IdGrupoCondicaoPagamento = cp.IdGrupoCondicaoPagamento,
             IdFormaCobranca = cp.IdFormaCobranca,
             IdFormaPagamento = cp.IdFormaPagamento,
             IdFormaPagamentoVista = cp.IdFormaPagamentoVista,
-            OrdemConsulta = cp.OrdemConsulta,
+            OrdemConsulta = cp.OrdemConsulta ?? 0,
             UtilizarPdv = cp.UtilizarPdv,
             RecebeAcrescimo = cp.RecebeAcrescimo,
-            Acrescimo = cp.Acrescimo,
+            Acrescimo = cp.Acrescimo ?? 0,
             RecebeDesconto = cp.RecebeDesconto,
-            Desconto = cp.Desconto,
+            Desconto = cp.Desconto ?? 0,
             AlteraParcelas = cp.AlteraParcelas,
-            AlteraNroParcela = cp.AlteraNroParcela,
-            IdParcelamentoTipo = cp.IdParcelamentoTipo,
-            TipoDivisaoParcelamento = cp.TipoDivisaoParcelamento,
-            QuantidadeParcela = cp.QuantidadeParcela,
-            DiasParcelamento = cp.DiasParcelamento,
+            AlteraNroParcela = cp.AlteraNroParcela ?? false,
+            IdParcelamentoTipo = cp.IdParcelamentoTipo ?? ParcelamentoTipo.DiasEntreParcela,
+            TipoDivisaoParcelamento = cp.TipoDivisaoParcelamento ?? DivisaoParcelamentoTipo.Quantidade,
+            QuantidadeParcela = cp.QuantidadeParcela ?? 0,
+            DiasParcelamento = cp.DiasParcelamento ?? 0,
             UsarMesComercial = cp.UsarMesComercial,
-            DiasMinimoProximoMes = cp.DiasMinimoProximoMes,
-            PrimeiraParcelaAVista = cp.PrimeiraParcelaAVista,
-            ObrigatorioFormaPagamento = cp.ObrigatorioFormaPagamento,
-            IdParcelaArredondamento = cp.IdParcelaArredondamento,
-            QuantidadeFaixa = cp.QuantidadeFaixa,
-            IdDiaSemana = cp.IdDiaSemana,
+            DiasMinimoProximoMes = cp.DiasMinimoProximoMes ?? 0,
+            PrimeiraParcelaAVista = cp.PrimeiraParcelaAVista ?? false,
+            ObrigatorioFormaPagamento = cp.ObrigatorioFormaPagamento ?? false,
+            IdParcelaArredondamento = cp.IdParcelaArredondamento ?? ParcelamentoArredondamento.Primeira,
+            QuantidadeFaixa = cp.QuantidadeFaixa ?? 0,
+            IdDiaSemana = cp.IdDiaSemana ?? DiaSemana.Domingo,
 
             Regras = cp.Regras.Select(r => new CondicaoPagtoRegraDto
             {
                 IdCondicaoPagtoParcela = r.IdCondicaoPagtoParcela,
-                NumeroDias = r.NumeroDias,
-                NumeroParcela = r.NumeroParcela,
-                PercentualDivisao = r.PercentualDivisao,
+                NumeroDias = r.NumeroDias ?? 0,
+                NumeroParcela = r.NumeroParcela ?? 1,
+                PercentualDivisao = r.PercentualDivisao ?? 0,
                 DiaInicial = r.DiaInicial,
                 DiaFinal = r.DiaFinal,
                 DiasLiberado = r.DiasLiberado,

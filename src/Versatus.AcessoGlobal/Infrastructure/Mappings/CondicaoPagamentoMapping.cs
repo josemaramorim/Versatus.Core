@@ -27,18 +27,15 @@ public class CondicaoPagamentoMapping : IEntityTypeConfiguration<CondicaoPagamen
 
         builder.Property(cp => cp.IdTipoCondicaoPagto)
             .HasColumnName("IdTipoCondicaoPagto")
-            .HasConversion<int>()
-            .IsRequired();
+            .HasConversion<int>();
 
         builder.Property(cp => cp.IdDisponibilidade)
             .HasColumnName("IdDisponibilidade")
-            .HasConversion<int>()
-            .IsRequired();
+            .HasConversion<int>();
 
         builder.Property(cp => cp.IdTipoVencimento)
             .HasColumnName("IdTipoVencimento")
-            .HasConversion<int>()
-            .IsRequired();
+            .HasConversion<int>();
 
         builder.Property(cp => cp.IdGrupoCondicaoPagamento)
             .HasColumnName("IdGloGrupoCondicaoPagamento");
@@ -53,8 +50,7 @@ public class CondicaoPagamentoMapping : IEntityTypeConfiguration<CondicaoPagamen
             .HasColumnName("IdGloFormaPagamentoAVista");
 
         builder.Property(cp => cp.OrdemConsulta)
-            .HasColumnName("OrdemConsulta")
-            .IsRequired();
+            .HasColumnName("OrdemConsulta");
 
         builder.Property(cp => cp.UtilizarPdv)
             .HasColumnName("UtilizarPdv")
@@ -67,8 +63,7 @@ public class CondicaoPagamentoMapping : IEntityTypeConfiguration<CondicaoPagamen
 
         builder.Property(cp => cp.Acrescimo)
             .HasColumnName("Acrescimo")
-            .HasPrecision(5, 2)
-            .IsRequired();
+            .HasPrecision(5, 2);
 
         builder.Property(cp => cp.RecebeDesconto)
             .HasColumnName("RecebeDesconto")
@@ -76,8 +71,7 @@ public class CondicaoPagamentoMapping : IEntityTypeConfiguration<CondicaoPagamen
 
         builder.Property(cp => cp.Desconto)
             .HasColumnName("Desconto")
-            .HasPrecision(5, 2)
-            .IsRequired();
+            .HasPrecision(5, 2);
 
         // Configurações de Parcelamento
         builder.Property(cp => cp.AlteraParcelas)
@@ -85,58 +79,47 @@ public class CondicaoPagamentoMapping : IEntityTypeConfiguration<CondicaoPagamen
             .IsRequired();
 
         builder.Property(cp => cp.AlteraNroParcela)
-            .HasColumnName("AlteraNroParcela")
-            .IsRequired();
+            .HasColumnName("AlteraNroParcela");
 
         builder.Property(cp => cp.IdParcelamentoTipo)
             .HasColumnName("IdTipoParcelamento")
-            .HasConversion<int>()
-            .IsRequired();
+            .HasConversion<int>();
 
         builder.Property(cp => cp.TipoDivisaoParcelamento)
             .HasColumnName("IdTipoDivisaoParcelamento")
-            .HasConversion<int>()
-            .IsRequired();
+            .HasConversion<int>();
 
         builder.Property(cp => cp.QuantidadeParcela)
-            .HasColumnName("QuantidadeParcela")
-            .IsRequired();
+            .HasColumnName("QuantidadeParcela");
 
         builder.Property(cp => cp.DiasParcelamento)
-            .HasColumnName("DiasParcelamento")
-            .IsRequired();
+            .HasColumnName("DiasParcelamento");
 
         builder.Property(cp => cp.UsarMesComercial)
             .HasColumnName("UsarMesComercial")
             .IsRequired();
 
         builder.Property(cp => cp.DiasMinimoProximoMes)
-            .HasColumnName("DiasMinimoProximoMes")
-            .IsRequired();
+            .HasColumnName("DiasMinimoProximoMes");
 
         builder.Property(cp => cp.PrimeiraParcelaAVista)
-            .HasColumnName("PrimeiraParcelaAVista")
-            .IsRequired();
+            .HasColumnName("PrimeiraParcelaAVista");
 
         builder.Property(cp => cp.ObrigatorioFormaPagamento)
-            .HasColumnName("ObrigatorioFormaPagamento")
-            .IsRequired();
+            .HasColumnName("ObrigatorioFormaPagamento");
 
         builder.Property(cp => cp.IdParcelaArredondamento)
             .HasColumnName("IdParcelaArredondamento")
-            .HasConversion<int>()
-            .IsRequired();
+            .HasConversion<int>();
 
         // Configurações de Faixa
         builder.Property(cp => cp.QuantidadeFaixa)
-            .HasColumnName("QuantidadeFaixa")
-            .IsRequired();
+            .HasColumnName("QuantidadeFaixa");
 
         // Configurações de Semanal
         builder.Property(cp => cp.IdDiaSemana)
             .HasColumnName("IdDiaSemana")
-            .HasConversion<int>()
-            .IsRequired();
+            .HasConversion<int>();
 
         // Relacionamentos
         builder.HasMany(cp => cp.Regras)

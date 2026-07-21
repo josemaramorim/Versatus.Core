@@ -25,9 +25,11 @@ public class CondicaoPagamentoController : ControllerBase
         [FromQuery] string sortBy = "descricao",
         [FromQuery] string sortOrder = "asc",
         [FromQuery] string search = "",
+        [FromQuery] int? disponibilidade = null,
+        [FromQuery] bool? ativo = null,
         CancellationToken cancellationToken = default)
     {
-        var resultado = await _condicaoPagamentoService.ListarPaginadoAsync(page, limit, sortBy, sortOrder, search, cancellationToken);
+        var resultado = await _condicaoPagamentoService.ListarPaginadoAsync(page, limit, sortBy, sortOrder, search, disponibilidade, ativo, cancellationToken);
         return Ok(resultado);
     }
 

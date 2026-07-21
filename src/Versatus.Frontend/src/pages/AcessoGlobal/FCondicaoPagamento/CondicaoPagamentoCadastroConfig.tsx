@@ -218,6 +218,27 @@ export class CondicaoPagamentoCadastroConfig extends BaseCadastroConfig<ICondica
         label: 'Buscar por Descrição',
         type: 'text',
       },
+      {
+        field: 'disponibilidade',
+        label: 'Disponibilidade',
+        type: 'select',
+        options: [
+          { label: 'Todos', value: '' },
+          { label: 'Pagamento', value: 56 },
+          { label: 'Recebimento', value: 57 },
+          { label: 'Ambas', value: 101 },
+        ],
+      },
+      {
+        field: 'ativo',
+        label: 'Situação',
+        type: 'select',
+        options: [
+          { label: 'Todos', value: '' },
+          { label: 'Ativo', value: 'true' },
+          { label: 'Inativo', value: 'false' },
+        ],
+      },
     ];
   }
 }

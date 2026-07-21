@@ -21,17 +21,14 @@ public class CondicaoPagtoRegraMapping : IEntityTypeConfiguration<CondicaoPagtoR
             .IsRequired();
 
         builder.Property(r => r.NumeroDias)
-            .HasColumnName("NumeroDias")
-            .IsRequired();
+            .HasColumnName("NumeroDias");
 
         builder.Property(r => r.NumeroParcela)
-            .HasColumnName("NumeroParcela")
-            .IsRequired();
+            .HasColumnName("NumeroParcela");
 
         builder.Property(r => r.PercentualDivisao)
             .HasColumnName("PercentualDivisao")
-            .HasPrecision(5, 2)
-            .IsRequired();
+            .HasPrecision(5, 2);
 
         // Faixas
         builder.Property(r => r.DiaInicial)
