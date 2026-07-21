@@ -17,11 +17,22 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITransportadoraRepository, TransportadoraRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IParametroRepository, ParametroRepository>();
+        services.AddScoped<ILocalizacaoRepository, LocalizacaoRepository>();
+        services.AddScoped<IOrganizacaoRepository, OrganizacaoRepository>();
+
 
         // Domain Services
         services.AddScoped<IEntidadeService, EntidadeService>();
         services.AddScoped<IEnderecoService, EnderecoService>();
         services.AddScoped<IAutenticacaoService, AutenticacaoService>();
+        services.AddScoped<IClienteService, ClienteService>();
+        services.AddScoped<IFornecedorService, FornecedorService>();
+        services.AddScoped<IFuncionarioService, FuncionarioService>();
+        services.AddScoped<ITransportadoraService, TransportadoraService>();
+        services.AddScoped<IParametroService, ParametroService>();
+        services.AddScoped<ILocalizacaoService, LocalizacaoService>();
+        services.AddScoped<IFinanceiroService, FinanceiroService>();
+        services.AddScoped<IOrganizacaoService, OrganizacaoService>();
 
         return services;
     }

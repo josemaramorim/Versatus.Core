@@ -29,5 +29,23 @@ public class Parametro
     /// </summary>
     public int? Tipo { get; set; }
 
+    /// <summary>
+    /// Agrupador do parâmetro para fins de exibição/organização. Mapeia para Agrupador no legado.
+    /// </summary>
+    public int Agrupador { get; set; }
 
+    /// <summary>
+    /// Indica se o parâmetro deve ser exibido na tela de configurações. Mapeia para Visivel no legado.
+    /// </summary>
+    public bool Visivel { get; set; } = true;
+
+    /// <summary>
+    /// ID da rotina associada. Mapeia para IdRotina no legado.
+    /// </summary>
+    public int? IdRotina { get; set; }
+
+    /// <summary>
+    /// Tipo de parâmetro (Sistema, Usuário, etc.). Mapeia para TipoParametro no legado.
+    /// </summary>
+    public int? TipoParametro { get; set; }
 }

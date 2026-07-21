@@ -1,5 +1,6 @@
 using Versatus.Framework.Repositories;
 using Versatus.AcessoGlobal.Domain.Entities;
+using Versatus.Framework.Pagination;
 
 namespace Versatus.AcessoGlobal.Domain.Repositories;
 
@@ -32,4 +33,22 @@ public interface IEntidadeRepository : IRepositorio<Entidade>
     /// Lista as últimas entidades cadastradas.
     /// </summary>
     Task<IEnumerable<Entidade>> ListarEntidadesAsync(int limit = 50, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lista entidades paginadas com ordenação e filtros.
+    /// </summary>
+    Task<PagedResult<Entidade>> ListarPaginadoAsync(
+        int pagina, 
+        int registrosPorPagina, 
+        string ordenarPor, 
+        string direcaoOrdenacao, 
+        string termoBusca, 
+        string papelFiltro, 
+        int? tipoPessoa = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém a entidade completa incluindo todas as sub-tabelas vinculadas.
+    /// </summary>
+    Task<Entidade?> GetCompletoPorIdAsync(int id, CancellationToken cancellationToken = default);
 }

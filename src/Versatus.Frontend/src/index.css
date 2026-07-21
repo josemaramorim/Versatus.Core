@@ -1,0 +1,7 @@
+/* CSS Reset e Configurações Globais básicas */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F4F6F8;
+  font-family: "Public Sans", "Inter", "Outfit", "Roboto", sans-serif;
+}

@@ -1,5 +1,10 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Versatus.AcessoGlobal.Domain.Entities;
 using Versatus.AcessoGlobal.Domain.DTOs;
+using Versatus.Framework.Pagination;
+using Versatus.Framework.Validation;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 
@@ -32,4 +37,37 @@ public interface IEntidadeService
     /// Atualiza uma entidade existente.
     /// </summary>
     Task AtualizarAsync(Entidade entidade, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lista entidades com paginação e filtros dinâmicos.
+    /// </summary>
+    Task<PagedResult<Entidade>> ListarPaginadoAsync(
+        int pagina, 
+        int registrosPorPagina, 
+        string ordenarPor, 
+        string direcaoOrdenacao, 
+        string termoBusca, 
+        string papelFiltro, 
+        int? tipoPessoa = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Obtém os dados completos da entidade.
+    /// </summary>
+    Task<Entidade?> ObterCompletoPorIdAsync(int id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Salva a entidade completa com transação explícita de "tudo ou nada".
+    /// </summary>
+    Task<Result<Entidade>> SalvarCompletoAsync(SalvarEntidadeDto dto, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Atualiza a entidade completa com transação explícita de "tudo ou nada".
+    /// </summary>
+    Task<Result<Entidade>> AtualizarCompletoAsync(int id, SalvarEntidadeDto dto, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Exclui uma entidade e seus papéis vinculados.
+    /// </summary>
+    Task ExcluirAsync(int id, CancellationToken cancellationToken = default);
 }

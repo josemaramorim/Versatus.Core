@@ -88,7 +88,7 @@ public class FakeContextoExecucao : IContextoExecucao
 
 public class FakeGeradorSequencial : IGeradorSequencial
 {
-    private int _current = 1000;
+    private int _current = 100000;
     public Task<int> ProximoAsync(string nomeObjeto, SequencialTipo tipo, CancellationToken cancellationToken = default)
     {
         return Task.FromResult(++_current);

@@ -1,0 +1,555 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <Optimize>true</Optimize>
+    <DebugType>
+    </DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BD8A2ABE-35DA-4882-AF94-CDEC031F35BC}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>Gestao.Financeira</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Projeto.Servidor.ObjetosNegocio.GestaoFinanceira</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Gentle.Common">
+      <Name>Gentle.Common</Name>
+      <HintPath>..\..\framework\Gentle\Output\Release\Gentle.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Gentle.Framework">
+      <Name>Gentle.Framework</Name>
+      <HintPath>..\..\framework\Gentle\Output\Release\Gentle.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Gentle.Provider.SQLServer">
+      <Name>Gentle.Provider.SQLServer</Name>
+      <HintPath>..\..\framework\Gentle\Output\Release\Gentle.Provider.SQLServer.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <Name>log4net</Name>
+      <HintPath>..\..\servidor.interface\bin\Debug\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System\v4.0_4.0.0.0__b77a5c561934e089\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_64\System.Data\v4.0_4.0.0.0__b77a5c561934e089\System.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.Linq">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Data.Linq\v4.0_4.0.0.0__b77a5c561934e089\System.Data.Linq.dll</HintPath>
+    </Reference>
+    <ProjectReference Include="..\..\..\aplicativos\BarcodeLib\BarcodeLib.csproj">
+      <Project>{F8646414-0C9C-49BB-9DA3-3923BF78A398}</Project>
+      <Name>BarcodeLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\aplicativos\BoletoNet\Boleto.Net.csproj">
+      <Project>{F173E80B-E36B-48AD-B483-A27F8CA86F3C}</Project>
+      <Name>Boleto.Net</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Geral\Geral.csproj">
+      <Name>Geral</Name>
+      <Project>{D5C93A8C-C343-4981-8F0E-B229B8BC638D}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Versatus.Eval\Versatus.Eval.csproj">
+      <Project>{73b06fb2-20bb-4354-aa14-86c4f784a9ad}</Project>
+      <Name>Versatus.Eval</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\VersatusLanguage\Versatus.Language.csproj">
+      <Project>{2987FCA1-D667-423C-9FA7-DA3A121DCDA9}</Project>
+      <Name>Versatus.Language</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\framework\servidor.framework\Servidor.Framework.csproj">
+      <Name>Servidor.Framework</Name>
+      <Project>{1DB1E260-1955-4146-AA90-376225EA5F68}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+    <ProjectReference Include="..\..\framework\Servidor.Strangler\Servidor.Strangler.csproj">
+      <Project>{4CE8F3B0-8F3B-4E8F-8F3B-4CE8F3B08F3B}</Project>
+      <Name>Servidor.Strangler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\servidor.interface\Servidor.Interface.csproj">
+      <Name>Servidor.Interface</Name>
+      <Project>{BE297334-4E6F-44ED-A0E8-6E6DA7E557F0}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+    <ProjectReference Include="..\acesso.global\Acesso.Global.csproj">
+      <Project>{A224CA5F-8C89-4AC6-9BCD-7E823030A672}</Project>
+      <Name>Acesso.Global</Name>
+    </ProjectReference>
+    <Reference Include="System.Drawing">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Drawing\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Windows.Forms\v4.0_4.0.0.0__b77a5c561934e089\System.Windows.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\System.Xml\v4.0_4.0.0.0__b77a5c561934e089\System.Xml.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\SolutionInfo.cs">
+      <Link>SolutionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\framework\servidor.framework\Factory.cs">
+      <Link>Factory.cs</Link>
+    </Compile>
+    <Compile Include="Adiantamento.cs" />
+    <Compile Include="CaixaBanco.cs" />
+    <Compile Include="CaixaBancoUsuario.cs" />
+    <Compile Include="CaixaBancoUsuarioLista.cs" />
+    <Compile Include="Consultas\AdiantamentoConsulta.cs" />
+    <Compile Include="AdtoAcerto.cs" />
+    <Compile Include="AdtoAcertoDistribuicao.cs" />
+    <Compile Include="AdtoAcertoDistribuicaoLista.cs" />
+    <Compile Include="AdtoAcertoDistribuicaoRateio.cs" />
+    <Compile Include="AdtoAcertoMovto.cs" />
+    <Compile Include="AdtoAcertoMovtoLista.cs" />
+    <Compile Include="AdtoLanctoEntidade.cs" />
+    <Compile Include="AdtoLanctoEntidadeLista.cs" />
+    <Compile Include="AplicacaoItemFin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AplicacaoItemFinGeral.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AplicacaoItemFinGeralLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AplicacaoItemFinLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AplicacaoItemFinReversao.cs" />
+    <Compile Include="Consultas\AdtoAcertoConsulta.cs" />
+    <Compile Include="Consultas\CaixaBancoConsulta.cs" />
+    <Compile Include="Consultas\CaixaBancoContaConsulta.cs" />
+    <Compile Include="Consultas\CaixaBancoTalaoConsulta.cs" />
+    <Compile Include="Consultas\ItemFinanceiroOperacaoFilialConsulta.cs" />
+    <Compile Include="Consultas\ParcelaLiquidadaExportacao.cs" />
+    <Compile Include="Consultas\ParcelaLiquidadaExportacaoConsulta.cs" />
+    <Compile Include="ContaBancaria.cs" />
+    <Compile Include="DocumentoCartao.cs" />
+    <Compile Include="Consultas\DocumentoParcConsultaRetornoBoleto.cs" />
+    <Compile Include="DocumentoParcelaImage.cs" />
+    <Compile Include="DocumentoParcelaImageLista.cs" />
+    <Compile Include="FormaMovInfoPix.cs" />
+    <Compile Include="SaldoCaixaBanco.cs" />
+    <Compile Include="SaldoCaixaBancoLista.cs" />
+    <Compile Include="TalaoCheque.cs" />
+    <Compile Include="View\FinanceiroUtil.cs" />
+    <Compile Include="ContraPartidaRateioDoctoFinanceiro.cs" />
+    <Compile Include="TransacaoFilial\FilialMovimento.cs" />
+    <Compile Include="Consultas\ReversaoDoctoParcelaChequeConsulta.cs" />
+    <Compile Include="TransacaoFilial\TransacaoFilial.cs" />
+    <Compile Include="View\AprovacaoDoctoPagarView.cs" />
+    <Compile Include="View\LiberacaoDoctoPagarView.cs" />
+    <Compile Include="View\TransacaoFinanceiraView.cs" />
+    <Compile Include="TransacaoFilial\TransacaoFilialLista.cs" />
+    <Compile Include="TransacaoFilial\TransacaoFinanceira.cs" />
+    <Compile Include="View\ArquivoRemessaView.cs" />
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cheque.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\ChequeEmitidoConsulta.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\ChequeEmitidoConsultaBase.cs" />
+    <Compile Include="ChequeEmitidoMovto.cs" />
+    <Compile Include="ChequeEmitidoMovtoLista.cs" />
+    <Compile Include="ChequeEmitidoMovtoUpdate.cs" />
+    <Compile Include="Consultas\ChequeEmitidoMovtoTalaoConsulta.cs" />
+    <Compile Include="ChequeLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ChequeRecebido.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\ChequeRecebidoConsulta.cs" />
+    <Compile Include="ChequeRecebidoMovto.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\ChequeRecebidoMovtoFinanceiroConsulta.cs" />
+    <Compile Include="ChequeRecebidoMovtoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\ChequeRecEmitConsulta.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cobrador.cs" />
+    <Compile Include="DoctoCancelado.cs" />
+    <Compile Include="DoctoCanceladoParcela.cs" />
+    <Compile Include="DoctoCanceladoParcelaLista.cs" />
+    <Compile Include="DoctoItemFinanceiro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DoctoItemFinanceiroLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DoctoMovtoItemFinanceiro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DoctoMovtoItemFinanceiroLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Documento.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DocumentoComissionado.cs" />
+    <Compile Include="DocumentoComissionadoLista.cs" />
+    <Compile Include="Consultas\DocumentoConsulta.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DocumentoFinanceiroBase.cs" />
+    <Compile Include="DocumentoManutencao.cs" />
+    <Compile Include="DocumentoMovto.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DocumentoMovtoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\DocumentoParcConsulta.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DocumentoParcela.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DocumentoParcelaLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DocumentoParcelaListaLanguage.cs" />
+    <Compile Include="DocumentoParcelaManutencao.cs" />
+    <Compile Include="DocumentoTributo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DocumentoTributoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Dominio.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DominioPeriodo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DominioPeriodoFechamento.cs" />
+    <Compile Include="DominioPeriodoFechamentoLista.cs" />
+    <Compile Include="DominioPeriodoFechamentoDetalhe.cs" />
+    <Compile Include="DominioPeriodoFormaPagto.cs" />
+    <Compile Include="Consultas\DominioPeriodoFormaPagtoConsulta.cs" />
+    <Compile Include="DominioPeriodoLacto.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DominioPeriodoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DominioPeriodoLog.cs" />
+    <Compile Include="DominioResponsavel.cs" />
+    <Compile Include="DominioResponsavelLista.cs" />
+    <Compile Include="DominioUsuario.cs" />
+    <Compile Include="Consultas\DominioUsuarioSuprimentoSangriaConsulta.cs" />
+    <Compile Include="DominioUsuarioLista.cs" />
+    <Compile Include="DominioUtil.cs" />
+    <Compile Include="DRE.cs" />
+    <Compile Include="DRETitulo.cs" />
+    <Compile Include="DRETituloClasse.cs" />
+    <Compile Include="DRETituloClasseLista.cs" />
+    <Compile Include="DRETituloLista.cs" />
+    <Compile Include="DRETituloOperacao.cs" />
+    <Compile Include="DRETituloOperacaoLista.cs" />
+    <Compile Include="FechamentoCaixaBase.cs" />
+    <Compile Include="FormaMovInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoAbatimento.cs" />
+    <Compile Include="FormaMovInfoCartao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoChequeCliente.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoChequeEmpresa.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoCrediario.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoCredito.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoDeposito.cs" />
+    <Compile Include="FormaMovInfoDinheiro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoFinanceira.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaMovInfoLanguage.cs" />
+    <Compile Include="FormaMovInfoOutros.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaPagamentoMov.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FormaPagamentoMovLanguage.cs" />
+    <Compile Include="FormaPagamentoMovLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IndiceConversor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\ProgramacaoCobrancaParcelaConsulta.cs" />
+    <Compile Include="ProgramacaoCobrancaParcelaLista.cs" />
+    <Compile Include="ProgramacaoCobrancaParcela.cs" />
+    <Compile Include="Consultas\LiqEstornoConsulta.cs" />
+    <Compile Include="MotivoDevolucaoCheque.cs" />
+    <Compile Include="Consultas\MovimentoFinanceiroConsulta.cs" />
+    <Compile Include="MovimentoFinanceiroUpdate.cs" />
+    <Compile Include="ParcelaGeral.cs" />
+    <Compile Include="ParcelaBaseLista.cs" />
+    <Compile Include="ProjecaoChequeEmitidoLista.cs" />
+    <Compile Include="ProjecaoChequeRecebidoLista.cs" />
+    <Compile Include="ProjecaoRecPagarLista.cs" />
+    <Compile Include="ItemFinanceiro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ItemFinanceiroBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ItemFinanceiroOperacao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ItemFinanceiroOperacaoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Liquidacao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LiquidacaoEstorno.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\LiquidacaoEstornoConsulta.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LiquidacaoEstornoFormaPagto.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LiquidacaoEstornoFormaPagtoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LiquidacaoEstornoItemFin.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LiquidacaoEstornoItemFinLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LiquidacaoFormaMovimento.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LiquidacaoFormaMovimentoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ManutencaoRateioFinanceiro.cs" />
+    <Compile Include="MovimentoFinanceiro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MovtoFinanceiroChequeEmitido.cs" />
+    <Compile Include="MovtoFinanceiroRateio.cs" />
+    <Compile Include="OperacaoDocumentoBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ParcelaBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ParcelaBaseLanguage.cs" />
+    <Compile Include="PeriodosAbertos.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ProgramacaoCobranca.cs" />
+    <Compile Include="Consultas\RelacaoContaTalaoConsulta.cs" />
+    <Compile Include="Consultas\ResumoPeriodoFormaPagtoConsulta.cs" />
+    <Compile Include="Reversao.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ReversaoDoctoParcela.cs" />
+    <Compile Include="ReversaoDoctoParcelaLista.cs" />
+    <Compile Include="ReversaoItemFinanceiro.cs" />
+    <Compile Include="ReversaoItemFinanceiroLista.cs" />
+    <Compile Include="SaldoRateio.cs" />
+    <Compile Include="SelecaoDocumento.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SelecaoDocumentoLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SuprimentoCheque.cs" />
+    <Compile Include="TrocoDinheiro.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TrocoFormaLista.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Consultas\PrimeiroMovtoChequeEmitidoConsulta.cs" />
+    <Compile Include="Consultas\UltimoMovtoChequeRecConsulta.cs" />
+    <Compile Include="View\ArquivoRetorno240View.cs" />
+    <Compile Include="View\ArquivoRetorno400View.cs" />
+    <Compile Include="View\ArquivoRetornoBase.cs" />
+    <Compile Include="View\ArquivoRetornoBaseView.cs" />
+    <Compile Include="View\ArquivoRetornoViewOutro.cs" />
+    <Compile Include="View\ClasseAvulsaDRE.cs" />
+    <Compile Include="View\ClasseAvulsaDRELista.cs" />
+    <Compile Include="View\DREImpressaoView.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="DSFinaneiro.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

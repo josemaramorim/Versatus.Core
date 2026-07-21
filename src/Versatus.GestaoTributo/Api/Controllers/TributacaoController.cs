@@ -47,4 +47,39 @@ public class TributacaoController : ControllerBase
 
         return Ok(config);
     }
+
+    [HttpGet("cests")]
+    public async Task<IActionResult> ListarCests([FromQuery] int limite = 50)
+    {
+        var cests = await _tributoService.ListarCestsAsync(limite);
+        return Ok(cests);
+    }
+
+    [HttpGet("situacoes-tributarias")]
+    public async Task<IActionResult> ListarSituacoesTributarias()
+    {
+        var csts = await _tributoService.ListarSituacoesTributariasAsync();
+        return Ok(csts);
+    }
+
+    [HttpGet("grupos-icms")]
+    public async Task<IActionResult> ListarGruposIcms()
+    {
+        var grupos = await _tributoService.ListarGruposTributariosIcmsAsync();
+        return Ok(grupos);
+    }
+
+    [HttpGet("regras-icms-st")]
+    public async Task<IActionResult> ListarRegrasIcmsSt()
+    {
+        var st = await _tributoService.ListarSubstituicoesEstoqueAsync();
+        return Ok(st);
+    }
+
+    [HttpGet("regimes-vigentes")]
+    public async Task<IActionResult> ListarRegimesVigentes()
+    {
+        var regimes = await _tributoService.ListarRegimesVigentesAsync();
+        return Ok(regimes);
+    }
 }

@@ -34,7 +34,31 @@ public abstract class AcessoGlobalRepositorioBase<TEntity> : IRepositorio<TEntit
 
     public virtual Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        Context.Entry(entity).State = EntityState.Modified;
+        var entry = Context.Entry(entity);
+        var keyValues = entry.Metadata.FindPrimaryKey()?
+            .Properties.Select(p => entry.Property(p.Name).CurrentValue).ToArray();
+
+        if (keyValues != null && keyValues.Length > 0)
+        {
+            var existingTracked = Context.ChangeTracker.Entries<TEntity>()
+                .FirstOrDefault(e => {
+                    var entryKeyValues = e.Metadata.FindPrimaryKey()?
+                        .Properties.Select(p => e.Property(p.Name).CurrentValue).ToArray();
+                    return entryKeyValues != null && entryKeyValues.SequenceEqual(keyValues);
+                });
+
+            if (existingTracked != null)
+            {
+                if (existingTracked.Entity == entity)
+                {
+                    existingTracked.State = EntityState.Modified;
+                    return Task.CompletedTask;
+                }
+                existingTracked.State = EntityState.Detached;
+            }
+        }
+
+        entry.State = EntityState.Modified;
         return Task.CompletedTask;
     }
 

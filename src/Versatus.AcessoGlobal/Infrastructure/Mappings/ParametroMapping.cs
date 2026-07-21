@@ -34,5 +34,21 @@ public class ParametroMapping : IEntityTypeConfiguration<Parametro>
         builder.Property(p => p.Tipo)
             .HasColumnName("IdTipoValor")
             .IsRequired(false);
+
+        builder.Property(p => p.Agrupador)
+            .HasColumnName("Agrupador")
+            .IsRequired();
+
+        builder.Property(p => p.Visivel)
+            .HasColumnName("Visivel")
+            .IsRequired();
+
+        builder.Property(p => p.IdRotina)
+            .HasColumnName("IDGLOROTINA")
+            .IsRequired(false);
+
+        builder.Property(p => p.TipoParametro)
+            .HasColumnName("IDTIPOPARAMETRO")
+            .IsRequired(false);
     }
 }

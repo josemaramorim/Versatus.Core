@@ -22,21 +22,36 @@ namespace Versatus.AcessoGlobal.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("GloPerfilUsuario", b =>
+                {
+                    b.Property<int>("IdGloPerfil")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdGloUsuario")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdGloPerfil", "IdGloUsuario");
+
+                    b.HasIndex("IdGloUsuario");
+
+                    b.ToTable("GloPerfilUsuario", (string)null);
+                });
+
             modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Classification.Categoria", b =>
                 {
                     b.Property<int>("IdCategoria")
                         .HasColumnType("int")
                         .HasColumnName("IdGloCategoria");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -44,7 +59,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -54,13 +69,13 @@ namespace Versatus.AcessoGlobal.Migrations
 
                     b.Property<int>("IdSinteticoAnalitico")
                         .HasColumnType("int")
-                        .HasColumnName("IdSinteticoAnalitico");
+                        .HasColumnName("IdAnaliticoSintetico");
 
                     b.Property<int?>("IdUsuarioAlteracao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -83,8 +98,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloCentroCusto");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CodigoFormatado")
@@ -97,7 +112,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -105,7 +120,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -119,13 +134,13 @@ namespace Versatus.AcessoGlobal.Migrations
 
                     b.Property<int>("IdSinteticoAnalitico")
                         .HasColumnType("int")
-                        .HasColumnName("IdSinteticoAnalitico");
+                        .HasColumnName("IdTipo");
 
                     b.Property<int?>("IdUsuarioAlteracao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -154,8 +169,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdFinClasse");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CodigoFormatado")
@@ -168,7 +183,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -176,7 +191,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -190,17 +205,17 @@ namespace Versatus.AcessoGlobal.Migrations
 
                     b.Property<int>("IdSinteticoAnalitico")
                         .HasColumnType("int")
-                        .HasColumnName("IdSinteticoAnalitico");
+                        .HasColumnName("IdTipo");
 
                     b.Property<int>("IdTipoNatureza")
                         .HasColumnType("int")
-                        .HasColumnName("IdTipoNatureza");
+                        .HasColumnName("IdNatureza");
 
                     b.Property<int?>("IdUsuarioAlteracao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -235,44 +250,16 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("Nome");
 
-                    b.Property<DateTime?>("DataAlteracao")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("DataAlteracao");
-
-                    b.Property<DateTime>("DataInclusao")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("DataInclusao");
-
                     b.Property<string>("Descricao")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("Descricao");
 
-                    b.Property<DateTime?>("HoraAlteracao")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("HoraAlteracao");
-
-                    b.Property<DateTime>("HoraInclusao")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("HoraInclusao");
-
-                    b.Property<int?>("IdUsuarioAlteracao")
+                    b.Property<int?>("Tipo")
                         .HasColumnType("int")
-                        .HasColumnName("IdGloUsuarioAlteracao");
-
-                    b.Property<int>("IdUsuarioInclusao")
-                        .HasColumnType("int")
-                        .HasColumnName("IdGloUsuarioInclusao");
-
-                    b.Property<string>("Tipo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("IdTipoValor");
 
                     b.Property<string>("Valor")
-                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)")
                         .HasColumnName("Objeto");
@@ -282,14 +269,52 @@ namespace Versatus.AcessoGlobal.Migrations
                     b.ToTable("GloParametro", (string)null);
                 });
 
+            modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Configuration.ParametroValor", b =>
+                {
+                    b.Property<int>("IdParametroValor")
+                        .HasColumnType("int")
+                        .HasColumnName("IDGLOPARAMETROVALOR");
+
+                    b.Property<int?>("IdEmpresa")
+                        .HasColumnType("int")
+                        .HasColumnName("IDGLOEMPRESA");
+
+                    b.Property<int?>("IdFilial")
+                        .HasColumnType("int")
+                        .HasColumnName("IDGLOFILIAL");
+
+                    b.Property<int?>("IdGrupo")
+                        .HasColumnType("int")
+                        .HasColumnName("IDGLOGRUPO");
+
+                    b.Property<int?>("IdParametro")
+                        .HasColumnType("int")
+                        .HasColumnName("IDGLOPARAMETRO");
+
+                    b.Property<int?>("IdPerfil")
+                        .HasColumnType("int")
+                        .HasColumnName("IDGLOPERFIL");
+
+                    b.Property<string>("Valor")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("VALOR");
+
+                    b.HasKey("IdParametroValor");
+
+                    b.HasIndex("IdParametro");
+
+                    b.ToTable("GloParametroValor", (string)null);
+                });
+
             modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Configuration.SerieDocumento", b =>
                 {
                     b.Property<int>("IdSerie")
                         .HasColumnType("int")
                         .HasColumnName("IdSequencialSerieDocto");
 
-                    b.Property<bool>("Ativa")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativa")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("Codigo")
@@ -302,7 +327,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -310,7 +335,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -318,7 +343,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -334,10 +359,6 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("ModeloFiscal");
 
-                    b.Property<int>("ProximoNumero")
-                        .HasColumnType("int")
-                        .HasColumnName("ProximoNumero");
-
                     b.HasKey("IdSerie");
 
                     b.ToTable("GloSerieDocumento", (string)null);
@@ -345,18 +366,20 @@ namespace Versatus.AcessoGlobal.Migrations
 
             modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Configuration.SerieDocumentoFilial", b =>
                 {
-                    b.Property<int>("IdRelacao")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("IdGloSerieDocumentoFilial");
+                    b.Property<string>("CodigoSerie")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("IdGloSerieDocumento");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRelacao"));
+                    b.Property<int>("IdFilial")
+                        .HasColumnType("int")
+                        .HasColumnName("IdGloFilial");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -364,35 +387,21 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
-
-                    b.Property<int>("IdFilial")
-                        .HasColumnType("int")
-                        .HasColumnName("IdGloFilial");
-
-                    b.Property<int>("IdSerie")
-                        .HasColumnType("int")
-                        .HasColumnName("IdSequencialSerieDocto");
 
                     b.Property<int?>("IdUsuarioAlteracao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
-                    b.Property<int>("ProximoNumero")
-                        .HasColumnType("int")
-                        .HasColumnName("ProximoNumero");
-
-                    b.HasKey("IdRelacao");
+                    b.HasKey("CodigoSerie", "IdFilial");
 
                     b.HasIndex("IdFilial");
-
-                    b.HasIndex("IdSerie");
 
                     b.ToTable("GloSerieDocumentoFilial", (string)null);
                 });
@@ -403,12 +412,12 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloCliente");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
-                    b.Property<bool>("Bloqueado")
-                        .HasColumnType("bit")
+                    b.Property<short?>("Bloqueado")
+                        .HasColumnType("smallint")
                         .HasColumnName("Bloqueado");
 
                     b.Property<string>("CodigoAlternativo")
@@ -424,12 +433,12 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
-                    b.Property<bool>("EnviarCNDNFe")
-                        .HasColumnType("bit")
+                    b.Property<short>("EnviarCNDNFe")
+                        .HasColumnType("smallint")
                         .HasColumnName("EnviarCNDNFe");
 
                     b.Property<DateTime?>("HoraAlteracao")
@@ -440,7 +449,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraCobranca");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -460,7 +469,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -473,12 +482,12 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("InscricaoProdutor");
 
-                    b.Property<bool>("ItemFinanceiroPadrao")
-                        .HasColumnType("bit")
+                    b.Property<short?>("ItemFinanceiroPadrao")
+                        .HasColumnType("smallint")
                         .HasColumnName("ItemFinanceiroPadrao");
 
-                    b.Property<double>("LimiteCredito")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("LimiteCredito")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("LimiteCredito");
 
                     b.Property<string>("LocalTrabalho")
@@ -491,8 +500,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("Profissao");
 
-                    b.Property<double>("RendaMensal")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("RendaMensal")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("RendaMensal");
 
                     b.Property<int>("SituacaoSPC")
@@ -504,8 +513,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("TelefoneTrabalho");
 
-                    b.Property<double>("ValorAluguel")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("ValorAluguel")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("ValorAluguel");
 
                     b.HasKey("IdCliente");
@@ -522,7 +531,6 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnName("IdGloEntidade");
 
                     b.Property<string>("Cpf")
-                        .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)")
                         .HasColumnName("CPF");
@@ -535,12 +543,12 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataNascimento");
 
-                    b.Property<int>("EstadoCivil")
+                    b.Property<int?>("EstadoCivil")
                         .HasColumnType("int")
                         .HasColumnName("IdEstadoCivil");
 
-                    b.Property<bool>("FisicaTipoJuridica")
-                        .HasColumnType("bit")
+                    b.Property<short?>("FisicaTipoJuridica")
+                        .HasColumnType("smallint")
                         .HasColumnName("FisicaTipoJuridica");
 
                     b.Property<string>("OrgaoEmissorRg")
@@ -553,7 +561,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("Rg");
 
-                    b.Property<int>("Sexo")
+                    b.Property<int?>("Sexo")
                         .HasColumnType("int")
                         .HasColumnName("IdSexo");
 
@@ -569,12 +577,11 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnName("IdGloEntidade");
 
                     b.Property<string>("Cnpj")
-                        .IsRequired()
                         .HasMaxLength(14)
                         .HasColumnType("nvarchar(14)")
                         .HasColumnName("CNPJ");
 
-                    b.Property<int>("Enquadramento")
+                    b.Property<int?>("Enquadramento")
                         .HasColumnType("int")
                         .HasColumnName("IdEnquadramento");
 
@@ -588,7 +595,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("RazaoSocial");
 
-                    b.Property<int>("RegimeTributario")
+                    b.Property<int?>("RegimeTributario")
                         .HasColumnType("int")
                         .HasColumnName("IdRegimeTributario");
 
@@ -603,8 +610,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloEntidade");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<int>("ContribuinteICMS")
@@ -684,68 +691,68 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("InscricaoSuframa");
 
-                    b.Property<bool>("IsAgenciaBancaria")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsAgenciaBancaria")
+                        .HasColumnType("smallint")
                         .HasColumnName("AgenciaBancaria");
 
-                    b.Property<bool>("IsAluno")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsAluno")
+                        .HasColumnType("smallint")
                         .HasColumnName("Aluno");
 
-                    b.Property<bool>("IsCliente")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsCliente")
+                        .HasColumnType("smallint")
                         .HasColumnName("Cliente");
 
-                    b.Property<bool>("IsComissionado")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsComissionado")
+                        .HasColumnType("smallint")
                         .HasColumnName("Comissionado");
 
-                    b.Property<bool>("IsContador")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsContador")
+                        .HasColumnType("smallint")
                         .HasColumnName("Contador");
 
-                    b.Property<bool>("IsFilial")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsFilial")
+                        .HasColumnType("smallint")
                         .HasColumnName("Filial");
 
-                    b.Property<bool>("IsFornecedor")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsFornecedor")
+                        .HasColumnType("smallint")
                         .HasColumnName("Fornecedor");
 
-                    b.Property<bool>("IsFuncionario")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsFuncionario")
+                        .HasColumnType("smallint")
                         .HasColumnName("Funcionario");
 
-                    b.Property<bool>("IsInstituicaoFinanceira")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsInstituicaoFinanceira")
+                        .HasColumnType("smallint")
                         .HasColumnName("InstituicaoFinanceira");
 
-                    b.Property<bool>("IsIntermediadorComercial")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsIntermediadorComercial")
+                        .HasColumnType("smallint")
                         .HasColumnName("IntermediadorComercial");
 
-                    b.Property<bool>("IsObra")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsObra")
+                        .HasColumnType("smallint")
                         .HasColumnName("Obra");
 
-                    b.Property<bool>("IsOutro")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsOutro")
+                        .HasColumnType("smallint")
                         .HasColumnName("Outro");
 
-                    b.Property<bool>("IsProfessor")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsProfessor")
+                        .HasColumnType("smallint")
                         .HasColumnName("Professor");
 
-                    b.Property<bool>("IsProspecto")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsProspecto")
+                        .HasColumnType("smallint")
                         .HasColumnName("Prospecto");
 
-                    b.Property<bool>("IsRepresentante")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsRepresentante")
+                        .HasColumnType("smallint")
                         .HasColumnName("Representante");
 
-                    b.Property<bool>("IsTransportadora")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsTransportadora")
+                        .HasColumnType("smallint")
                         .HasColumnName("Transportadora");
 
                     b.Property<string>("Nome")
@@ -777,8 +784,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloEntidadeEndereco");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CaixaPostal")
@@ -817,12 +824,12 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("Logradouro");
 
-                    b.Property<int>("Numero")
+                    b.Property<int?>("Numero")
                         .HasColumnType("int")
                         .HasColumnName("Numero");
 
-                    b.Property<bool>("Padrao")
-                        .HasColumnType("bit")
+                    b.Property<short>("Padrao")
+                        .HasColumnType("smallint")
                         .HasColumnName("Padrao");
 
                     b.Property<int>("TipoEndereco")
@@ -848,8 +855,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloFornecedor");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CodigoAlternativo")
@@ -866,7 +873,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -874,7 +881,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -890,12 +897,12 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
-                    b.Property<bool>("IsFornecedorCotacao")
-                        .HasColumnType("bit")
+                    b.Property<short>("IsFornecedorCotacao")
+                        .HasColumnType("smallint")
                         .HasColumnName("FornecedorCotacao");
 
                     b.HasKey("IdFornecedor");
@@ -911,8 +918,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloFuncionario");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CategoriaCnh")
@@ -933,7 +940,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataEmissaoCtps");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -949,7 +956,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -973,7 +980,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1032,15 +1039,15 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloTransportadora");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1048,7 +1055,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1060,7 +1067,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1090,11 +1097,11 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloBanco");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
-                    b.Property<int>("Codigo")
+                    b.Property<int?>("Codigo")
                         .HasColumnType("int")
                         .HasColumnName("CodigoBancoCobranca");
 
@@ -1102,7 +1109,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1110,7 +1117,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1118,7 +1125,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1137,10 +1144,10 @@ namespace Versatus.AcessoGlobal.Migrations
                 {
                     b.Property<int>("IdForma")
                         .HasColumnType("int")
-                        .HasColumnName("IdFormaPagamento");
+                        .HasColumnName("IdGloFormaPagamento");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("Codigo")
@@ -1153,7 +1160,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1161,7 +1168,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1169,7 +1176,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1192,17 +1199,17 @@ namespace Versatus.AcessoGlobal.Migrations
                 {
                     b.Property<int>("IdBairro")
                         .HasColumnType("int")
-                        .HasColumnName("IdBairro");
+                        .HasColumnName("IdGloBairro");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1210,19 +1217,19 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
                     b.Property<int>("IdCidade")
                         .HasColumnType("int")
-                        .HasColumnName("IdCidade");
+                        .HasColumnName("IdGloCidade");
 
                     b.Property<int?>("IdUsuarioAlteracao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1245,8 +1252,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloCidade");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CEP")
@@ -1269,7 +1276,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1277,7 +1284,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1289,16 +1296,16 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
-                    b.Property<double>("Latitude")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("Latitude");
 
-                    b.Property<double>("Longitude")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("Longitude");
 
                     b.Property<string>("Nome")
@@ -1344,30 +1351,29 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloBairroFinal");
 
-                    b.Property<int>("IdBairroInicial")
+                    b.Property<int?>("IdBairroInicial")
                         .HasColumnType("int")
                         .HasColumnName("IdGloBairroInicial");
 
-                    b.Property<int>("IdCidade")
+                    b.Property<int?>("IdCidade")
                         .HasColumnType("int")
                         .HasColumnName("IdGloCidade");
 
-                    b.Property<int>("IdTipoLogradouro")
+                    b.Property<int?>("IdTipoLogradouro")
                         .HasColumnType("int")
                         .HasColumnName("IdGloTipoLogradouro");
 
-                    b.Property<double>("Latitude")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("LATITUDE");
 
                     b.Property<string>("Logradouro")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("Logradouro");
 
-                    b.Property<double>("Longitude")
-                        .HasColumnType("float")
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("LONGITUDE");
 
                     b.HasKey("IdEndereco");
@@ -1389,8 +1395,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdSequencialEstado");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CodigoIBGE")
@@ -1403,35 +1409,31 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
-                    b.Property<bool>("ExigeIdentificacaoTecnico")
-                        .HasColumnType("bit")
+                    b.Property<short>("ExigeIdentificacaoTecnico")
+                        .HasColumnType("smallint")
                         .HasColumnName("ExigeIdentificacaoTecnico");
 
-                    b.Property<bool>("ExigeRegistroSistema")
-                        .HasColumnType("bit")
+                    b.Property<short>("ExigeRegistroSistema")
+                        .HasColumnType("smallint")
                         .HasColumnName("ExigeRegistroSistema");
 
                     b.Property<DateTime?>("HoraAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
-
-                    b.Property<int>("IdPais")
-                        .HasColumnType("int")
-                        .HasColumnName("IdGloPais");
 
                     b.Property<int?>("IdUsuarioAlteracao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1449,8 +1451,6 @@ namespace Versatus.AcessoGlobal.Migrations
 
                     b.HasKey("IdEstado");
 
-                    b.HasIndex("IdPais");
-
                     b.ToTable("GloEstado", (string)null);
                 });
 
@@ -1466,8 +1466,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("Abreviacao");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<string>("CodigoBACEN")
@@ -1480,7 +1480,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1494,7 +1494,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1502,7 +1502,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1515,23 +1515,22 @@ namespace Versatus.AcessoGlobal.Migrations
                 {
                     b.Property<int>("IdTipoLogradouro")
                         .HasColumnType("int")
-                        .HasColumnName("IdTipoLogradouro");
+                        .HasColumnName("IdGloTipoLogradouro");
 
                     b.Property<string>("Abreviacao")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("Abreviacao");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1539,7 +1538,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1547,7 +1546,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1568,15 +1567,15 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloEmpresa");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1584,7 +1583,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1600,41 +1599,35 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
                     b.Property<string>("MascaraCentroCusto")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("MascaraCentroCusto");
 
                     b.Property<string>("MascaraClasse")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("MascaraClasse");
 
                     b.Property<string>("MascaraPlanoContabil")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("MascaraPlanoContabil");
 
                     b.Property<string>("MascaraProjeto")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("MascaraProjeto");
 
                     b.Property<string>("MsgFinal")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("MsgFinal");
 
                     b.Property<string>("MsgInicial")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("MsgInicial");
 
@@ -1657,8 +1650,8 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloFilial");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<int>("IdEmpresa")
@@ -1690,15 +1683,15 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloGrupo");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1706,7 +1699,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1714,7 +1707,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1735,15 +1728,15 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloPerfil");
 
-                    b.Property<bool>("Administrador")
-                        .HasColumnType("bit")
+                    b.Property<short>("Administrador")
+                        .HasColumnType("smallint")
                         .HasColumnName("Administrador");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1757,7 +1750,7 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
 
@@ -1765,12 +1758,12 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
-                    b.Property<bool>("UsaDominioFinanceiro")
-                        .HasColumnType("bit")
+                    b.Property<short>("UsaDominioFinanceiro")
+                        .HasColumnType("smallint")
                         .HasColumnName("UsaDominioFinanceiro");
 
                     b.HasKey("IdPerfil");
@@ -1784,15 +1777,15 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuario");
 
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("bit")
+                    b.Property<short>("Ativo")
+                        .HasColumnType("smallint")
                         .HasColumnName("Ativo");
 
                     b.Property<DateTime?>("DataAlteracao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataAlteracao");
 
-                    b.Property<DateTime>("DataInclusao")
+                    b.Property<DateTime?>("DataInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("DataInclusao");
 
@@ -1800,23 +1793,15 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraAlteracao");
 
-                    b.Property<DateTime>("HoraInclusao")
+                    b.Property<DateTime?>("HoraInclusao")
                         .HasColumnType("datetime2")
                         .HasColumnName("HoraInclusao");
-
-                    b.Property<int?>("IdFuncionario")
-                        .HasColumnType("int")
-                        .HasColumnName("IdGloFuncionario");
-
-                    b.Property<int>("IdPerfil")
-                        .HasColumnType("int")
-                        .HasColumnName("IdGloPerfil");
 
                     b.Property<int?>("IdUsuarioAlteracao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioAlteracao");
 
-                    b.Property<int>("IdUsuarioInclusao")
+                    b.Property<int?>("IdUsuarioInclusao")
                         .HasColumnType("int")
                         .HasColumnName("IdGloUsuarioInclusao");
 
@@ -1832,21 +1817,29 @@ namespace Versatus.AcessoGlobal.Migrations
                         .HasColumnType("nvarchar(150)")
                         .HasColumnName("Nome");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("varbinary(max)")
                         .HasColumnName("Senha");
-
-                    b.Property<DateTime?>("UltimoLogon")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("DataUltimoLogon");
 
                     b.HasKey("IdUsuario");
 
-                    b.HasIndex("IdPerfil");
-
                     b.ToTable("GloUsuario", (string)null);
+                });
+
+            modelBuilder.Entity("GloPerfilUsuario", b =>
+                {
+                    b.HasOne("Versatus.AcessoGlobal.Domain.Security.Perfil", null)
+                        .WithMany()
+                        .HasForeignKey("IdGloPerfil")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Versatus.AcessoGlobal.Domain.Security.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdGloUsuario")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Classification.Categoria", b =>
@@ -1895,17 +1888,28 @@ namespace Versatus.AcessoGlobal.Migrations
                     b.Navigation("Filial");
                 });
 
+            modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Configuration.ParametroValor", b =>
+                {
+                    b.HasOne("Versatus.AcessoGlobal.Domain.Configuration.Parametro", "Parametro")
+                        .WithMany()
+                        .HasForeignKey("IdParametro")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Parametro");
+                });
+
             modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Configuration.SerieDocumentoFilial", b =>
                 {
-                    b.HasOne("Versatus.AcessoGlobal.Domain.Organization.Filial", "Filial")
+                    b.HasOne("Versatus.AcessoGlobal.Domain.Configuration.SerieDocumento", "SerieDocumento")
                         .WithMany()
-                        .HasForeignKey("IdFilial")
+                        .HasForeignKey("CodigoSerie")
+                        .HasPrincipalKey("Codigo")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Versatus.AcessoGlobal.Domain.Configuration.SerieDocumento", "SerieDocumento")
+                    b.HasOne("Versatus.AcessoGlobal.Domain.Organization.Filial", "Filial")
                         .WithMany()
-                        .HasForeignKey("IdSerie")
+                        .HasForeignKey("IdFilial")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -2073,20 +2077,17 @@ namespace Versatus.AcessoGlobal.Migrations
                     b.HasOne("Versatus.AcessoGlobal.Domain.Location.Bairro", "BairroInicial")
                         .WithMany()
                         .HasForeignKey("IdBairroInicial")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Versatus.AcessoGlobal.Domain.Location.Cidade", "Cidade")
                         .WithMany()
                         .HasForeignKey("IdCidade")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Versatus.AcessoGlobal.Domain.Location.TipoLogradouro", "TipoLogradouro")
                         .WithMany()
                         .HasForeignKey("IdTipoLogradouro")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("BairroFinal");
 
@@ -2095,17 +2096,6 @@ namespace Versatus.AcessoGlobal.Migrations
                     b.Navigation("Cidade");
 
                     b.Navigation("TipoLogradouro");
-                });
-
-            modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Location.Estado", b =>
-                {
-                    b.HasOne("Versatus.AcessoGlobal.Domain.Location.Pais", "Pais")
-                        .WithMany()
-                        .HasForeignKey("IdPais")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Pais");
                 });
 
             modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Organization.Empresa", b =>
@@ -2128,17 +2118,6 @@ namespace Versatus.AcessoGlobal.Migrations
                         .IsRequired();
 
                     b.Navigation("Empresa");
-                });
-
-            modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Security.Usuario", b =>
-                {
-                    b.HasOne("Versatus.AcessoGlobal.Domain.Security.Perfil", "Perfil")
-                        .WithMany()
-                        .HasForeignKey("IdPerfil")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Perfil");
                 });
 
             modelBuilder.Entity("Versatus.AcessoGlobal.Domain.Classification.Categoria", b =>
