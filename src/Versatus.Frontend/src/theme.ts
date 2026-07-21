@@ -94,6 +94,22 @@ export const theme = createTheme({
         size: 'small', // Campos mais compactos e discretos
       },
     },
+    MuiFormLabel: {
+      styleOverrides: {
+        asterisk: {
+          color: '#FF4842 !important', // Vermelho vivo Minimals
+          fontWeight: 'bold',
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        asterisk: {
+          color: '#FF4842 !important', // Vermelho vivo Minimals
+          fontWeight: 'bold',
+        },
+      },
+    },
     MuiSelect: {
       defaultProps: {
         size: 'small',

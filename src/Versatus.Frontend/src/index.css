@@ -7,7 +7,10 @@ body {
 }
 
 /* Destaque em vermelho visível para o asterisco (*) de campos obrigatórios MUI */
-.MuiFormLabel-asterisk {
-  color: #d32f2f !important;
-  font-weight: bold;
+.MuiFormLabel-root .MuiFormLabel-asterisk,
+.MuiInputLabel-root .MuiInputLabel-asterisk,
+.MuiFormLabel-asterisk,
+span.MuiFormLabel-asterisk {
+  color: #FF4842 !important;
+  font-weight: bold !important;
 }
