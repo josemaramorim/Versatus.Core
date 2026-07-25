@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   Box,
   Drawer,
@@ -13,7 +13,6 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
-  Divider,
   alpha
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -21,7 +20,6 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import CloseIcon from '@mui/icons-material/Close';
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useMenu } from '../../context/MenuContext';
@@ -33,10 +31,8 @@ const SIDEBAR_WIDTH_COLLAPSED = 64;
 export const ContextualSidebar: React.FC = () => {
   const { modulos, moduloAtivo, setModuloAtivo, favoritos, adicionarFavorito, removerFavorito } = useMenu();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
-  const [favsOpen, setFavsOpen] = useState<boolean>(true);
   const [openAccordionIds, setOpenAccordionIds] = useState<number[]>([]);
 
   const corHex = moduloAtivo?.corHex || '#2065D1';
@@ -256,7 +252,7 @@ export const ContextualSidebar: React.FC = () => {
           justifyContent: collapsed ? 'center' : 'space-between',
           px: 2,
           py: 1,
-          borderBottom: '1px border-subtle'
+          borderBottom: '1px solid rgba(145, 158, 171, 0.12)'
         }}
       >
         {!collapsed && (
@@ -268,94 +264,6 @@ export const ContextualSidebar: React.FC = () => {
           {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
       </Box>
-
-      {/* Seção ⭐ Favoritos */}
-      {favoritos.length > 0 && (
-        <Box sx={{ px: 1, pt: 1, pb: 0.5 }}>
-          {!collapsed ? (
-            <Accordion
-              expanded={favsOpen}
-              onChange={() => setFavsOpen(!favsOpen)}
-              elevation={0}
-              sx={{
-                boxShadow: 'none',
-                '&:before': { display: 'none' },
-                bgcolor: 'transparent'
-              }}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ fontSize: 18 }} />} sx={{ minHeight: 32, px: 1 }}>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: 'warning.main', letterSpacing: 0.5 }}>
-                  ⭐ FAVORITOS
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails sx={{ p: 0, maxHeight: 180, overflowY: 'auto' }}>
-                <List disablePadding>
-                  {favoritos.map((fav) => (
-                    <Tooltip key={fav.idFavorito} title={fav.caminhoCompleto} placement="right">
-                      <ListItemButton
-                        onClick={() => navigate(fav.rotaCompleta)}
-                        sx={{
-                          py: 0.5,
-                          px: 1.5,
-                          borderRadius: 1,
-                          mb: 0.2,
-                          '&:hover': {
-                            bgcolor: alpha('#000', 0.04),
-                            '& .remove-fav-btn': { opacity: 1 }
-                          }
-                        }}
-                      >
-                        <Box
-                          component="span"
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: fav.corHex || '#2065D1',
-                            mr: 1.5,
-                            flexShrink: 0
-                          }}
-                        />
-                        <ListItemText
-                          primary={fav.nomeRotina}
-                          slotProps={{
-                            primary: {
-                              variant: 'body2',
-                              noWrap: true,
-                              sx: {
-                                fontSize: '0.8125rem',
-                                fontWeight: 600
-                              }
-                            }
-                          }}
-                        />
-                        <IconButton
-                          size="small"
-                          className="remove-fav-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removerFavorito(fav.idRotina, fav.nomeRotina);
-                          }}
-                          sx={{ opacity: 0, p: 0.2, color: 'text.disabled', '&:hover': { color: 'error.main' } }}
-                        >
-                          <CloseIcon style={{ fontSize: 14 }} />
-                        </IconButton>
-                      </ListItemButton>
-                    </Tooltip>
-                  ))}
-                </List>
-              </AccordionDetails>
-            </Accordion>
-          ) : (
-            <Tooltip title="Favoritos" placement="right">
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
-                <StarIcon style={{ color: '#F59E0B', fontSize: 20 }} />
-              </Box>
-            </Tooltip>
-          )}
-          <Divider sx={{ my: 1 }} />
-        </Box>
-      )}
 
       {/* Título do Módulo Ativo */}
       {!collapsed && moduloAtivo && (
