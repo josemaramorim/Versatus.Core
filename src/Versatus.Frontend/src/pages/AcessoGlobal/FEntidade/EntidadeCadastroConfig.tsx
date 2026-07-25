@@ -142,19 +142,8 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
   getColunas(): IColunaConfig<IEntidadeForm>[] {
     return [
       {
-        header: 'Código',
-        field: 'codigo',
-        width: 120,
-        sortable: true
-      },
-      {
-        header: 'Nome / Nome Fantasia',
+        header: 'Nome',
         field: 'razaoSocial',
-        sortable: true
-      },
-      {
-        header: 'Razão Social',
-        field: 'apelido',
         sortable: true
       },
       {
