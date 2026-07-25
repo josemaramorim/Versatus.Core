@@ -264,7 +264,25 @@ Commit: `git commit -m "feat(frontend): Add AppShell, TopBar, ModuleSelectorButt
 
 ---
 
-## 7. FINALIZAÇÃO
+## 7. ESCOPO — O QUE ESTA FEATURE NÃO COBRE
+
+> [!IMPORTANT]
+> Os itens abaixo estão **explicitamente fora do escopo** desta branch. Não implemente, não esboce, não deixe TODOs de código para eles. Serão tratados em features separadas com seus próprios prompts de execução.
+
+| Fora do escopo | Motivo |
+|---|---|
+| **Autenticação / JWT** | Fase futura dedicada. O `IdUsuario` dos favoritos usa `1` como placeholder nesta fase |
+| **Filtragem do menu por permissão de usuário** | Depende de autenticação — o endpoint `/api/menu/arvore` retorna todos os itens sem filtro por ora |
+| **Tela de cadastro de Módulos** (`FModulo`) | CRUD separado — será migrado como Padrão A em outra branch |
+| **Tela de cadastro de Menus** (`FMenu`) | CRUD separado — será migrado como Padrão A em outra branch |
+| **Tela de cadastro de Rotinas** (`FRotina`) | CRUD separado — será migrado como Padrão A em outra branch |
+| **Busca global (⌘K) no TopBar** | Feature de UX avançada — placeholder visual (ícone de lupa sem funcionalidade) é suficiente |
+| **Itens recentes ("Visitados recentemente")** | Feature futura da sidebar — não implementar nesta fase |
+| **Demais telas de negócio** | Cada tela tem seu próprio prompt de execução em `specs/prompts-execucao/` |
+
+---
+
+## 8. FINALIZAÇÃO
 
 ```powershell
 git push origin feat/nav-menu-modulos-shell
