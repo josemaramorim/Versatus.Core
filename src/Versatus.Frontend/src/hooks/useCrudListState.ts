@@ -138,7 +138,7 @@ export function useCrudListState<T>(
   const onEditarClick = async (record: T) => {
     setLoading(true);
     try {
-      const id = (record as any).idEntidade || (record as any).id;
+      const id = config.getRecordId(record);
       if (!id) {
         setSelectedRecord(record);
         setModalMode('edit');
@@ -149,7 +149,7 @@ export function useCrudListState<T>(
         headers: getApiHeaders()
       });
       if (!response.ok) {
-        throw new Error('Erro ao buscar detalhes da entidade');
+        throw new Error(`Erro ao buscar detalhes de ${config.getTitulo().toLowerCase()}`);
       }
 
       const data = await response.json();
@@ -179,14 +179,14 @@ export function useCrudListState<T>(
     setLoading(true);
     try {
       // Mescla o estado original (selectedRecord) com as alterações do formulário (recordData)
-      // para preservar idEntidade, id, e outras propriedades internas não expostas na tela.
+      // para preservar idEntidade, idCondicaoPagamento, e outras propriedades internas não expostas na tela.
       const mergedRecord = modalMode === 'edit'
         ? { ...selectedRecord, ...recordData }
         : recordData;
 
       const processedRecord = config.beforeSave(mergedRecord);
       
-      const id = (processedRecord as any).idEntidade || (processedRecord as any).id;
+      const id = config.getRecordId(processedRecord);
       const url = modalMode === 'edit' 
         ? `${config.getApiEndpoint()}/${id}`
         : config.getApiEndpoint();
@@ -202,7 +202,7 @@ export function useCrudListState<T>(
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
-        const mainMessage = errData.message || 'Erro ao persistir entidade.';
+        const mainMessage = errData.message || `Erro ao persistir ${config.getTitulo().toLowerCase()}.`;
         const techDetail = errData.error || '';
         const combinedMessage = techDetail 
           ? `${mainMessage}\n\n[Detalhe técnico para o suporte: ${techDetail}]`
@@ -214,7 +214,7 @@ export function useCrudListState<T>(
       await fetchRecords();
     } catch (err: any) {
       console.error(err);
-      const msg = err.message || 'Erro ao persistir registro.';
+      const msg = err.message || `Erro ao persistir ${config.getTitulo().toLowerCase()}.`;
       if (options?.onError) {
         options.onError(msg);
       } else {
@@ -228,7 +228,7 @@ export function useCrudListState<T>(
   const onDeleteConfirm = async () => {
     setLoading(true);
     try {
-      const id = (selectedRecord as any).idEntidade || (selectedRecord as any).id;
+      const id = config.getRecordId(selectedRecord);
       const response = await fetch(`${config.getApiEndpoint()}/${id}`, {
         method: 'DELETE',
         headers: getApiHeaders()

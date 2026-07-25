@@ -53,6 +53,14 @@ export abstract class BaseCadastroConfig<T> {
   abstract getValidationSchema(): ZodTypeAny;
 
   /**
+   * Obtém a chave primária / ID do registro dinamicamente.
+   */
+  getRecordId(record: any): any {
+    if (!record) return undefined;
+    return record.idCondicaoPagamento ?? record.idEntidade ?? record.idParametro ?? record.id ?? record.codigo;
+  }
+
+  /**
    * Transforma o objeto retornado pela API no formato do formulário/estado do front-end.
    * Implementação padrão: retorna os dados como recebidos (sem transformação).
    * Sobrescreva em subclasses quando a API usar uma estrutura diferente do formulário.
