@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analise de Banco de Dados — Versatus ERP Web</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand: #0f172a; --brand-mid: #7c3aed; --brand-light: #ede9fe;
+      --success: #16a34a; --success-bg: #dcfce7;
+      --danger: #dc2626; --danger-bg: #fee2e2;
+      --warning: #d97706; --warning-bg: #fef3c7;
+      --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0;
+      --text: #0f172a; --muted: #64748b;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+
+    /* COVER */
+    .cover {
+      background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 50%, #7c3aed 100%);
+      color: white; padding: 80px 60px 60px; position: relative; overflow: hidden;
+    }
+    .cover-label { font-size:11px; letter-spacing:3px; text-transform:uppercase; opacity:.65; margin-bottom:24px; }
+    .cover h1 { font-size:38px; font-weight:800; line-height:1.2; max-width:720px; margin-bottom:20px; }
+    .cover h1 span { color:#c4b5fd; }
+    .cover-sub { font-size:16px; opacity:.82; max-width:650px; margin-bottom:50px; font-weight:300; }
+    .cover-meta { display:flex; gap:40px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,.2); padding-top:28px; font-size:13px; }
+    .cover-meta label { display:block; opacity:.55; font-size:11px; letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+
+    /* LAYOUT */
+    .container { max-width:920px; margin:0 auto; padding:0 40px; }
+    .section { padding:56px 0 16px; }
+    .section-num { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--brand-mid); font-weight:600; margin-bottom:8px; }
+    .section h2 { font-size:27px; font-weight:800; margin-bottom:10px; }
+    .section-desc { color:var(--muted); font-size:15px; max-width:700px; margin-bottom:32px; }
+    hr.div { border:none; border-top:1px solid var(--border); margin:44px 0; }
+
+    /* CALLOUTS */
+    .callout { border-radius:10px; padding:18px 22px; font-size:14px; margin:20px 0; display:flex; gap:14px; }
+    .callout-icon { font-size:22px; flex-shrink:0; margin-top:1px; }
+    .callout.info { background:var(--brand-light); color:#3b0764; border:1px solid #c4b5fd; }
+    .callout.warn { background:var(--warning-bg); color:#78350f; border:1px solid #fcd34d; }
+    .callout.danger { background:var(--danger-bg); color:#7f1d1d; border:1px solid #fca5a5; }
+    .callout.success { background:var(--success-bg); color:#14532d; border:1px solid #86efac; }
+    .callout strong { font-weight:700; display:block; margin-bottom:4px; }
+
+    /* COST CARDS */
+    .cost-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:24px 0; }
+    .cost-card { background:white; border:1px solid var(--border); border-radius:12px; padding:20px; text-align:center; }
+    .cost-card .cc-icon { font-size:28px; margin-bottom:8px; }
+    .cost-card .cc-name { font-size:13px; font-weight:700; margin-bottom:6px; }
+    .cost-card .cc-price { font-size:22px; font-weight:800; margin-bottom:4px; }
+    .cost-card .cc-detail { font-size:11px; color:var(--muted); }
+    .cost-card.expensive { border-color:#fca5a5; background:#fff5f5; }
+    .cost-card.expensive .cc-price { color:var(--danger); }
+    .cost-card.free { border-color:#86efac; background:#f0fdf4; }
+    .cost-card.free .cc-price { color:var(--success); }
+    .cost-card.medium { border-color:#fcd34d; background:#fffbeb; }
+    .cost-card.medium .cc-price { color:var(--warning); }
+
+    /* DB CARDS */
+    .db-grid { display:grid; grid-template-columns:1fr; gap:24px; margin:24px 0; }
+    .db-card { background:white; border:2px solid var(--border); border-radius:16px; padding:28px; position:relative; }
+    .db-card.winner { border-color:#7c3aed; }
+    .db-card.ok { border-color:#86efac; }
+    .db-card.no { border-color:#fca5a5; }
+    .db-badge { position:absolute; top:18px; right:18px; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; }
+    .db-badge.win { background:#ede9fe; color:#6d28d9; }
+    .db-badge.ok { background:#dcfce7; color:#15803d; }
+    .db-badge.no { background:#fee2e2; color:#dc2626; }
+    .db-badge.med { background:#fef3c7; color:#b45309; }
+    .db-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+    .db-logo { width:46px; height:46px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; flex-shrink:0; }
+    .db-title { font-size:18px; font-weight:800; }
+    .db-sub { font-size:13px; color:var(--muted); }
+    .pros-cons-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px; }
+    .pc-col { font-size:13px; }
+    .pc-col strong { display:block; font-size:11px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+    .pc-col.pros strong { color:var(--success); }
+    .pc-col.cons strong { color:var(--danger); }
+    .pc-col li { list-style:none; padding-left:18px; position:relative; margin-bottom:5px; color:var(--muted); line-height:1.5; }
+    .pc-col.pros li::before { content:'V'; position:absolute; left:0; color:var(--success); font-weight:700; font-size:11px; }
+    .pc-col.cons li::before { content:'X'; position:absolute; left:0; color:var(--danger); font-weight:700; font-size:11px; }
+    .db-verdict { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:12px 16px; font-size:13px; margin-top:14px; color:var(--muted); }
+    .db-verdict strong { color:var(--text); }
+
+    /* STRANGLER */
+    .strangler-flow { display:flex; flex-direction:column; gap:0; margin:24px 0; }
+    .sf-row { display:flex; align-items:stretch; gap:0; }
+    .sf-phase { background:white; border:1px solid var(--border); border-radius:12px; padding:18px 20px; flex:1; margin:4px; }
+    .sf-phase h4 { font-size:13px; font-weight:700; margin-bottom:6px; }
+    .sf-phase p { font-size:12px; color:var(--muted); line-height:1.6; }
+    .sf-phase .sf-tag { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-bottom:8px; letter-spacing:.5px; }
+    .sf-phase.phase-now .sf-tag { background:#fee2e2; color:#dc2626; }
+    .sf-phase.phase-mid .sf-tag { background:#fef3c7; color:#b45309; }
+    .sf-phase.phase-new .sf-tag { background:#dcfce7; color:#15803d; }
+    .sf-arrow { display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--muted); padding:0 4px; }
+
+    /* TABLE */
+    .table-wrap { overflow-x:auto; margin:20px 0; }
+    table { width:100%; border-collapse:collapse; font-size:13px; background:white; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+    thead th { background:#1e1b4b; color:white; padding:12px 14px; text-align:left; font-size:12px; font-weight:600; }
+    tbody td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    tbody tr:nth-child(even) td { background:#f8fafc; }
+    tbody td:first-child { font-weight:600; }
+    .td-yes { color:var(--success); font-weight:700; }
+    .td-no { color:var(--danger); font-weight:700; }
+    .td-med { color:var(--warning); font-weight:700; }
+    .stars { color:#f59e0b; }
+    .highlight-row td { background:#f5f3ff !important; font-weight:600; }
+
+    /* MIGRATION STEPS */
+    .mig-steps { display:flex; flex-direction:column; gap:16px; margin:24px 0; }
+    .mig-step { display:flex; gap:20px; background:white; border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+    .mig-num { width:36px; height:36px; border-radius:50%; background:var(--brand-light); color:var(--brand-mid); font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .mig-body h4 { font-size:15px; font-weight:700; margin-bottom:4px; }
+    .mig-body p { font-size:13px; color:var(--muted); line-height:1.6; }
+    .mig-tag { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-bottom:6px; }
+    .mig-tag.safe { background:#dcfce7; color:#15803d; }
+    .mig-tag.caution { background:#fef3c7; color:#b45309; }
+    .mig-tag.risk { background:#fee2e2; color:#dc2626; }
+
+    /* RECOMMENDATION */
+    .rec-box { background:linear-gradient(135deg, #1e1b4b, #4c1d95, #6d28d9); color:white; border-radius:16px; padding:40px; margin:40px 0; }
+    .rec-box .rec-label { font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.6; margin-bottom:10px; }
+    .rec-box h3 { font-size:22px; font-weight:800; margin-bottom:14px; }
+    .rec-box p { opacity:.88; font-size:15px; line-height:1.8; max-width:740px; }
+
+    footer { background:#1e293b; color:rgba(255,255,255,.45); text-align:center; padding:28px; font-size:12px; margin-top:60px; }
+    @media print {
+      .cover { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .rec-box { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      thead th { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .cost-card.expensive, .cost-card.free, .cost-card.medium { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div style="position:relative;z-index:1">
+    <div class="cover-label">Versatus ERP — Analise Tecnica — 2025</div>
+    <h1>Escolha do <span>Banco de Dados</span><br/>Alternativa ao SQL Server</h1>
+    <p class="cover-sub">Analise de custo, compatibilidade e estrategia de migracao para o ERP Versatus durante o processo de estrangulamento (Strangler Fig) do sistema legado.</p>
+    <div class="cover-meta">
+      <div><label>Projeto</label><strong>Versatus ERP Web (.NET 10)</strong></div>
+      <div><label>Data</label><strong>Julho 2025</strong></div>
+      <div><label>Publico</label><strong>Equipe Tecnica e Gestao</strong></div>
+      <div><label>Status</label><strong>Para deliberacao</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- CONTEXTO -->
+  <div class="section">
+    <div class="section-num">01 — Contexto e Problema</div>
+    <h2>Por que sair do SQL Server?</h2>
+    <p class="section-desc">O SQL Server e um banco de dados robusto, porem seu modelo de licenciamento e um dos mais caros do mercado — especialmente para ERPs que escalam por numero de usuarios ou por nucleo de CPU.</p>
+
+    <div class="cost-grid">
+      <div class="cost-card expensive">
+        <div class="cc-icon">💸</div>
+        <div class="cc-name">SQL Server Standard</div>
+        <div class="cc-price">~R$ 18.000</div>
+        <div class="cc-detail">por nucleo/ano (licenca OEM)<br/>ou ~R$ 900/usuario/ano</div>
+      </div>
+      <div class="cost-card expensive">
+        <div class="cc-icon">💸</div>
+        <div class="cc-name">SQL Server Enterprise</div>
+        <div class="cc-price">~R$ 70.000</div>
+        <div class="cc-detail">por par de nucleos/ano<br/>para features avancadas</div>
+      </div>
+      <div class="cost-card medium">
+        <div class="cc-icon">☁️</div>
+        <div class="cc-name">Azure SQL (cloud)</div>
+        <div class="cc-price">~$460/mes</div>
+        <div class="cc-detail">por instancia General Purpose<br/>4 vCores · ~R$ 2.300/mes</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">!</div>
+      <div>
+        <strong>Agravante: SQL Server 2008 ja nao tem suporte</strong>
+        O sistema legado roda em SQL Server 2008, cuja vida util encerrou em julho de 2019. Isso significa: sem patches de seguranca, sem correcoes de bugs e nenhuma cobertura de suporte da Microsoft. Alem do custo alto, ha risco real de seguranca e conformidade (LGPD).
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">i</div>
+      <div>
+        <strong>O modelo de estrangulamento (Strangler Fig) complica a migracao</strong>
+        No Strangler Fig, o sistema legado (WinForms + SQL Server 2008) continua funcionando em paralelo com o novo sistema (.NET 10 + novo banco). Isso significa que durante a transicao, os dois sistemas precisam coexistir — possivelmente acessando o mesmo banco de dados ou mantendo sincronismo.
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- O PROBLEMA DO STRANGLER FIG -->
+  <div class="section">
+    <div class="section-num">02 — Estrangulamento e o Banco de Dados</div>
+    <h2>Como o Strangler Fig afeta a decisao do banco?</h2>
+    <p class="section-desc">O padrao de migracao Strangler Fig nao e simples quando ha um banco de dados compartilhado. Entender as fases e essencial para tomar a decisao correta no momento certo.</p>
+
+    <div class="strangler-flow">
+      <div class="sf-row">
+        <div class="sf-phase phase-now">
+          <span class="sf-tag">FASE ATUAL</span>
+          <h4>Legado 100% Ativo</h4>
+          <p>WinForms acessa diretamente o SQL Server 2008 do cliente. A nova API .NET 10 TAMBEM acessa o mesmo SQL Server 2008 (via leitura do legado). Dois sistemas, um banco.</p>
+        </div>
+        <div class="sf-arrow">→</div>
+        <div class="sf-phase phase-mid">
+          <span class="sf-tag">PERIODO DE TRANSICAO</span>
+          <h4>Coexistencia (Hibrido)</h4>
+          <p>Algumas telas ja estao no novo sistema web. Outras ainda rodam no legado WinForms. Ambos precisam de dados consistentes — migracao de banco aqui e de alto risco.</p>
+        </div>
+        <div class="sf-arrow">→</div>
+        <div class="sf-phase phase-new">
+          <span class="sf-tag">ESTADO FINAL</span>
+          <h4>Legado Desligado</h4>
+          <p>Todas as telas foram migradas para web. O WinForms foi aposentado. O banco pode ser migrado para o novo SGBD sem restricoes do legado.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-icon">!</div>
+      <div>
+        <strong>Conclusao critica: nao migre o banco durante o estrangulamento</strong>
+        Tentar trocar o banco de dados ENQUANTO o sistema legado ainda esta ativo e de altissimo risco. O WinForms depende de features especificas do SQL Server (stored procedures legadas, tipos de dados, collation). A estrategia correta e: primeiro termine o estrangulamento, depois migre o banco.
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- BANCOS ANALISADOS -->
+  <div class="section">
+    <div class="section-num">03 — Bancos de Dados Avaliados</div>
+    <h2>As alternativas ao SQL Server</h2>
+
+    <div class="db-grid">
+
+      <!-- POSTGRESQL -->
+      <div class="db-card winner">
+        <span class="db-badge win">Recomendado</span>
+        <div class="db-header">
+          <div class="db-logo" style="background:#e0f2fe;color:#0369a1">PG</div>
+          <div>
+            <div class="db-title">PostgreSQL 16</div>
+            <div class="db-sub">Open Source · Gratuito · Linux, Windows, macOS · EF Core nativo</div>
+          </div>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>100% gratuito — sem licenca por nucleo ou usuario</li>
+            <li>Suporte nativo no EF Core (Npgsql provider)</li>
+            <li>Excelente performance para ERPs e consultas complexas</li>
+            <li>JSONB nativo para campos flexiveis</li>
+            <li>Suporte total a transacoes ACID e foreign keys</li>
+            <li>Full-text search integrado</li>
+            <li>Particionamento de tabelas para bancos grandes</li>
+            <li>Comunidade enorme e ativa</li>
+            <li>Usado por Nubank, Netflix, Instagram, iFood</li>
+            <li>Row-Level Security para multitenancy</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>Sintaxe SQL levemente diferente do SQL Server (ex: ILIKE, LIMIT)</li>
+            <li>Stored procedures legadas precisam ser convertidas (PL/pgSQL)</li>
+            <li>Ferramentas graficas menos polidas que SSMS (mas DBeaver resolve)</li>
+            <li>Curva inicial para DBAs acostumados com SQL Server</li>
+          </ul>
+        </div>
+        <div class="db-verdict"><strong>Veredicto:</strong> A melhor alternativa open source para ERPs. Maturidade de 30+ anos, sem custo de licenca, suporte excelente no .NET e compatibilidade com todos os cenarios de implantacao (on-premises, cloud, Docker).</div>
+      </div>
+
+      <!-- MYSQL / MARIADB -->
+      <div class="db-card ok">
+        <span class="db-badge ok">Valido</span>
+        <div class="db-header">
+          <div class="db-logo" style="background:#f0fdf4;color:#15803d">MY</div>
+          <div>
+            <div class="db-title">MySQL 8 / MariaDB 11</div>
+            <div class="db-sub">Open Source · Gratuito · Amplamente usado em aplicacoes web</div>
+          </div>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>Gratuito (MySQL Community / MariaDB)</li>
+            <li>Suporte no EF Core via Pomelo provider</li>
+            <li>Enorme base de usuarios — facil encontrar DBA</li>
+            <li>Performance solida para leituras e aplicacoes web</li>
+            <li>MariaDB e fork compativel com MySQL, totalmente gratuito</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>Menos recursos avancados que PostgreSQL (sem JSONB nativo, sem particionamento avancado)</li>
+            <li>MySQL pertence a Oracle — risco de mudanca de licenca</li>
+            <li>Suporte a stored procedures mais limitado</li>
+            <li>Menos adequado para ERPs com queries muito complexas</li>
+          </ul>
+        </div>
+        <div class="db-verdict"><strong>Veredicto:</strong> Valido para aplicacoes web simples, porem menos adequado para ERPs com logica de negocio complexa. Para o Versatus, o PostgreSQL e superior em todos os quesitos relevantes.</div>
+      </div>
+
+      <!-- SQL SERVER EXPRESS -->
+      <div class="db-card">
+        <span class="db-badge med">Paliativo</span>
+        <div class="db-header">
+          <div class="db-logo" style="background:#fef3c7;color:#b45309">SS</div>
+          <div>
+            <div class="db-title">SQL Server Express / Developer</div>
+            <div class="db-sub">Microsoft · Gratuito (com limitacoes) · Mesma engine do SQL Server</div>
+          </div>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>Zero alteracao no codigo legado (100% compativel)</li>
+            <li>Sem licenca para ambientes de desenvolvimento</li>
+            <li>Reduz custo no curto prazo durante o estrangulamento</li>
+            <li>Mesma sintaxe — sem reescrita de stored procedures</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>Express: limite de 10 GB por banco — inviavel para clientes com bancos grandes</li>
+            <li>Sem SQL Server Agent (sem jobs agendados)</li>
+            <li>Developer: gratuito APENAS para desenvolvimento — proibido em producao</li>
+            <li>Nao resolve o problema de custo em producao</li>
+          </ul>
+        </div>
+        <div class="db-verdict"><strong>Veredicto:</strong> Util apenas como solucao temporaria de custo durante o desenvolvimento. Nao resolve o problema de licenciamento em producao para bancos acima de 10 GB.</div>
+      </div>
+
+      <!-- SQLITE -->
+      <div class="db-card no">
+        <span class="db-badge no">Nao recomendado</span>
+        <div class="db-header">
+          <div class="db-logo" style="background:#fee2e2;color:#dc2626">SQ</div>
+          <div>
+            <div class="db-title">SQLite</div>
+            <div class="db-sub">Arquivo local · Sem servidor · Extremamente leve</div>
+          </div>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>Zero custo e zero configuracao</li>
+            <li>Ideal para testes locais e desenvolvimento</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>NAO suporta acesso concorrente de multiplos usuarios</li>
+            <li>Sem stored procedures, triggers avancados ou roles</li>
+            <li>Limite pratico de ~1 GB para performance aceitavel</li>
+            <li>Absolutamente inviavel para producao de um ERP</li>
+          </ul>
+        </div>
+        <div class="db-verdict"><strong>Veredicto:</strong> Inviavel para producao de um ERP. Util apenas em testes unitarios e desenvolvimento local isolado.</div>
+      </div>
+
+      <!-- AZURE SQL / MANAGED -->
+      <div class="db-card">
+        <span class="db-badge med">Cloud — custo variavel</span>
+        <div class="db-header">
+          <div class="db-logo" style="background:#f0f9ff;color:#0369a1">AZ</div>
+          <div>
+            <div class="db-title">Azure SQL Managed Instance / Amazon RDS</div>
+            <div class="db-sub">Cloud gerenciado · Compatibilidade total com SQL Server · Pay-as-you-go</div>
+          </div>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>100% compativel com SQL Server (sem reescrita de codigo)</li>
+            <li>Sem gestao de servidor (backup, patch, HA automaticos)</li>
+            <li>Escalabilidade elastica (aumenta recursos sob demanda)</li>
+            <li>SLA de 99.99% de disponibilidade</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>AINDA e caro: Azure SQL Managed Instance ~$460/mes por instancia</li>
+            <li>Custo pode surpreender com crescimento de dados e requisicoes</li>
+            <li>Dados ficam na nuvem — pode ser problema para clientes corporativos</li>
+            <li>Nao resolve o problema de custo, apenas muda quem gerencia</li>
+          </ul>
+        </div>
+        <div class="db-verdict"><strong>Veredicto:</strong> Elimina a gestao de infraestrutura mas nao reduz o custo de licenca. Valido se o time nao quiser gerenciar servidor, mas o custo mensal se mantem alto.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- COMPARATIVO -->
+  <div class="section">
+    <div class="section-num">04 — Comparativo</div>
+    <h2>Tabela de Decisao</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>SQL Server (atual)</th>
+            <th>PostgreSQL (rec.)</th>
+            <th>MySQL / MariaDB</th>
+            <th>SQL Express</th>
+            <th>Azure SQL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Custo de licenca</td>
+            <td><span class="td-no">Alto (R$18k+/ano)</span></td>
+            <td><span class="td-yes">Gratis</span></td>
+            <td><span class="td-yes">Gratis</span></td>
+            <td><span class="td-med">Gratis (dev only)</span></td>
+            <td><span class="td-no">~R$2.300/mes</span></td>
+          </tr>
+          <tr>
+            <td>Suporte EF Core (.NET 10)</td>
+            <td><span class="td-yes">Nativo</span></td>
+            <td><span class="td-yes">Nativo (Npgsql)</span></td>
+            <td><span class="td-yes">Pomelo provider</span></td>
+            <td><span class="td-yes">Nativo</span></td>
+            <td><span class="td-yes">Nativo</span></td>
+          </tr>
+          <tr>
+            <td>Compatibilidade c/ legado</td>
+            <td><span class="td-yes">Total</span></td>
+            <td><span class="td-med">Parcial (reescrita)</span></td>
+            <td><span class="td-med">Parcial</span></td>
+            <td><span class="td-yes">Total</span></td>
+            <td><span class="td-yes">Total</span></td>
+          </tr>
+          <tr>
+            <td>Performance para ERP</td>
+            <td><span class="stars">*****</span></td>
+            <td><span class="stars">*****</span></td>
+            <td><span class="stars">***</span></td>
+            <td><span class="stars">***</span></td>
+            <td><span class="stars">*****</span></td>
+          </tr>
+          <tr>
+            <td>Multitenancy / Row-Level Security</td>
+            <td><span class="td-yes">Sim (2016+)</span></td>
+            <td><span class="td-yes">Sim (nativo)</span></td>
+            <td><span class="td-med">Limitado</span></td>
+            <td><span class="td-no">Nao</span></td>
+            <td><span class="td-yes">Sim</span></td>
+          </tr>
+          <tr>
+            <td>On-premises sem custo de cloud</td>
+            <td><span class="td-no">Licenca cara</span></td>
+            <td><span class="td-yes">Sim — gratis</span></td>
+            <td><span class="td-yes">Sim — gratis</span></td>
+            <td><span class="td-med">Limite 10 GB</span></td>
+            <td><span class="td-no">Exige cloud</span></td>
+          </tr>
+          <tr>
+            <td>Docker / Kubernetes</td>
+            <td><span class="td-med">Sim (image paga)</span></td>
+            <td><span class="td-yes">Sim (gratis)</span></td>
+            <td><span class="td-yes">Sim (gratis)</span></td>
+            <td><span class="td-med">Limitado</span></td>
+            <td><span class="td-no">Cloud only</span></td>
+          </tr>
+          <tr>
+            <td>Adequacao para SaaS futuro</td>
+            <td><span class="stars">***</span></td>
+            <td><span class="stars">*****</span></td>
+            <td><span class="stars">***</span></td>
+            <td><span class="stars">*</span></td>
+            <td><span class="stars">****</span></td>
+          </tr>
+          <tr>
+            <td>Maturidade e confiabilidade</td>
+            <td><span class="stars">*****</span></td>
+            <td><span class="stars">*****</span></td>
+            <td><span class="stars">****</span></td>
+            <td><span class="stars">****</span></td>
+            <td><span class="stars">*****</span></td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Recomendacao geral</td>
+            <td>Atual (caro)</td>
+            <td>RECOMENDADO</td>
+            <td>Valido</td>
+            <td>Temporario</td>
+            <td>Se cloud obrigatoria</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- ESTRATEGIA DE MIGRACAO -->
+  <div class="section">
+    <div class="section-num">05 — Estrategia de Migracao</div>
+    <h2>Como migrar sem quebrar o legado?</h2>
+    <p class="section-desc">A chave e respeitar o processo de estrangulamento e so migrar o banco quando o legado nao depender mais dele.</p>
+
+    <div class="mig-steps">
+      <div class="mig-step">
+        <div class="mig-num">1</div>
+        <div class="mig-body">
+          <span class="mig-tag safe">Seguro — Agora</span>
+          <h4>Continue com SQL Server 2008 durante o estrangulamento</h4>
+          <p>Enquanto o WinForms ainda esta ativo, mantenha o SQL Server 2008 intocado. A nova API .NET 10 pode ler e escrever no mesmo banco SQL Server 2008 usando o EF Core com SQL Server provider. Nao ha conflito — voce ja esta fazendo isso corretamente.</p>
+        </div>
+      </div>
+      <div class="mig-step">
+        <div class="mig-num">2</div>
+        <div class="mig-body">
+          <span class="mig-tag safe">Seguro — Agora</span>
+          <h4>Configure o novo ambiente com PostgreSQL para desenvolvimento e testes</h4>
+          <p>Crie um ambiente paralelo de desenvolvimento/homologacao com PostgreSQL. Ajuste as migrations do EF Core para funcionar com Npgsql. Valide que todas as queries funcionam corretamente. Isso nao afeta o legado — e um ambiente separado.</p>
+        </div>
+      </div>
+      <div class="mig-step">
+        <div class="mig-num">3</div>
+        <div class="mig-body">
+          <span class="mig-tag caution">Cuidado — Durante o estrangulamento</span>
+          <h4>Migre stored procedures e logica de banco para a camada de aplicacao</h4>
+          <p>Toda logica que esta em stored procedures do SQL Server deve ser movida para os servicos .NET (C#). Isso elimina a dependencia de features exclusivas do SQL Server e prepara o terreno para qualquer banco. Faca isso modulo a modulo, em paralelo com a migracao de telas.</p>
+        </div>
+      </div>
+      <div class="mig-step">
+        <div class="mig-num">4</div>
+        <div class="mig-body">
+          <span class="mig-tag caution">Cuidado — Apos ultimo modulo migrado</span>
+          <h4>Migre os dados do SQL Server 2008 para PostgreSQL</h4>
+          <p>Quando a ultima tela do WinForms for aposentada, execute a migracao de dados. Use a ferramenta pgloader (open source, especializada em migrar de SQL Server para PostgreSQL) ou scripts ETL customizados. Mantenha o SQL Server 2008 como backup por 30-60 dias apos a migracao.</p>
+        </div>
+      </div>
+      <div class="mig-step">
+        <div class="mig-num">5</div>
+        <div class="mig-body">
+          <span class="mig-tag safe">Destino Final</span>
+          <h4>Producao 100% em PostgreSQL — SQL Server descomissionado</h4>
+          <p>Com o legado aposentado e os dados migrados, o sistema web roda inteiramente em PostgreSQL. Custo de banco vai a zero (somente infraestrutura do servidor). A licenca do SQL Server pode ser encerrada ou mantida apenas para clientes que ainda nao migraram.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">i</div>
+      <div>
+        <strong>Sobre a ferramenta pgloader</strong>
+        O pgloader (pgloader.io) e uma ferramenta open source criada especificamente para migracao de dados do SQL Server, MySQL e outros bancos para o PostgreSQL. Ele converte tipos de dados automaticamente, migra indices, constraints e dados em lote. E a ferramenta de referencia para esse tipo de migracao.
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- IMPACTO NO CODIGO -->
+  <div class="section">
+    <div class="section-num">06 — Impacto no Codigo .NET</div>
+    <h2>O que muda no codigo quando trocar de banco?</h2>
+    <p class="section-desc">Com EF Core, a troca de banco e muito menos traumatica do que parece. A maioria do codigo de negocio nao muda.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Componente</th>
+            <th>Impacto na troca SQL Server → PostgreSQL</th>
+            <th>Nivel de Esforco</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Entities e DTOs (C#)</td>
+            <td>Nenhum — POCOs puras nao dependem de banco</td>
+            <td><span class="td-yes">Zero</span></td>
+          </tr>
+          <tr>
+            <td>Repositorios e Servicos</td>
+            <td>Nenhum se usar EF Core corretamente (sem SQL raw)</td>
+            <td><span class="td-yes">Zero</span></td>
+          </tr>
+          <tr>
+            <td>DbContext e Fluent API</td>
+            <td>Trocar o provider: UseSqlServer → UseNpgsql. Verificar tipos de coluna.</td>
+            <td><span class="td-yes">Baixo</span></td>
+          </tr>
+          <tr>
+            <td>Migrations do EF Core</td>
+            <td>Regenerar as migrations com o novo provider. Nao reescrever do zero.</td>
+            <td><span class="td-yes">Baixo</span></td>
+          </tr>
+          <tr>
+            <td>Queries LINQ</td>
+            <td>Nenhum — LINQ e traduzido pelo EF Core para o SQL do banco alvo</td>
+            <td><span class="td-yes">Zero</span></td>
+          </tr>
+          <tr>
+            <td>SQL Raw / FromSqlRaw()</td>
+            <td>Precisa revisar sintaxe (ex: TOP → LIMIT, GETDATE() → NOW())</td>
+            <td><span class="td-med">Medio</span></td>
+          </tr>
+          <tr>
+            <td>Stored Procedures legadas</td>
+            <td>Reescrever em PL/pgSQL ou mover logica para C#. Maior esforco.</td>
+            <td><span class="td-no">Alto</span></td>
+          </tr>
+          <tr>
+            <td>Funcoes de data/hora, string</td>
+            <td>Algumas diferencas de comportamento (collation, case sensitivity)</td>
+            <td><span class="td-med">Medio</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success">
+      <div class="callout-icon">V</div>
+      <div>
+        <strong>Boa noticia: o projeto Versatus ja segue as boas praticas</strong>
+        O projeto ja usa Fluent API no EF Core (sem atributos de banco nas entidades), LINQ para queries e DTOs limpos. Isso significa que a troca de provider sera de baixissimo impacto no codigo de negocio — exatamente o cenario ideal para migracao de banco.
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <!-- RECOMENDACAO -->
+  <div class="rec-box">
+    <div class="rec-label">Nossa recomendacao tecnica</div>
+    <h3>PostgreSQL e a escolha certa — mas no momento certo.</h3>
+    <p>
+      O <strong>PostgreSQL 16</strong> e o banco de dados ideal para o Versatus Web: gratuito, maduro, com suporte nativo no EF Core, capaz de rodar on-premises ou em cloud via Docker, e preparado para multitenancy futuro (SaaS).
+      <br/><br/>
+      Porem, a migracao deve respeitar o processo de estrangulamento. A ordem correta e:
+      (1) Continue com SQL Server durante o estrangulamento — sem tocar no banco legado.
+      (2) Desenvolva e teste ja com PostgreSQL em ambiente de desenvolvimento.
+      (3) Mova stored procedures para a camada C# modulo a modulo.
+      (4) Apenas quando a ultima tela WinForms for aposentada, execute a migracao de dados com pgloader.
+      <br/><br/>
+      Para clientes que ainda nao concluiram a migracao: mantenha a instancia SQL Server deles ate a conclusao. A nova arquitetura permite rodar com SQL Server ou PostgreSQL com minima alteracao de configuracao — basta trocar a connection string e o provider do EF Core.
+    </p>
+  </div>
+
+</div>
+
+<footer>Versatus ERP Web · Analise de Banco de Dados · Julho 2025 · Confidencial — uso interno</footer>
+</body>
+</html>

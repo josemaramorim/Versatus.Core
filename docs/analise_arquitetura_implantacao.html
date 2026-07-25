@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arquitetura de Implantação — Versatus ERP Web</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand: #0f172a; --brand-mid: #1e40af; --brand-light: #dbeafe;
+      --success: #16a34a; --success-bg: #dcfce7;
+      --danger: #dc2626; --danger-bg: #fee2e2;
+      --warning: #d97706; --warning-bg: #fef3c7;
+      --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0;
+      --text: #0f172a; --muted: #64748b;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+    .cover {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0369a1 100%);
+      color: white; padding: 80px 60px 60px; position: relative; overflow: hidden;
+    }
+    .cover-label { font-size:11px; letter-spacing:3px; text-transform:uppercase; opacity:.7; margin-bottom:24px; }
+    .cover h1 { font-size:38px; font-weight:800; line-height:1.2; max-width:720px; margin-bottom:20px; }
+    .cover h1 span { color:#7dd3fc; }
+    .cover-sub { font-size:16px; opacity:.82; max-width:640px; margin-bottom:50px; font-weight:300; }
+    .cover-meta { display:flex; gap:40px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,.2); padding-top:28px; font-size:13px; }
+    .cover-meta label { display:block; opacity:.55; font-size:11px; letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+    .container { max-width:920px; margin:0 auto; padding:0 40px; }
+    .section { padding:56px 0 16px; }
+    .section-num { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--brand-mid); font-weight:600; margin-bottom:8px; }
+    .section h2 { font-size:27px; font-weight:800; margin-bottom:10px; }
+    .section-desc { color:var(--muted); font-size:15px; max-width:700px; margin-bottom:32px; }
+    hr.div { border:none; border-top:1px solid var(--border); margin:44px 0; }
+    .callout { border-radius:10px; padding:18px 22px; font-size:14px; margin:20px 0; display:flex; gap:14px; }
+    .callout-icon { font-size:20px; flex-shrink:0; margin-top:2px; }
+    .callout.info { background:var(--brand-light); color:#1e3a8a; border:1px solid #93c5fd; }
+    .callout.warn { background:var(--warning-bg); color:#78350f; border:1px solid #fcd34d; }
+    .callout.danger { background:var(--danger-bg); color:#7f1d1d; border:1px solid #fca5a5; }
+    .callout strong { font-weight:700; display:block; margin-bottom:4px; }
+    .q-block { background:white; border:1px solid var(--border); border-radius:14px; padding:28px; margin:20px 0; }
+    .q-num { display:inline-block; background:#0f172a; color:white; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; margin-bottom:14px; }
+    .q-title { font-size:17px; font-weight:700; margin-bottom:14px; }
+    .q-answer { font-size:14px; color:var(--muted); line-height:1.8; }
+    .q-answer strong { color:var(--text); }
+    .scenario-grid { display:grid; grid-template-columns:1fr; gap:24px; margin:24px 0; }
+    .scenario-card { background:var(--surface); border:2px solid var(--border); border-radius:16px; padding:30px; position:relative; }
+    .scenario-card.recommended { border-color:#3b82f6; }
+    .scenario-card.not-rec { border-color:#fca5a5; }
+    .sc-badge { position:absolute; top:20px; right:20px; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; letter-spacing:0.5px; }
+    .sc-badge.rec { background:#dbeafe; color:#1d4ed8; }
+    .sc-badge.no { background:#fee2e2; color:#dc2626; }
+    .sc-badge.curr { background:#f1f5f9; color:#475569; }
+    .sc-header { display:flex; align-items:center; gap:14px; margin-bottom:18px; }
+    .sc-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .sc-title { font-size:18px; font-weight:800; }
+    .sc-sub { font-size:13px; color:var(--muted); }
+    .sc-arch { background:#f8fafc; border-radius:10px; padding:16px 20px; margin:16px 0; font-size:13px; font-family:monospace; color:#334155; line-height:1.9; border:1px solid var(--border); }
+    .box { display:inline-block; background:white; border:1px solid #cbd5e1; border-radius:6px; padding:2px 10px; font-size:12px; font-weight:600; color:#1e293b; }
+    .box.db { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; }
+    .box.api { background:#f0fdf4; border-color:#86efac; color:#15803d; }
+    .box.ui { background:#fefce8; border-color:#fde047; color:#854d0e; }
+    .box.cloud { background:#fdf4ff; border-color:#d8b4fe; color:#6b21a8; }
+    .pros-cons-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+    .pc-col { font-size:13px; }
+    .pc-col strong { display:block; font-size:11px; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+    .pc-col.pros strong { color:var(--success); }
+    .pc-col.cons strong { color:var(--danger); }
+    .pc-col li { list-style:none; padding-left:18px; position:relative; margin-bottom:6px; color:var(--muted); line-height:1.5; }
+    .pc-col.pros li::before { content:'V'; position:absolute; left:0; color:var(--success); font-weight:700; }
+    .pc-col.cons li::before { content:'X'; position:absolute; left:0; color:var(--danger); font-weight:700; }
+    .table-wrap { overflow-x:auto; margin:20px 0; }
+    table { width:100%; border-collapse:collapse; font-size:13px; background:white; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+    thead th { background:#0f172a; color:white; padding:12px 14px; text-align:left; font-size:12px; font-weight:600; }
+    tbody td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    tbody tr:nth-child(even) td { background:#f8fafc; }
+    tbody td:first-child { font-weight:600; }
+    .td-yes { color:var(--success); font-weight:700; }
+    .td-no { color:var(--danger); font-weight:700; }
+    .td-med { color:var(--warning); font-weight:700; }
+    .stars { color:#f59e0b; }
+    .impact-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin:20px 0; }
+    .impact-card { background:white; border:1px solid var(--border); border-radius:12px; padding:20px; text-align:center; }
+    .impact-card .ic { font-size:32px; margin-bottom:10px; }
+    .impact-card h4 { font-size:14px; font-weight:700; margin-bottom:6px; }
+    .impact-card p { font-size:12px; color:var(--muted); line-height:1.6; }
+    .impact-card.high { border-color:#fca5a5; }
+    .impact-card.med { border-color:#fcd34d; }
+    .impact-card.low { border-color:#86efac; }
+    .rec-box { background:linear-gradient(135deg, #0f172a, #1e3a8a); color:white; border-radius:16px; padding:40px; margin:40px 0; }
+    .rec-box .rec-label { font-size:11px; letter-spacing:2px; text-transform:uppercase; opacity:.6; margin-bottom:10px; }
+    .rec-box h3 { font-size:22px; font-weight:800; margin-bottom:14px; }
+    .rec-box p { opacity:.88; font-size:15px; line-height:1.8; max-width:740px; }
+    .roadmap { display:flex; flex-direction:column; gap:16px; margin:24px 0; }
+    .rm-item { display:flex; gap:20px; background:white; border:1px solid var(--border); border-radius:12px; padding:20px 24px; }
+    .rm-phase { min-width:90px; text-align:center; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; background:var(--brand-light); color:var(--brand-mid); border-radius:8px; padding:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; line-height:1.5; }
+    .rm-body h4 { font-size:15px; font-weight:700; margin-bottom:4px; }
+    .rm-body p { font-size:13px; color:var(--muted); }
+    footer { background:#1e293b; color:rgba(255,255,255,.45); text-align:center; padding:28px; font-size:12px; margin-top:60px; }
+    @media print {
+      .cover { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .rec-box { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      thead th { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cover">
+  <div style="position:relative;z-index:1">
+    <div class="cover-label">Versatus ERP — Analise Tecnica — 2025</div>
+    <h1>Arquitetura de <span>Implantacao Web</span><br/>Onde Hospedar o ERP?</h1>
+    <p class="cover-sub">Analise das opcoes de hospedagem, banco de dados e modelo de distribuicao para o ERP Versatus migrando do desktop para a web. Inclui avaliacao de viabilidade SaaS.</p>
+    <div class="cover-meta">
+      <div><label>Projeto</label><strong>Versatus ERP Web (.NET 10)</strong></div>
+      <div><label>Data</label><strong>Julho 2025</strong></div>
+      <div><label>Publico</label><strong>Equipe Tecnica e Gestao</strong></div>
+      <div><label>Status</label><strong>Para deliberacao</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-num">01 — Contexto</div>
+    <h2>De onde viemos e para onde vamos?</h2>
+    <p class="section-desc">Entender o modelo atual e essencial para avaliar o impacto de cada alternativa.</p>
+
+    <div class="q-block">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px">Modelo Atual (Legado)</div>
+          <ul style="list-style:none;font-size:14px;color:var(--muted);line-height:2.2">
+            <li>Instalado fisicamente em cada cliente</li>
+            <li>Banco SQL Server proprio por cliente (servidor do cliente)</li>
+            <li>Licenca por usuario — faturamento por cliente</li>
+            <li>Atualizacoes: visita manual ou acesso remoto cliente a cliente</li>
+            <li>WinForms — executavel instalado nas maquinas</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px">Objetivo (ERP Web)</div>
+          <ul style="list-style:none;font-size:14px;color:var(--muted);line-height:2.2">
+            <li>Acesso via browser — zero instalacao nas maquinas</li>
+            <li>Backend .NET 10 + API REST</li>
+            <li>Banco SQL Server 2008 legado</li>
+            <li>Atualizacoes centralizadas (idealmente)</li>
+            <li><strong style="color:var(--text)">Onde hospedar? Quantas instancias? SaaS?</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">!</div>
+      <div><strong>O problema central</strong>Alguns clientes possuem bancos de dados muito grandes e servidores dedicados. Isso impede uma solucao unica de hospedagem centralizada sem uma analise cuidadosa de isolamento, performance e custo por cliente.</div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="section-num">02 — Suas Duvidas Respondidas</div>
+    <h2>As 4 questoes em analise</h2>
+
+    <div class="q-block">
+      <div class="q-num">Pergunta 1</div>
+      <div class="q-title">Onde ficara a aplicacao e o banco de dados?</div>
+      <div class="q-answer">
+        Existem <strong>tres modelos possiveis</strong> de hospedagem, e a escolha depende do perfil de cada cliente:<br/><br/>
+        <strong>A) On-Premises do Cliente (manter o modelo atual)</strong><br/>
+        O servidor .NET e o banco SQL Server ficam na infraestrutura do proprio cliente. A diferenca do legado e apenas que o frontend passa a ser acessado via browser em vez de executavel. Para clientes com bancos grandes e servidores dedicados, este e o modelo de menor risco no curto prazo.<br/><br/>
+        <strong>B) Cloud dedicada por cliente (VM isolada)</strong><br/>
+        Cada cliente ganha uma maquina virtual na nuvem (Azure, AWS) com sua propria instancia da API e seu proprio banco SQL Server. Permite atualizacoes centralizadas mas mantem isolamento total de dados.<br/><br/>
+        <strong>C) SaaS Multitenant (unica instalacao, todos os clientes)</strong><br/>
+        Uma unica aplicacao e infraestrutura atendem todos os clientes. Os dados sao separados por schema ou por banco dentro do mesmo servidor. Modelo mais eficiente em custo de operacao, mas o mais complexo para migrar.
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-num">Pergunta 2</div>
+      <div class="q-title">Sera uma unica instalacao para todos os clientes?</div>
+      <div class="q-answer">
+        <strong>Nao necessariamente — e misturar os modelos e valido.</strong><br/><br/>
+        Voce pode ter uma estrategia hibrida:<br/>
+        - Clientes pequenos: SaaS compartilhado (custo baixo)<br/>
+        - Clientes medios: instancia cloud dedicada por cliente<br/>
+        - Clientes grandes (bancos volumosos): on-premises no servidor do cliente<br/><br/>
+        Isso e exatamente o que ERPs como <strong>SAP Business One, Protheus e Senior</strong> fazem: oferecem o mesmo produto em multiplos modelos de implantacao, deixando o cliente escolher com base em porte e investimento.
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-num">Pergunta 3</div>
+      <div class="q-title">Em instalacoes isoladas, como controlar as atualizacoes?</div>
+      <div class="q-answer">
+        <strong>Para instancias em cloud (Azure / AWS):</strong> Voce implanta a nova versao em um pipeline CI/CD (GitHub Actions, Azure DevOps) que atualiza todas as VMs automaticamente. Uma tag de versao pode controlar quais clientes recebem a atualizacao primeiro (canary release).<br/><br/>
+        <strong>Para on-premises no cliente:</strong> A API .NET pode ser empacotada como um container Docker. A atualizacao vira um simples "docker pull + docker-compose up" que o cliente executa ou que voce executa remotamente via acesso autorizado. Muito mais rapido que instalar um executavel em cada maquina.<br/><br/>
+        <strong>Controle de versao por cliente:</strong> Um painel interno (backoffice) pode registrar a versao instalada em cada cliente, quando foi a ultima atualizacao, e permitir disparar atualizacoes remotas de forma controlada.
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-num">Pergunta 4</div>
+      <div class="q-title">E possivel transformar em SaaS? Qual o custo e impacto?</div>
+      <div class="q-answer">
+        <strong>Sim, e possivel — mas e uma transformacao profunda e de medio/longo prazo.</strong><br/><br/>
+        O SaaS exige que a aplicacao seja multitenant: um unico sistema atende multiplos clientes simultaneamente com dados completamente isolados. O .NET 10 + EF Core suportam isso nativamente com as estrategias certas de banco. Os impactos sao detalhados na secao seguinte.
+      </div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="section-num">03 — Modelos de Arquitetura</div>
+    <h2>As tres arquiteturas em detalhe</h2>
+    <div class="scenario-grid">
+
+      <div class="scenario-card">
+        <span class="sc-badge curr">Modelo A — Menor mudanca</span>
+        <div class="sc-header">
+          <div class="sc-icon" style="background:#f0fdf4">H</div>
+          <div>
+            <div class="sc-title">On-Premises por Cliente</div>
+            <div class="sc-sub">Servidor do cliente hospeda API + banco. Frontend no browser.</div>
+          </div>
+        </div>
+        <div class="sc-arch">
+          <span class="box ui">Browser</span> &rarr; <span class="box api">API .NET 10</span> &rarr; <span class="box db">SQL Server (servidor do cliente)</span><br/>
+          <span style="font-size:12px;color:#94a3b8">Cada cliente: instalacao propria · banco proprio · servidor proprio</span>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>Dados ficam na estrutura do cliente (LGPD simplificada)</li>
+            <li>Sem custo de cloud para a Versatus</li>
+            <li>Clientes com grandes bancos nao sofrem impacto de performance</li>
+            <li>Modelo familiar — menor resistencia do cliente</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>Atualizacoes ainda dependem de acesso remoto a cada cliente</li>
+            <li>Suporte mais complexo (varios ambientes diferentes)</li>
+            <li>Cliente precisa manter servidor e banco</li>
+            <li>Nao escala como negocio SaaS</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="scenario-card recommended">
+        <span class="sc-badge rec">Modelo B — Recomendado</span>
+        <div class="sc-header">
+          <div class="sc-icon" style="background:#eff6ff">C</div>
+          <div>
+            <div class="sc-title">Cloud Dedicada por Cliente (VM Isolada)</div>
+            <div class="sc-sub">Cada cliente tem sua VM na cloud com API + banco isolados.</div>
+          </div>
+        </div>
+        <div class="sc-arch">
+          <span class="box ui">Browser</span> &rarr; <span class="box cloud">Azure / AWS</span><br/>
+          &nbsp;&nbsp;+-- <span class="box api">VM Cliente A: API .NET + SQL Server A</span><br/>
+          &nbsp;&nbsp;+-- <span class="box api">VM Cliente B: API .NET + SQL Server B</span><br/>
+          &nbsp;&nbsp;+-- <span class="box api">VM Cliente N: API .NET + SQL Server N</span><br/>
+          <span style="font-size:12px;color:#94a3b8">CI/CD pipeline atualiza todas as VMs via automacao</span>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>Atualizacao automatica via CI/CD — um deploy atualiza todos</li>
+            <li>Isolamento total de dados (banco separado por cliente)</li>
+            <li>Clientes grandes podem ter VMs maiores (custo repassado)</li>
+            <li>Suporte remoto simplificado (acesso a VM)</li>
+            <li>Compativel com SQL Server 2008 via VM Windows</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>Custo de cloud por VM — precisa repassar ao cliente</li>
+            <li>Gestao de multiplas VMs (pode ser automatizado)</li>
+            <li>Clientes com bancos gigantes precisam de VMs maiores e caras</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="scenario-card not-rec">
+        <span class="sc-badge no">Modelo C — Alto esforco</span>
+        <div class="sc-header">
+          <div class="sc-icon" style="background:#fdf4ff">S</div>
+          <div>
+            <div class="sc-title">SaaS Multitenant</div>
+            <div class="sc-sub">Uma unica instalacao atende todos os clientes com dados segregados.</div>
+          </div>
+        </div>
+        <div class="sc-arch">
+          <span class="box ui">Browser A / B / N</span> &rarr; <span class="box cloud">Load Balancer</span><br/>
+          &nbsp;&nbsp;+-- <span class="box api">API .NET 10 (unica, com TenantId)</span> &rarr; <span class="box db">SQL Server: Schema por cliente</span><br/>
+          <span style="font-size:12px;color:#94a3b8">TenantId em cada requisicao · Middleware de resolucao de tenant · Row-Level Security</span>
+        </div>
+        <div class="pros-cons-grid">
+          <ul class="pc-col pros"><strong>Vantagens</strong>
+            <li>Custo operacional menor (um ambiente para N clientes)</li>
+            <li>Um deploy atualiza todos instantaneamente</li>
+            <li>Modelo de receita recorrente (assinatura)</li>
+            <li>Suporte centralizado</li>
+          </ul>
+          <ul class="pc-col cons"><strong>Desvantagens</strong>
+            <li>Requer refatoracao profunda (TenantId em todas as tabelas)</li>
+            <li>Bancos grandes impactam performance de todos os clientes</li>
+            <li>LGPD mais complexo (dados de clientes no mesmo servidor)</li>
+            <li>Bug afeta todos os clientes simultaneamente</li>
+            <li>Clientes corporativos podem recusar dados em nuvem compartilhada</li>
+            <li>Alta complexidade de migracao do banco legado</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="section-num">04 — Comparativo</div>
+    <h2>Tabela de Decisao</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Criterio</th>
+            <th>A · On-Premises</th>
+            <th>B · Cloud Isolada (Recomendado)</th>
+            <th>C · SaaS Multitenant</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Facilidade de implantacao</td><td><span class="stars">***</span></td><td><span class="stars">****</span></td><td><span class="stars">*****</span></td></tr>
+          <tr><td>Atualizacao centralizada</td><td><span class="td-no">Nao</span></td><td><span class="td-yes">Sim (CI/CD)</span></td><td><span class="td-yes">Sim</span></td></tr>
+          <tr><td>Isolamento de dados por cliente</td><td><span class="td-yes">Total</span></td><td><span class="td-yes">Total</span></td><td><span class="td-med">Parcial (schema)</span></td></tr>
+          <tr><td>Compatibilidade com bancos grandes</td><td><span class="td-yes">Alta</span></td><td><span class="td-yes">Alta (VM dedicada)</span></td><td><span class="td-no">Baixa</span></td></tr>
+          <tr><td>Custo de operacao (Versatus)</td><td><span class="td-yes">Baixo</span></td><td><span class="td-med">Medio</span></td><td><span class="td-yes">Baixo</span></td></tr>
+          <tr><td>Custo para o cliente</td><td><span class="td-med">Servidor proprio</span></td><td><span class="td-med">VM na cloud</span></td><td><span class="td-yes">Assinatura mensal</span></td></tr>
+          <tr><td>Esforco de migracao do codigo</td><td><span class="stars">*****</span></td><td><span class="stars">****</span></td><td><span class="stars">*</span></td></tr>
+          <tr><td>Conformidade LGPD</td><td><span class="td-yes">Simples</span></td><td><span class="td-yes">Simples</span></td><td><span class="td-med">Complexo</span></td></tr>
+          <tr><td>Controle de versao por cliente</td><td><span class="td-no">Manual</span></td><td><span class="td-yes">Automatico</span></td><td><span class="td-yes">Automatico</span></td></tr>
+          <tr><td>Viabilidade no curto prazo (2025)</td><td><span class="td-yes">Alta</span></td><td><span class="td-yes">Alta</span></td><td><span class="td-no">Baixa</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="section-num">05 — SaaS em detalhe</div>
+    <h2>O que e necessario para virar SaaS?</h2>
+    <p class="section-desc">Transformar um ERP legado em SaaS multitenant e um projeto de medio/longo prazo. Estes sao os principais pilares.</p>
+    <div class="impact-grid">
+      <div class="impact-card high">
+        <div class="ic">DB</div>
+        <h4>Banco Multitenant</h4>
+        <p>Todas as tabelas precisam de TenantId. Dados de clientes diferentes coexistem no mesmo SQL Server com isolamento por schema. Impacto: muito alto no banco legado.</p>
+      </div>
+      <div class="impact-card high">
+        <div class="ic">API</div>
+        <h4>Middleware de Tenant</h4>
+        <p>A API .NET precisa identificar qual cliente esta fazendo a requisicao e injetar o contexto do tenant em todo o pipeline. Requer refatoracao do DbContext.</p>
+      </div>
+      <div class="impact-card med">
+        <div class="ic">ID</div>
+        <h4>Autenticacao Centralizada</h4>
+        <p>Um sistema de Identity unico (Keycloak, Azure Entra ID B2C) gerencia usuarios de todos os clientes com isolamento por tenant.</p>
+      </div>
+      <div class="impact-card med">
+        <div class="ic">$</div>
+        <h4>Billing e Assinatura</h4>
+        <p>Integracao com plataforma de cobranca recorrente (Stripe, Asaas). Controle de planos, usuarios ativos, funcionalidades habilitadas por assinatura.</p>
+      </div>
+      <div class="impact-card med">
+        <div class="ic">LOG</div>
+        <h4>Monitoramento Multitenant</h4>
+        <p>Logs, alertas e dashboards precisam distinguir eventos por tenant. Application Insights ou Grafana com tags de tenant em cada evento.</p>
+      </div>
+      <div class="impact-card low">
+        <div class="ic">URL</div>
+        <h4>Dominios e Subdomnios</h4>
+        <p>Cada cliente pode ter seu subdominio: clienteA.versatus.com.br. O load balancer roteia para a instancia correta identificando o tenant pelo subdominio.</p>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-icon">!</div>
+      <div><strong>Alerta critico: bancos de dados legados</strong>O SQL Server 2008 nao possui suporte nativo eficiente para multitenancy com Row-Level Security (RLS foi introduzido no SQL Server 2016). Transformar clientes com SQL Server 2008 em SaaS exigiria uma migracao de banco como pre-requisito — um projeto dentro do projeto.</div>
+    </div>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="rec-box">
+    <div class="rec-label">Nossa recomendacao tecnica</div>
+    <h3>Comece com Cloud Isolada por Cliente. Construa o caminho para SaaS gradualmente.</h3>
+    <p>
+      O Modelo B (VM cloud dedicada por cliente) e o equilibrio ideal entre modernizacao imediata e risco controlado. Ele resolve o maior problema do legado (atualizacoes manuais cliente a cliente) via CI/CD, mantem isolamento total de dados, acomoda clientes com bancos grandes com VMs de maior capacidade, e permite migrar para SaaS no futuro de forma gradual — comecando pelos clientes menores e novos.<br/><br/>
+      Para clientes que exigem dados em sua propria infraestrutura, o Modelo A (on-premises + app web) continua sendo viavel e compativel com a mesma codebase — a API .NET e o frontend React/Blazor rodam igualmente em cloud ou on-premises.
+    </p>
+  </div>
+
+  <hr class="div"/>
+
+  <div class="section">
+    <div class="section-num">06 — Roadmap Sugerido</div>
+    <h2>Plano de evolucao da arquitetura</h2>
+    <div class="roadmap">
+      <div class="rm-item">
+        <div class="rm-phase">Fase 1<br/>0-6 meses</div>
+        <div class="rm-body">
+          <h4>Migracao Web com On-Premises</h4>
+          <p>Entregar o ERP web funcionando na infraestrutura atual de cada cliente. O cliente usa o browser mas o servidor ainda e dele. Validar as telas migradas em producao real com clientes piloto.</p>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-phase">Fase 2<br/>6-12 meses</div>
+        <div class="rm-body">
+          <h4>Cloud Isolada para clientes novos e pequenos</h4>
+          <p>Novos contratos ja nascem em VMs na cloud (Azure/AWS). Configurar pipeline CI/CD para deploy automatico. Implantar painel de controle interno de versoes por cliente.</p>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-phase">Fase 3<br/>12-24 meses</div>
+        <div class="rm-body">
+          <h4>Migracao de clientes legados para cloud</h4>
+          <p>Migrar progressivamente os clientes do modelo on-premises para VMs em cloud, comecando pelos menores. Oferecer beneficios (backup automatico, menor custo de suporte) como incentivo.</p>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-phase">Fase 4<br/>24+ meses</div>
+        <div class="rm-body">
+          <h4>SaaS Multitenant (opcional, para segmento SMB)</h4>
+          <p>Criar uma versao SaaS do produto para clientes pequenos e novos que nao exigem isolamento total. Planos de assinatura mensal. Clientes corporativos continuam em instancias isoladas. Dois produtos, um codebase base compartilhado.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>Versatus ERP Web · Analise de Arquitetura de Implantacao · Julho 2025 · Confidencial — uso interno</footer>
+</body>
+</html>
