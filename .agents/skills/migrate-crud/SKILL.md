@@ -103,9 +103,10 @@ Quando o usuário solicitar a migração:
 Após aprovação da Spec Funcional pelo usuário:
 
 > [!IMPORTANT]
-> **Boas Práticas C# / .NET 10 / SOLID / Clean Architecture:**
+> **Boas Práticas C# / .NET 10 / SOLID / Clean Architecture / CQRS:**
 > - **Domain:** Classes POCO puras em `Domain/Entities/`, sem DataAnnotations, com file-scoped namespaces e Nullable Reference Types habilitados.
 > - **SOLID & Injeção de Dependência:** Interfaces desacopladas em `Domain/Services/I[Nome]Service.cs` e `Domain/Repositories/`. Injeção via construtor no Controller.
+> - **CQRS DB Split:** Repositórios utilizam `ReadContext` / `ReadDbSet` (com `NoTracking` na `ReadConnection`) para consultas e `Context` / `DbSet` (na `WriteConnection`) para gravações.
 > - **Clean Code:** Métodos focados, nomes expressivos alinhados à Spec.
 > - **Result Pattern:** PROIBIDO usar `throw new ...Exception(...)` para indicar erros de validação de dados ou falta de registros. Sempre retornar `Result<T>` com `ValidationError`.
 

@@ -23,7 +23,7 @@ Leia os seguintes arquivos nesta ordem antes de escrever qualquer código ou spe
 ## 2. CONTEXTO DO PROJETO E PREMISSAS ARQUITETURAIS
 - **Princípios Fundamentais:** SOLID, Clean Architecture, Clean Code e Boas Práticas do .NET 10
 - **Banco de dados:** SQL Server 2008 (sem OFFSET/FETCH — paginação obrigatória em memória)
-- **Backend:** .NET 10, Clean Architecture (Domain POCOs puras, Infrastructure Fluent API, Controllers limpos, Result<T> Pattern para erros funcionais)
+- **Backend:** .NET 10, Clean Architecture (Domain POCOs puras, Infrastructure Fluent API, CQRS DB Split Write/Read Connection, Controllers limpos, Result<T> Pattern para erros funcionais)
 - **Frontend:** React + TypeScript + Material-UI (MUI), BaseCadastroConfig<T> OOP, Zod Validation
 - **Branch atual:** develop (limpa e atualizada)
 - **Formulários já migrados:** FParametro (Padrão B), FCondicaoPagamento e FEntidade (Padrão A)

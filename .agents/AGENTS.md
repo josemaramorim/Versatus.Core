@@ -105,3 +105,10 @@ Todo formulário migrado deve ser classificado em um dos dois padrões antes de 
   <FormControl fullWidth required error={!!errors.idTipoCondicaoPagto}>
     <InputLabel>Tipo Condição</InputLabel>
   ```
+
+## 11. Arquitetura de Banco de Dados CQRS (Leitura vs. Escrita)
+- **Obrigatorio:** O projeto adota a segregação de conexões de banco de dados (CQRS Leve):
+  - **Mutações / Alteração de Estado (`POST`, `PUT`, `DELETE`):** Executadas na conexão principal de escrita (`WriteConnection` / `AcessoGlobalDbContext` / `TributoDbContext`).
+  - **Consultas / Paginações / Lookups (`GET`):** Executadas na conexão de leitura desabilitada de tracking (`ReadConnection` / `AcessoGlobalReadDbContext` / `TributoReadDbContext`).
+- Os repositórios herdados de `AcessoGlobalRepositorioBase<TEntity>` utilizam automaticamente `ReadContext` / `ReadDbSet` para leitura e `Context` / `DbSet` para escrita.
+- Configuração de conexão via variáveis `WriteConnection` e `ReadConnection` no `appsettings.json` / ICP.
