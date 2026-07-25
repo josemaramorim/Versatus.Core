@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFinanceiroService, FinanceiroService>();
         services.AddScoped<IOrganizacaoService, OrganizacaoService>();
         services.AddScoped<ICondicaoPagamentoService, CondicaoPagamentoService>();
+        services.AddScoped<IMenuService, MenuService>();
 
         return services;
     }

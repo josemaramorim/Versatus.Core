@@ -59,6 +59,14 @@ public class AcessoGlobalDbContext : DbContext
     public DbSet<ParametroValor> ParametroValores => Set<ParametroValor>();
     public DbSet<TipoEnumerado> TiposEnumerados => Set<TipoEnumerado>();
 
+    public DbSet<GloModulo> Modulos => Set<GloModulo>();
+    public DbSet<GloMenu> Menus => Set<GloMenu>();
+    public DbSet<GloMenuModulo> MenuModulos => Set<GloMenuModulo>();
+    public DbSet<GloMenuMenu> MenuMenus => Set<GloMenuMenu>();
+    public DbSet<GloMenuRotina> MenuRotinas => Set<GloMenuRotina>();
+    public DbSet<GloRotina> Rotinas => Set<GloRotina>();
+    public DbSet<GloFavorito> Favoritos => Set<GloFavorito>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
