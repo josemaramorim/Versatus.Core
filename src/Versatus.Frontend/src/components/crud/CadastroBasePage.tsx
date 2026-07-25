@@ -116,10 +116,10 @@ export function CadastroBasePage<T>({
   };
 
   return (
-    <Box sx={{ p: 4, minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ p: 0, bgcolor: 'background.default' }}>
       
       {/* 1. Breadcrumbs */}
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 0.5 }}>
         <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
           Dashboard
         </Link>
@@ -137,7 +137,7 @@ export function CadastroBasePage<T>({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          mb: 4 
+          mb: 2.5 
         }}
       >
         <Typography variant="h4" component="h1" sx={{ color: 'text.primary', fontWeight: 800 }}>

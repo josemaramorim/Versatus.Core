@@ -14,7 +14,8 @@ export const AppShell: React.FC = () => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            py: 2,
+            px: 2.5,
             minWidth: 0,
             overflowX: 'auto',
             bgcolor: 'background.default'
