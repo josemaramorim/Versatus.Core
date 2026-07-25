@@ -1,4 +1,4 @@
-﻿# Prompt de Execução — Sistema de Navegação ERP (AppShell + Módulos + Sidebar + Favoritos)
+# Prompt de Execução — Sistema de Navegação ERP (AppShell + Módulos + Sidebar + Favoritos)
 
 > **Branch:** `feat/nav-menu-modulos-shell`
 > **Base:** `develop` (atualizada em 2026-07-25)
@@ -22,9 +22,69 @@ Leia os seguintes arquivos **nesta ordem** antes de escrever qualquer código:
 - **Banco de dados:** SQL Server 2008 — SEM suporte a OFFSET/FETCH. Paginação SEMPRE em memória
 - **Backend:** .NET 10, Clean Architecture, EF Core com Fluent API, Result<T> Pattern
 - **Frontend:** React 19 + TypeScript + Material-UI v9 (MUI), react-router-dom v7, Vite 8
-- **Tema:** Inspirado no Minimals (minimals.cc) — cor primária `#2065D1`, fundo `#F4F6F8`
+- **Tema:** Minimals (detalhado na Seção 2a abaixo)
 - **Branch de trabalho:** `feat/nav-menu-modulos-shell` (já criada a partir de `develop`)
 - **PROIBIDO:** Commitar em `main` ou `develop` diretamente
+
+### Telas já migradas (NÃO alterar o comportamento delas)
+- `FEntidade` → rota `/acesso-global/entidade`
+- `FParametro` → rota `/acesso-global/parametro`
+- `FCondicaoPagamento` → rota `/acesso-global/condicao-pagamento`
+
+---
+
+## 2a. TEMPLATE FRONTEND — MINIMALS (VERSÃO FREE + MELHORIAS PRO)
+
+### Contexto
+O projeto utiliza como base visual o template **Minimals** do [minimal-ui-kit](https://github.com/minimal-ui-kit/material-kit-react) (licença MIT — versão free/open-source).
+
+- **Demo Free:** https://free.minimals.cc
+- **Demo Pago (referência visual):** https://minimals.cc/dashboard
+- **O código pago NÃO será utilizado** — apenas o free como base, com melhorias implementadas manualmente.
+
+### Tema atual do projeto (`src/Versatus.Frontend/src/theme.ts`) — NÃO alterar
+O tema já está configurado no projeto com as cores e tipografia do Minimals:
+```
+Cor primária:   #2065D1 (Azul Royal)
+Cor secundária: #845ADF (Roxo sutil)
+Fundo default:  #F4F6F8 (Cinza extra-claro)
+Fundo paper:    #FFFFFF
+Texto primário: #212B36
+Texto secundário:#637381
+Fonte: "Public Sans", "Inter", "Outfit", Roboto, sans-serif
+Border radius:  12px (cards: 16px)
+```
+
+### Melhorias "Pro" a implementar no layout desta feature
+
+A versão paga do Minimals tem features visuais que a free não tem. Implemente **todas** as abaixo:
+
+| Feature Pro | Como implementar |
+|---|---|
+| **Sidebar colapsável** (modo mini com apenas ícones) | Botão toggle no topo da sidebar: `useState(sidebarOpen)`. Quando fechada: width=64px mostrando só ícones. Quando aberta: width=240px com labels. Transição CSS `width 0.3s ease` |
+| **Seções com título em uppercase** na sidebar | Antes de cada grupo de accordion, renderizar `<Typography variant="overline" sx={{ color: 'text.disabled', px: 2, pt: 2, pb: 1 }}>` com o nome do grupo |
+| **Highlight na rota ativa** com borda colorida | NavLink do react-router-dom: quando ativo, aplicar `borderLeft: '3px solid {moduloAtivo.corHex}'` + `bgcolor: alpha(corHex, 0.08)` + `fontWeight: 700` |
+| **Cards com sombra Minimals** | Box shadow: `'0 0 2px 0 rgba(145,158,171,0.2), 0 12px 24px -4px rgba(145,158,171,0.12)'` — já configurado no tema |
+| **TopBar sticky** com blur de fundo | `position: sticky; top: 0; backdropFilter: blur(6px); bgcolor: rgba(255,255,255,0.8)` |
+| **Botão de módulo estilizado** | Pill com borda, ponto colorido (cor do módulo), nome do módulo e chevron. Hover com bgcolor suave |
+| **Grid de módulos no popup** | MUI `Popover` com `Paper` elevado. Grid 4 colunas em desktop, 3 em mobile. Cada card: ícone sobre fundo colorido suave `alpha(corHex, 0.12)` + nome centralizado abaixo. Card ativo com borda colorida |
+| **Animação de abertura do popup** | MUI Popover já tem `TransitionComponent`. Adicionar `transformOrigin` e `anchorOrigin` adequados |
+| **Accordion sem borda padrão do MUI** | Sobrescrever estilo: `boxShadow: 'none'`, `'&:before': { display: 'none' }`, `borderRadius: 0` |
+| **Hover nos itens da sidebar** | `'&:hover': { bgcolor: alpha('#000', 0.04), borderRadius: 1 }` |
+| **Toast de favoritos** | MUI `Snackbar` + `Alert` com severity `success` e `error`. Auto-hide em 2500ms |
+| **Badge de módulo nos favoritos** | `<Box component="span" sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: corHex, mr: 1, flexShrink: 0 }} />` |
+| **Tooltip com caminho completo** | MUI `Tooltip` com `title={caminhoCompleto}` e `placement="right"` nos itens de favorito |
+| **Ícone ⭐ ao hover na rotina** | Usar `useState(hoveredRotina)`. Renderizar `<StarBorderIcon>` com opacity 0 → 1 no hover via sx |
+| **Scroll suave na sidebar** | `overflowY: 'auto'`, `'&::-webkit-scrollbar': { width: 4 }`, `'&::-webkit-scrollbar-thumb': { bgcolor: alpha('#000', 0.12), borderRadius: 2 }` |
+
+### Paleta de cores dos módulos (para os cards do popup)
+Cada módulo tem sua cor `corHex` vinda do banco. Para o fundo do ícone no card do popup usar: `alpha(corHex, 0.12)`. Para a borda do card ativo: `2px solid corHex`.
+
+### Referência visual alvo
+O resultado deve ser visualmente próximo de: https://minimals.cc/dashboard
+Sidebar com grupos, topbar limpa com seletor de módulo, cards com sombra suave, tipografia elegante.
+
+---
 
 ### Telas já migradas (NÃO alterar o comportamento delas)
 - `FEntidade` → rota `/acesso-global/entidade`
