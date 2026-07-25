@@ -19,7 +19,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Connection Strings (CQRS: Write vs Read Split)
 var writeConnectionString = builder.Configuration.GetConnectionString("WriteConnection")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=localhost\\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;";
 
 var readConnectionString = builder.Configuration.GetConnectionString("ReadConnection")
