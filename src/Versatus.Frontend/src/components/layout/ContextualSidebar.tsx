@@ -27,7 +27,7 @@ import * as MuiIcons from '@mui/icons-material';
 import { useMenu } from '../../context/MenuContext';
 import type { MenuItemDto, RotinaItemDto } from '../../types/menu';
 
-const SIDEBAR_WIDTH_EXPANDED = 260;
+const SIDEBAR_WIDTH_EXPANDED = 270;
 const SIDEBAR_WIDTH_COLLAPSED = 88;
 
 function getIconComponent(iconName: string | null) {
