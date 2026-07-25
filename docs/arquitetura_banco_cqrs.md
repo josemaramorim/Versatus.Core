@@ -1,77 +1,89 @@
 # Guia de Arquitetura — Conexões de Banco de Dados (Leitura vs. Escrita) & DbContexts
 
-Este documento detalha a estratégia de segregação de conexões no banco de dados (CQRS Leve) e comprova o estado de prontidão dos `DbContexts` do projeto Versatus.Net8.
+Este documento detalha a arquitetura de segregação de conexões no banco de dados (CQRS) implementada no projeto **Versatus.Net8** na branch `feat/cqrs-db-read-write-split`.
 
 ---
 
-## 1. Conexão Única vs. Separação Leitura / Escrita
+## 1. Visão Geral da Arquitetura Implementada
 
-### Cenário Atual (Conexão Única)
-Atualmente o projeto utiliza uma única *Connection String* para leitura e escrita em cada módulo.
-- **Vantagens:** Simplicidade de configuração e consistência ACID imediata.
-- **Limitação:** Em cenários de alta carga, relatórios pesados ou paginações em massa competem pelos mesmos recursos do banco que processa cadastros e vendas.
+A aplicação opera com duas *Connection Strings* distintas e contextos segregados por responsabilidade:
 
-### Cenário Futuro (Separação Leitura / Escrita — CQRS Leve)
-Segregação da conexão em duas:
-1. **Conexão de Escrita (Master / Primary):** Processa operações de gravação (`POST`, `PUT`, `DELETE`).
-2. **Conexão de Leitura (Read Replica):** Processa consultas e relatórios (`GET`), apontando para uma réplica do banco com `QueryTrackingBehavior.NoTracking`.
-
-#### Comparativo Técnico:
-
-| Critério | Conexão Única (Atual) | Separação Leitura / Escrita |
-|---|---|---|
-| **Complexidade de Código** | Mínima (1 DbContext) | Baixa (2 DbContexts / DI) |
-| **Alívio de Carga no Banco** | Nenhum | Alto (consultas vão para réplica) |
-| **Consistência de Dados** | Imediata | Eventual (delay de milissegundos) |
-| **Uso de AsNoTracking()** | Manual em cada query | Nativo na conexão de leitura |
-| **Recomendado para ERP?** | Fase de migração | Produção em alta escala |
+1. **Conexão de Escrita (`WriteConnection`):** Utilizada pela instância master (`AcessoGlobalDbContext` / `TributoDbContext`) para gravações e mutações (`POST`, `PUT`, `DELETE`).
+2. **Conexão de Leitura (`ReadConnection`):** Utilizada pela instância de réplica de leitura (`AcessoGlobalReadDbContext` / `TributoReadDbContext`) para consultas e relatórios (`GET`), configurada nativamente com `QueryTrackingBehavior.NoTracking`.
 
 ---
 
-## 2. Status de Prontidão dos DbContexts Atuais
+## 2. Configuração no `appsettings.json`
 
-Mapeamos todos os `DbContexts` existentes no repositório:
+O arquivo `src/Versatus.WebAPI/appsettings.json` declara explicitamente as duas conexões:
 
-1. **`AcessoGlobalDbContext`** (`src/Versatus.AcessoGlobal/Infrastructure/AcessoGlobalDbContext.cs`)
-2. **`TributoDbContext`** (`src/Versatus.GestaoTributo/Infrastructure/TributoDbContext.cs`)
-3. **`VersatusDbContext`** (`src/Versatus.Infra.Data/Context/VersatusDbContext.cs`)
+```json
+{
+  "ConnectionStrings": {
+    "WriteConnection": "Server=localhost\\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;",
+    "ReadConnection": "Server=localhost\\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;"
+  }
+}
+```
 
-### ✅ Todos os DbContexts JÁ ESTÃO 100% PREPARADOS para a separação.
-
-#### Motivos de Prontidão Arquitetural:
-- **Injeção via `DbContextOptions<TContext>`:** Todos os contextos recebem opções via construtor padrão do EF Core.
-- **Mapeamentos 100% via Fluent API:** Nenhuma entidade do domínio possui anotações de banco (`[Table]`, `[Column]`).
-- **Entidades POCO Puras:** O domínio está totalmente desacoplado da infraestrutura de banco.
+> **Nota:** Em ambientes de desenvolvimento/local, ambas apontam para a mesma instância. Em homologação/produção, `ReadConnection` aponta para o endereço IP / DNS da Réplica de Leitura.
 
 ---
 
-## 3. Como Ativar Réplicas de Leitura sem Alterar o Código de Negócio
+## 3. Registro dos DbContexts no `Program.cs`
 
-Para ativar a separação no futuro, **NENHUMA classe de serviço ou entidade precisará ser alterada**. A alteração é restrita à camada de Injeção de Dependências (DI):
+No arquivo `src/Versatus.WebAPI/Program.cs`, os contextos são registrados no *Dependency Injection* do ASP.NET Core:
 
 ```csharp
-// Exemplo de configuração no Program.cs / DependencyInjection:
+// Connection Strings (CQRS: Write vs Read Split)
+var writeConnectionString = builder.Configuration.GetConnectionString("WriteConnection")
+    ?? "Server=localhost\\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;";
 
-// 1. Contexto de ESCRITA (Banco Master)
+var readConnectionString = builder.Configuration.GetConnectionString("ReadConnection")
+    ?? writeConnectionString;
+
+// DbContexts para ESCRITA (Master DB)
 builder.Services.AddDbContext<AcessoGlobalDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionEscrita")));
+    options.UseSqlServer(writeConnectionString).EnableSensitiveDataLogging());
 
-// 2. Contexto de LEITURA (Réplica de Leitura sem tracking de memória)
+builder.Services.AddDbContext<TributoDbContext>(options =>
+    options.UseSqlServer(writeConnectionString));
+
+// DbContexts para LEITURA (Read Replica DB com NoTracking)
 builder.Services.AddDbContext<AcessoGlobalReadDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionLeitura"))
+    options.UseSqlServer(readConnectionString)
+           .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
+builder.Services.AddDbContext<TributoReadDbContext>(options =>
+    options.UseSqlServer(readConnectionString)
            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 ```
 
 ---
 
-## 4. Diretrizes de Injeção de Dependência nos Serviços
+## 4. Repositórios com Suporte CQRS NATIVO
 
-- **Serviços de Alteração de Estado (Commands):** Injetam a interface do serviço responsável por escrita.
-- **Serviços de Relatórios e Consultas Paginadas (Queries):** Injetam o contexto configurado com `NoTracking`.
+Na camada de infraestrutura (`AcessoGlobalRepositorioBase<TEntity>`), o redirecionamento de chamadas é automático:
+
+- **Operações de Leitura (`GetByIdAsync`, `GetAllAsync`, `ListarPaginadoAsync`, buscas):** Utilizam `ReadContext` / `ReadDbSet` (sem tracking de memória, alta performance, réplica de leitura).
+- **Operações de Escrita (`AddAsync`, `UpdateAsync`, `DeleteAsync`, `SaveChangesAsync`):** Utilizam `Context` / `DbSet` (rastreados, apontam para a instância principal de gravação).
 
 ---
 
-## 5. Resumo e Recomendação
+## 5. Matriz de Componentes Ativos
 
-1. **Fase Atual (Migração):** Manter a conexão única atual. O código já está padronizado e limpo.
-2. **Fase Futura (Produção em Carga):** Ativar a réplica de leitura configurando a *ConnectionString* de leitura no DI, aproveitando a arquitetura limpa já construída no .NET 10.
+| Componente | Tipo de Operação | Contexto Injetado | Connection String Utilizada |
+|---|---|---|---|
+| `EntidadeRepository` | Consultas / Grids / Paginação | `AcessoGlobalReadDbContext` | `ReadConnection` |
+| `EntidadeRepository` | Inserção / Edição / Exclusão | `AcessoGlobalDbContext` | `WriteConnection` |
+| `LocalizacaoRepository` | Lookups (País, Estado, Cidade) | `AcessoGlobalReadDbContext` | `ReadConnection` |
+| `OrganizacaoRepository` | Grupos, Empresas, Filiais | `AcessoGlobalReadDbContext` | `ReadConnection` |
+| `UsuarioRepository` | Busca de usuário / Login | `AcessoGlobalReadDbContext` | `ReadConnection` |
+
+---
+
+## 6. Resumo dos Benefícios Garantidos
+
+1. **Alívio de Carga no Banco Principal:** Todas as buscas de telas e Grids paginadas leem da réplica sem travar locks nas transações de gravação.
+2. **Economia de RAM do Servidor:** `QueryTrackingBehavior.NoTracking` pré-configurado no contexto de leitura evita o consumo de memória do Change Tracker do EF Core em consultas de listagem.
+3. **Transparência para a Aplicação:** Os controllers e serviços de domínio mantêm suas interfaces intactas sem precisar saber qual conexão está sendo utilizada.
