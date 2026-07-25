@@ -197,49 +197,229 @@ Commit: `git commit -m "feat(db): Add PrefixoRota, CorHex, IconeMui to GloModulo
 
 Antes de build: verificar servidor ativo com `manage_task list` e matar se necessário.
 
+#### 2.1 — Entidades POCO (SEM DataAnnotations — Regra 1 do AGENTS.md)
+
 Criar em `src/Versatus.AcessoGlobal/Domain/Entities/`:
-- `GloModulo.cs` — com props: IdModulo, Nome, Ordem, ChaveModulo, TipoModulo, PrefixoRota?, CorHex?, IconeMui?
+- `GloModulo.cs` — props: IdModulo, Nome, Ordem, ChaveModulo, TipoModulo, PrefixoRota?, CorHex?, IconeMui?
 - `GloMenu.cs` — IdMenu, Descricao, Ordem
-- `GloMenuModulo.cs` — IdMenu, IdModulo, Ordem + navegação
-- `GloMenuMenu.cs` — IdMenu, IdMenuPai, Ordem + navegação (sem cascade delete)
-- `GloMenuRotina.cs` — IdMenu, IdRotina, Ordem + navegação
+- `GloMenuModulo.cs` — IdMenu, IdModulo, Ordem + props de navegação
+- `GloMenuMenu.cs` — IdMenu, IdMenuPai, Ordem + props de navegação
+- `GloMenuRotina.cs` — IdMenu, IdRotina, Ordem + props de navegação
 - `GloRotina.cs` — IdRotina, Nome, TipoRotina, Objeto?
-- `GloFavorito.cs` — IdFavorito, IdUsuario, IdRotina, Ordem + navegação
+- `GloFavorito.cs` — IdFavorito, IdUsuario, IdRotina, Ordem + prop de navegação
 
-Adicionar Fluent API no DbContext (nomes de tabelas e colunas legadas conforme Seção 4).
+#### 2.2 — Fluent API no DbContext (código COMPLETO obrigatório)
 
-Criar DTOs: `ModuloMenuDto`, `MenuItemDto`, `RotinaItemDto`, `FavoritoDto`.
+Adicionar em `OnModelCreating` do `VersatusDbContext`:
 
-Criar `MenuService` com métodos:
-- `ObterArvore()` — hierarquia recursiva, tudo em memória (ToListAsync)
-- `ObterFavoritos(int idUsuario)` — lista com dados completos
-- `AdicionarFavorito(int idUsuario, int idRotina)`
-- `RemoverFavorito(int idUsuario, int idRotina)`
+```csharp
+// GloModulo — tabela e colunas legadas
+modelBuilder.Entity<GloModulo>(e => {
+    e.ToTable("GloModulo");
+    e.HasKey(x => x.IdModulo);
+    e.Property(x => x.IdModulo).HasColumnName("IdGloModulo");
+    e.Property(x => x.TipoModulo).HasColumnName("IdTipoModulo");
+    e.Property(x => x.PrefixoRota).HasMaxLength(100).IsRequired(false);
+    e.Property(x => x.CorHex).HasMaxLength(7).IsRequired(false);
+    e.Property(x => x.IconeMui).HasMaxLength(50).IsRequired(false);
+});
 
-Criar `MenuController` com:
-- `GET /api/menu/arvore`
-- `GET /api/menu/favoritos` (idUsuario = 1 hardcoded)
-- `POST /api/menu/favoritos`
-- `DELETE /api/menu/favoritos/{idRotina}`
+// GloMenu
+modelBuilder.Entity<GloMenu>(e => {
+    e.ToTable("GloMenu");
+    e.HasKey(x => x.IdMenu);
+    e.Property(x => x.IdMenu).HasColumnName("IdGloMenu");
+    e.Property(x => x.Descricao).HasMaxLength(200).IsRequired();
+});
+
+// GloMenuModulo — PK composta
+modelBuilder.Entity<GloMenuModulo>(e => {
+    e.ToTable("GloMenuModulo");
+    e.HasKey(x => new { x.IdMenu, x.IdModulo });
+    e.Property(x => x.IdMenu).HasColumnName("IdGloMenu");
+    e.Property(x => x.IdModulo).HasColumnName("IdGloModulo");
+    e.HasOne(x => x.Menu).WithMany().HasForeignKey(x => x.IdMenu);
+    e.HasOne(x => x.Modulo).WithMany().HasForeignKey(x => x.IdModulo);
+});
+
+// GloMenuMenu — PK composta + sem cascade delete (auto-referência)
+modelBuilder.Entity<GloMenuMenu>(e => {
+    e.ToTable("GloMenuMenu");
+    e.HasKey(x => new { x.IdMenu, x.IdMenuPai });
+    e.Property(x => x.IdMenu).HasColumnName("IdGloMenu");
+    e.Property(x => x.IdMenuPai).HasColumnName("IdGloMenuPai");
+    e.HasOne(x => x.Menu)
+        .WithMany()
+        .HasForeignKey(x => x.IdMenu)
+        .OnDelete(DeleteBehavior.NoAction);
+    e.HasOne(x => x.MenuPai)
+        .WithMany()
+        .HasForeignKey(x => x.IdMenuPai)
+        .OnDelete(DeleteBehavior.NoAction);
+});
+
+// GloMenuRotina — PK composta
+modelBuilder.Entity<GloMenuRotina>(e => {
+    e.ToTable("GloMenuRotina");
+    e.HasKey(x => new { x.IdMenu, x.IdRotina });
+    e.Property(x => x.IdMenu).HasColumnName("IdGloMenu");
+    e.Property(x => x.IdRotina).HasColumnName("IdGloRotina");
+    e.HasOne(x => x.Menu).WithMany().HasForeignKey(x => x.IdMenu);
+    e.HasOne(x => x.Rotina).WithMany().HasForeignKey(x => x.IdRotina);
+});
+
+// GloRotina
+modelBuilder.Entity<GloRotina>(e => {
+    e.ToTable("GloRotina");
+    e.HasKey(x => x.IdRotina);
+    e.Property(x => x.IdRotina).HasColumnName("IdGloRotina");
+    e.Property(x => x.TipoRotina).HasColumnName("IdTipoRotina");
+    e.Property(x => x.Objeto).HasMaxLength(200).IsRequired(false);
+});
+
+// GloFavorito
+modelBuilder.Entity<GloFavorito>(e => {
+    e.ToTable("GloFavorito");
+    e.HasKey(x => x.IdFavorito);
+    e.Property(x => x.IdFavorito).HasColumnName("IdGloFavorito");
+    e.Property(x => x.IdRotina).HasColumnName("IdGloRotina");
+    e.HasOne(x => x.Rotina)
+        .WithMany()
+        .HasForeignKey(x => x.IdRotina)
+        .OnDelete(DeleteBehavior.NoAction);
+});
+```
+
+#### 2.3 — DTOs (incluindo CorHex e IconeMui obrigatórios)
+
+```csharp
+// ModuloMenuDto — CorHex e IconeMui DEVEM estar presentes (vêm do banco)
+public record ModuloMenuDto(
+    int IdModulo,
+    string Nome,
+    string? PrefixoRota,
+    string? IconeMui,   // nome do ícone MUI ex: "ReceiptLong"
+    string? CorHex,     // hexadecimal ex: "#2065D1"
+    int Ordem,
+    List<MenuItemDto> Menus
+);
+
+public record MenuItemDto(
+    int IdMenu, string Descricao, int Ordem,
+    List<MenuItemDto> SubMenus,
+    List<RotinaItemDto> Rotinas
+);
+
+public record RotinaItemDto(
+    int IdRotina, string Nome, string? Objeto,
+    int Ordem, string RotaCompleta
+    // RotaCompleta = modulo.PrefixoRota + "/" + rotina.Objeto (montado no MenuService)
+);
+
+public record FavoritoDto(
+    int IdFavorito, int IdRotina,
+    string NomeRotina, string RotaCompleta,
+    string NomeModulo,
+    string? CorHex,        // cor do módulo desta rotina (para badge)
+    string CaminhoCompleto // ex: "Faturamento → Cadastros → Clientes"
+);
+```
+
+#### 2.4 — MenuService (SQL Server 2008 — tudo em memória)
+
+Métodos obrigatórios:
+- `ObterArvore()` — carregar todos os módulos, menus, submenus e rotinas com `ToListAsync()` e montar a hierarquia em memória. `RotaCompleta = modulo.PrefixoRota + "/" + rotina.Objeto`
+- `ObterFavoritos(int idUsuario)` — carregar com `ToListAsync()` incluindo rotina e módulo
+- `AdicionarFavorito(int idUsuario, int idRotina)` — verificar se já existe antes de inserir
+- `RemoverFavorito(int idUsuario, int idRotina)` — retornar `Result<bool>` se não encontrado
+
+> ⚠️ PROIBIDO usar `.Skip().Take()` diretamente sobre `IQueryable` (Regra 7 do AGENTS.md)
+
+#### 2.5 — MenuController
+
+Endpoints (URL padrão — usar SEMPRE `/api/menu/` como prefixo):
+```
+GET    /api/menu/arvore              → List<ModuloMenuDto>
+GET    /api/menu/favoritos           → List<FavoritoDto>  (IdUsuario = 1 hardcoded)
+POST   /api/menu/favoritos           → body: { idRotina: int }
+DELETE /api/menu/favoritos/{idRotina}
+```
 
 Executar: `dotnet build src/Versatus.WebAPI/Versatus.WebAPI.csproj`
 Commit: `git commit -m "feat(backend): Add Menu navigation entities, DTOs, MenuService and MenuController"`
 
 ### FASE 3 — Frontend
 
-Criar:
-- `src/types/menu.ts` — interfaces TypeScript (ModuloMenuDto, MenuItemDto, RotinaItemDto, FavoritoDto)
-- `src/context/MenuContext.tsx` — estado global de navegação e favoritos
-- `src/hooks/useMenuArvore.ts` — busca árvore da API + localStorage
-- `src/hooks/useFavoritos.ts` — CRUD favoritos com toast (MUI Snackbar)
-- `src/components/layout/AppShell.tsx` — shell com TopBar + Sidebar + Outlet
-- `src/components/layout/TopBar.tsx` — logo + ModuleSelectorButton + search/avatar placeholder
-- `src/components/layout/ModuleSelectorButton.tsx` — botão com MUI Popover + grid de módulos
-- `src/components/layout/ContextualSidebar.tsx` — accordion não-exclusivo + seção favoritos colapsável
+#### 3.1 — Tipos TypeScript (`src/types/menu.ts`)
+As interfaces DEVEM espelhar os DTOs do backend exatamente:
+```typescript
+export interface ModuloMenuDto {
+  idModulo: number;
+  nome: string;
+  prefixoRota: string | null;
+  iconeMui: string | null;   // nome do ícone MUI — pode ser null (usar fallback 'Apps')
+  corHex: string | null;     // hex — pode ser null (gerar cor via hash do idModulo)
+  ordem: number;
+  menus: MenuItemDto[];
+}
+export interface MenuItemDto {
+  idMenu: number; descricao: string; ordem: number;
+  subMenus: MenuItemDto[]; rotinas: RotinaItemDto[];
+}
+export interface RotinaItemDto {
+  idRotina: number; nome: string; objeto: string | null;
+  ordem: number; rotaCompleta: string;
+}
+export interface FavoritoDto {
+  idFavorito: number; idRotina: number; nomeRotina: string;
+  rotaCompleta: string; nomeModulo: string;
+  corHex: string | null;    // cor do módulo (para badge colorida)
+  caminhoCompleto: string;  // ex: "Faturamento → Cadastros → Clientes"
+}
+```
 
-Modificar:
-- `src/main.tsx` — envolver com BrowserRouter
-- `src/App.tsx` — substituir Tabs por Routes com AppShell + 3 rotas existentes
+#### 3.2 — Hooks (URL padronizada: `/api/menu/`)
+- `src/hooks/useMenuArvore.ts` — `GET /api/menu/arvore` + recuperar módulo ativo do `localStorage` key `versatus_modulo_ativo`
+- `src/hooks/useFavoritos.ts` — endpoints:
+  - `GET /api/menu/favoritos`
+  - `POST /api/menu/favoritos`
+  - `DELETE /api/menu/favoritos/{idRotina}`
+  - Exibir MUI `Snackbar` + `Alert` (severity `success`/`error`, auto-hide 2500ms)
+
+#### 3.3 — Context (`src/context/MenuContext.tsx`)
+```typescript
+interface MenuContextState {
+  modulos: ModuloMenuDto[];
+  moduloAtivo: ModuloMenuDto | null;
+  setModuloAtivo: (m: ModuloMenuDto) => void; // persiste em localStorage
+  favoritos: FavoritoDto[];
+  adicionarFavorito: (rotina: RotinaItemDto, modulo: ModuloMenuDto) => void;
+  removerFavorito: (idRotina: number) => void;
+  isLoading: boolean;
+}
+```
+
+#### 3.4 — Componentes de Layout
+- `src/components/layout/AppShell.tsx` — `<TopBar>` + `<ContextualSidebar>` + `<Outlet>` (react-router-dom)
+- `src/components/layout/TopBar.tsx` — logo + `<ModuleSelectorButton>` + ícone busca/avatar (placeholders)
+- `src/components/layout/ModuleSelectorButton.tsx` — Pill estilizado + MUI Popover com grid de cards de módulos
+- `src/components/layout/ContextualSidebar.tsx` — accordion não-exclusivo + seção `⭐ Favoritos` colapsável
+
+#### 3.5 — Modificações em arquivos existentes
+- `src/main.tsx` — envolver app com `<BrowserRouter>`
+- `src/App.tsx` — substituir Tabs manuais por:
+```tsx
+<MenuProvider>
+  <Routes>
+    <Route path="/" element={<AppShell />}>
+      <Route index element={<Navigate to="/acesso-global/parametro" replace />} />
+      <Route path="/acesso-global/entidade" element={<FEntidade />} />
+      <Route path="/acesso-global/parametro" element={<FParametro />} />
+      <Route path="/acesso-global/condicao-pagamento" element={<FCondicaoPagamento />} />
+    </Route>
+  </Routes>
+</MenuProvider>
+```
 
 Executar: `cd src/Versatus.Frontend && npm run build`
 Commit: `git commit -m "feat(frontend): Add AppShell, TopBar, ModuleSelectorButton, ContextualSidebar with favorites"`
