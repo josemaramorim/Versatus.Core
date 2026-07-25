@@ -94,74 +94,82 @@ export const ContextualSidebar: React.FC = () => {
     const favorited = isFavorited(rotina.idRotina);
 
     return (
-      <ListItemButton
+      <Tooltip
         key={rotina.idRotina}
-        component={NavLink}
-        to={rotina.rotaCompleta}
-        sx={{
-          pl: collapsed ? 2 : 2 + level * 1.5,
-          pr: 1,
-          py: 0.75,
-          minHeight: 38,
-          borderRadius: 1,
-          mb: 0.2,
-          borderLeft: active ? `3px solid ${corHex}` : '3px solid transparent',
-          bgcolor: active ? alpha(corHex, 0.08) : 'transparent',
-          color: active ? corHex : 'text.secondary',
-          fontWeight: active ? 700 : 500,
-          '&:hover': {
-            bgcolor: alpha(corHex, 0.05),
-            color: 'text.primary',
-            '& .star-action-icon': {
-              opacity: 1
-            }
-          }
-        }}
+        title={rotina.nome}
+        placement="right"
+        enterDelay={400}
+        enterNextDelay={200}
+        arrow
       >
-        {!collapsed && (
-          <ListItemIcon sx={{ minWidth: 24, color: active ? corHex : 'text.disabled' }}>
-            <InsertDriveFileIcon style={{ fontSize: 16 }} />
-          </ListItemIcon>
-        )}
-        <ListItemText
-          primary={rotina.nome}
-          slotProps={{
-            primary: {
-              variant: 'body2',
-              noWrap: true,
-              sx: {
-                fontSize: '0.8125rem',
-                fontWeight: active ? 700 : 500
+        <ListItemButton
+          component={NavLink}
+          to={rotina.rotaCompleta}
+          sx={{
+            pl: collapsed ? 2 : 2 + level * 1.5,
+            pr: 1,
+            py: 0.75,
+            minHeight: 38,
+            borderRadius: 1,
+            mb: 0.2,
+            borderLeft: active ? `3px solid ${corHex}` : '3px solid transparent',
+            bgcolor: active ? alpha(corHex, 0.08) : 'transparent',
+            color: active ? corHex : 'text.secondary',
+            fontWeight: active ? 700 : 500,
+            '&:hover': {
+              bgcolor: alpha(corHex, 0.05),
+              color: 'text.primary',
+              '& .star-action-icon': {
+                opacity: 1
               }
             }
           }}
-        />
-
-        {!collapsed && (
-          <IconButton
-            size="small"
-            className="star-action-icon"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (favorited) {
-                removerFavorito(rotina.idRotina, rotina.nome);
-              } else {
-                adicionarFavorito(rotina.idRotina, rotina.nome);
+        >
+          {!collapsed && (
+            <ListItemIcon sx={{ minWidth: 24, color: active ? corHex : 'text.disabled' }}>
+              <InsertDriveFileIcon style={{ fontSize: 16 }} />
+            </ListItemIcon>
+          )}
+          <ListItemText
+            primary={rotina.nome}
+            slotProps={{
+              primary: {
+                variant: 'body2',
+                noWrap: true,
+                sx: {
+                  fontSize: '0.8125rem',
+                  fontWeight: active ? 700 : 500
+                }
               }
             }}
-            sx={{
-              p: 0.25,
-              opacity: favorited ? 1 : 0,
-              transition: 'opacity 0.2s',
-              color: favorited ? '#F59E0B' : 'text.disabled',
-              '&:hover': { color: '#F59E0B' }
-            }}
-          >
-            {favorited ? <StarIcon style={{ fontSize: 16 }} /> : <StarBorderIcon style={{ fontSize: 16 }} />}
-          </IconButton>
-        )}
-      </ListItemButton>
+          />
+
+          {!collapsed && (
+            <IconButton
+              size="small"
+              className="star-action-icon"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (favorited) {
+                  removerFavorito(rotina.idRotina, rotina.nome);
+                } else {
+                  adicionarFavorito(rotina.idRotina, rotina.nome);
+                }
+              }}
+              sx={{
+                p: 0.25,
+                opacity: favorited ? 1 : 0,
+                transition: 'opacity 0.2s',
+                color: favorited ? '#F59E0B' : 'text.disabled',
+                '&:hover': { color: '#F59E0B' }
+              }}
+            >
+              {favorited ? <StarIcon style={{ fontSize: 16 }} /> : <StarBorderIcon style={{ fontSize: 16 }} />}
+            </IconButton>
+          )}
+        </ListItemButton>
+      </Tooltip>
     );
   };
 
