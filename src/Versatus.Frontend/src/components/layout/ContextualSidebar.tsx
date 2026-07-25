@@ -31,7 +31,7 @@ const SIDEBAR_WIDTH_EXPANDED = 240;
 const SIDEBAR_WIDTH_COLLAPSED = 64;
 
 export const ContextualSidebar: React.FC = () => {
-  const { moduloAtivo, favoritos, adicionarFavorito, removerFavorito } = useMenu();
+  const { modulos, moduloAtivo, setModuloAtivo, favoritos, adicionarFavorito, removerFavorito } = useMenu();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -40,6 +40,20 @@ export const ContextualSidebar: React.FC = () => {
   const [openAccordionIds, setOpenAccordionIds] = useState<number[]>([]);
 
   const corHex = moduloAtivo?.corHex || '#2065D1';
+
+  // Sincroniza o módulo ativo com a rota atual da URL quando o usuário navega (ex: via Favoritos ou Link direto)
+  useEffect(() => {
+    if (!modulos || modulos.length === 0) return;
+    const currentPath = location.pathname;
+
+    const targetModulo = modulos.find(
+      (m) => m.prefixoRota && m.prefixoRota !== '/' && currentPath.startsWith(m.prefixoRota)
+    );
+
+    if (targetModulo && moduloAtivo?.idModulo !== targetModulo.idModulo) {
+      setModuloAtivo(targetModulo);
+    }
+  }, [location.pathname, modulos, moduloAtivo, setModuloAtivo]);
 
   // Carrega estado dos accordions do localStorage por módulo
   useEffect(() => {
