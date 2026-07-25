@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -7,22 +6,14 @@ import {
   Box,
   IconButton,
   Avatar,
-  Tooltip,
-  Chip,
-  alpha
+  Tooltip
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import StarIcon from '@mui/icons-material/Star';
-import CloseIcon from '@mui/icons-material/Close';
 import { ModuleSelectorButton } from './ModuleSelectorButton';
-import { useMenu } from '../../context/MenuContext';
+import { FavoritesSelectorButton } from './FavoritesSelectorButton';
 
 export const TopBar: React.FC = () => {
-  const { favoritos, removerFavorito } = useMenu();
-  const location = useLocation();
-  const navigate = useNavigate();
-
   return (
     <AppBar
       position="sticky"
@@ -41,7 +32,7 @@ export const TopBar: React.FC = () => {
           variant="h6"
           component="div"
           sx={{
-            mr: 2,
+            mr: 2.5,
             fontWeight: 800,
             letterSpacing: '-0.5px',
             color: 'primary.main',
@@ -61,60 +52,11 @@ export const TopBar: React.FC = () => {
           </Typography>
         </Typography>
 
-        <ModuleSelectorButton />
-
-        {/* Barra de Favoritos rápida na TopBar */}
-        {favoritos.length > 0 && (
-          <Box
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-              alignItems: 'center',
-              gap: 0.75,
-              ml: 2,
-              maxWidth: '45vw',
-              overflowX: 'auto',
-              py: 0.5,
-              '&::-webkit-scrollbar': { height: 3 },
-              '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.1)', borderRadius: 2 }
-            }}
-          >
-            {favoritos.map((fav) => {
-              const active = location.pathname === fav.rotaCompleta;
-              const chipColor = fav.corHex || '#2065D1';
-
-              return (
-                <Tooltip key={fav.idFavorito} title={`${fav.nomeModulo} > ${fav.nomeRotina}`}>
-                  <Chip
-                    size="small"
-                    icon={<StarIcon style={{ fontSize: 13, color: '#F59E0B' }} />}
-                    label={fav.nomeRotina}
-                    onClick={() => navigate(fav.rotaCompleta)}
-                    onDelete={(e) => {
-                      e.stopPropagation();
-                      removerFavorito(fav.idRotina, fav.nomeRotina);
-                    }}
-                    deleteIcon={<CloseIcon style={{ fontSize: 12 }} />}
-                    sx={{
-                      height: 26,
-                      fontSize: '0.75rem',
-                      fontWeight: active ? 700 : 500,
-                      bgcolor: active ? alpha(chipColor, 0.15) : 'action.hover',
-                      color: active ? chipColor : 'text.primary',
-                      border: active ? `1px solid ${alpha(chipColor, 0.4)}` : '1px solid transparent',
-                      cursor: 'pointer',
-                      flexShrink: 0,
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        bgcolor: alpha(chipColor, 0.2),
-                        transform: 'translateY(-1px)'
-                      }
-                    }}
-                  />
-                </Tooltip>
-              );
-            })}
-          </Box>
-        )}
+        {/* Botões seletores de Módulo e Favoritos */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <ModuleSelectorButton />
+          <FavoritesSelectorButton />
+        </Box>
 
         <Box sx={{ flexGrow: 1 }} />
 
