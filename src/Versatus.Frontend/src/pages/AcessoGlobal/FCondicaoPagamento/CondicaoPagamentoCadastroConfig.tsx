@@ -165,12 +165,6 @@ export class CondicaoPagamentoCadastroConfig extends BaseCadastroConfig<ICondica
   getColunas(): IColunaConfig<ICondicaoPagamentoForm>[] {
     return [
       {
-        header: 'Código',
-        field: 'idCondicaoPagamento',
-        width: 100,
-        sortable: true,
-      },
-      {
         header: 'Descrição',
         field: 'descricao',
         sortable: true,
