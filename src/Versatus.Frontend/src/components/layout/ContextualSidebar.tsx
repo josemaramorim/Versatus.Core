@@ -270,15 +270,8 @@ export const ContextualSidebar: React.FC = () => {
         </IconButton>
       </Box>
 
-      {/* Título do Módulo Ativo */}
-      {!collapsed && moduloAtivo && (
-        <Typography variant="overline" sx={{ color: 'text.disabled', px: 2, pt: 1, pb: 0.5, letterSpacing: 1.1 }}>
-          {moduloAtivo.nome}
-        </Typography>
-      )}
-
       {/* Árvore de Menus do Módulo Ativo */}
-      <Box sx={{ px: 1, pb: 4 }}>
+      <Box sx={{ px: 1, pt: 1, pb: 4 }}>
         {moduloAtivo?.menus.map((menu) => renderMenuItem(menu))}
       </Box>
     </Drawer>
