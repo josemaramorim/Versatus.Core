@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import type { ZodTypeAny } from 'zod';
 import type { IColunaConfig, IFiltroConfig } from '../../../types/cadastro';
 import { BaseCadastroConfig } from '../../../types/cadastro';
@@ -200,7 +201,17 @@ export class CondicaoPagamentoCadastroConfig extends BaseCadastroConfig<ICondica
         field: 'ativo',
         width: 120,
         sortable: true,
-        renderCell: (record) => (record.ativo ? 'Ativo' : 'Inativo'),
+        renderCell: (record) => (
+          <Box
+            component="span"
+            sx={{
+              fontWeight: 600,
+              color: record.ativo ? 'success.main' : 'error.main'
+            }}
+          >
+            {record.ativo ? 'Ativo' : 'Inativo'}
+          </Box>
+        ),
       },
     ];
   }
