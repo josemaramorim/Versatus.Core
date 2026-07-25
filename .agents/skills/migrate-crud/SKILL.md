@@ -1,11 +1,11 @@
 ---
 name: migrate-crud
-description: Pipeline de migração automatizada de formulários legados (C#) para a arquitetura .NET 10 + React OOP.
+description: Pipeline de migração automatizada de formulários legados (C#) para a arquitetura .NET 10 + React OOP seguindo SOLID, Clean Architecture e Clean Code.
 ---
 
 # Skill: migrate-crud
 
-Este skill guia o agente através do pipeline de migração de formulários do ERP legado para o novo sistema.
+Este skill guia o agente através do pipeline de migração de formulários do ERP legado para o novo sistema, garantindo conformidade com **SOLID, Clean Architecture, Clean Code e recursos modernos do .NET 10**.
 
 ---
 
@@ -89,6 +89,7 @@ Quando o usuário solicitar a migração:
    - Verifique o esquema do banco de dados legado (ou campos condicionais do formulário). Propriedades que aceitam `NULL` no banco ou que são preenchidas apenas em determinadas abas/tipos DEVEM ser declaradas como nulas (`int?`, `decimal?`, enums nulos) na entidade C# para evitar exceções de runtime `SqlNullValueException: Data is Null`.
 6. Execute a **Classificação Obrigatória** da Seção 0 e documente o resultado.
 7. Gere a Spec Funcional em `docs/spec_f[nome].md` seguindo rigorosamente o formato de `docs/spec_fentidade.md`.
+   - **[OBRIGATÓRIO] Requisitos Arquiteturais (SOLID / Clean Architecture):** Documente na Spec que a implementação backend deverá respeitar a separação Clean Architecture (Domain POCO, Application/Services, Infrastructure EF Core Mapping, Api Controller limpo) e comunicação via Result Pattern.
    - **[OBRIGATÓRIO] Critérios de Aceite:** Inclua a seção `## 7. Critérios de Aceite (Cenários de Teste)` detalhando o comportamento em cenários felizes (ex: busca/listagem com filtros, retorno `200/201`), cenários de falha via Result Pattern (`400 BadRequest` com `ValidationError`), alinhamento de nulidade e regras de UI/UX.
    - Para Padrão B [LOTE]: documente os endpoints `/escopo` e `/salvar-valores`, o agrupador, os escopos suportados e as regras de ocultação dos botões.
 8. Use o arquivo `references/FRONTEND/enum_mapping_guide.md` para identificar mapeamentos de enums legados.
@@ -101,13 +102,16 @@ Quando o usuário solicitar a migração:
 
 Após aprovação da Spec Funcional pelo usuário:
 
+> [!IMPORTANT]
+> **Boas Práticas C# / .NET 10 / SOLID / Clean Architecture:**
+> - **Domain:** Classes POCO puras em `Domain/Entities/`, sem DataAnnotations, com file-scoped namespaces e Nullable Reference Types habilitados.
+> - **SOLID & Injeção de Dependência:** Interfaces desacopladas em `Domain/Services/I[Nome]Service.cs` e `Domain/Repositories/`. Injeção via construtor no Controller.
+> - **Clean Code:** Métodos focados, nomes expressivos alinhados à Spec.
+> - **Result Pattern:** PROIBIDO usar `throw new ...Exception(...)` para indicar erros de validação de dados ou falta de registros. Sempre retornar `Result<T>` com `ValidationError`.
+
 > [!WARNING]
 > **SQL Server 2008:** O banco de dados NÃO suporta OFFSET/FETCH nativos do EF Core.
 > Sempre buscar para memória com ToListAsync() antes de paginar com .Skip().Take() na camada de serviço. Nunca use .Skip().Take() diretamente na query do banco.
-
-> [!WARNING]
-> **Padrão de Erros funcional (Result Pattern):** PROIBIDO usar `throw new ...Exception(...)` para indicar erros de validação de dados ou quando registros não forem encontrados para atualização/exclusão.
-> Sempre retornar `Result<T>` ou `ValidationResult` encapsulando instâncias de `ValidationError`. O Controller deve checar `!result.IsSuccess` e retornar `400 BadRequest(new { message = ..., errors = result.Errors })`.
 
 > [!WARNING]
 > **Lock de DLL:** Se dotnet run estiver ativo (servidor rodando), dotnet build falhará por lock nos arquivos DLL.
@@ -124,6 +128,7 @@ Após aprovação da Spec Funcional pelo usuário:
    - Se o DTO de resposta ler propriedades navegáveis filhas (ex: `Regras`, `Itens`), inclua `.Include(x => x.[Colecao])` na query paginada para evitar referências nulas.
    - Suporte filtros adicionais relevantes no método de paginação (`disponibilidade`, `ativo`, `status`, etc.).
 5. Crie o controlador REST em `src/Versatus.[Modulo]/Api/Controllers/[Nome]Controller.cs`.
+   - Controller enxuto delegando para `I[Nome]Service`.
    - Exponha parâmetros adicionais de filtro via `[FromQuery]`.
    - Trate retornos do tipo `Result<T>`, convertendo falhas de validação em `400 BadRequest`.
 6. Encerre o servidor se necessário.
@@ -143,14 +148,14 @@ Após a compilação limpa do backend:
 1. Crie a pasta do formulário em `src/Versatus.Frontend/src/pages/[Modulo]/F[Nome]/`.
 2. Crie `types.ts` contendo `I[Nome]Form` e `defaultValues`.
 3. Crie `schema.ts` com as regras de validação Zod baseadas na Spec.
-4. Crie `[Nome]CadastroConfig.tsx` estendendo `BaseCadastroConfig<T>`.
+4. Crie `[Nome]CadastroConfig.tsx` estendendo `BaseCadastroConfig<T>` (OOP / Clean Architecture no frontend).
    - Sobrescreva `mapBackendToForm` e `mapFormToBackend` se houver diferenças de enums ou estrutura.
    - Configure em `getFiltros()` os filtros específicos da tela (ex: texto de busca, seletores de status/disponibilidade).
 5. Crie `index.tsx` com a View do formulário:
    - **[CRUD]** Grid paginado + botões Novo/Editar/Excluir usando MUI.
    - **[LOTE]** Accordions **fechados por padrão**, agrupados pelo campo Agrupador. Cada item exibe: (a) Descrição em destaque, (b) Chave técnica como subtexto, (c) campo de edição inline condicionado ao tipo. Botões Novo e Excluir completamente ausentes do JSX.
-   - **[OBRIGATÓRIO] Sinalização visual de obrigatoriedade:** Todo campo definido como obrigatório na Spec (`✅`) DEVE receber a prop `required` no componente MUI (`TextField`, `FormControl`). O MUI exibirá o asterisco `*` automaticamente no label. Omitir `required` é proibido pela Regra 9 do AGENTS.md.
-   - **[OBRIGATÓRIO] Checklist de Cobertura de Propriedades:** Antes de finalizar o JSX de `index.tsx`, compare a lista de propriedades da interface `I[Nome]Form` com o formulário e garanta que TODAS as propriedades editáveis (como `ativo`/`situacao`, flags, observações) tenham componentes de entrada (TextField, Switch, Checkbox, Select) correspondentes na tela. Omitir campos do DTO na UI é proibido pela Regra 2 do AGENTS.md.
+   - **[OBRIGATÓRIO] Sinalização visual de obrigatoriedade:** Todo campo definido como obrigatório na Spec (`✅`) DEVE receber a prop `required` no componente MUI (`TextField`, `FormControl`). O MUI exibirá o asterisco `*` automaticamente no label. Omitir `required` é proibido pela Regra 10 do AGENTS.md.
+   - **[OBRIGATÓRIO] Checklist de Cobertura de Propriedades:** Antes de finalizar o JSX de `index.tsx`, compare a lista de propriedades da interface `I[Nome]Form` com o formulário e garanta que TODAS as propriedades editáveis (como `ativo`/`situacao`, flags, observações) tenham componentes de entrada (TextField, Switch, Checkbox, Select) correspondentes na tela. Omitir campos do DTO na UI é proibido pela Regra 3 do AGENTS.md.
 6. Execute `npm run build` na pasta do frontend. Corrija quaisquer erros ou warnings de tipo.
 7. Crie o commit: `git commit -m "feat(frontend): Add F[Nome] page, schema, types and config"`.
 

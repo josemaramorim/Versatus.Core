@@ -1,4 +1,4 @@
-﻿# Prompt Genérico — Migração de Formulário Legado para .NET 10 + React
+# Prompt Genérico — Migração de Formulário Legado para .NET 10 + React
 
 > **Como usar:**
 > 1. Copie o bloco de prompt abaixo
@@ -14,16 +14,17 @@ Você é um agente especializado na migração do sistema legado Versatus (Delph
 ## 1. LEITURA OBRIGATÓRIA ANTES DE QUALQUER AÇÃO
 Leia os seguintes arquivos nesta ordem antes de escrever qualquer código ou spec:
 
-1. `.agents/AGENTS.md` — Regras e leis do projeto (9 regras ativas)
+1. `.agents/AGENTS.md` — Regras e leis do projeto (10 regras ativas, incluindo SOLID, Clean Architecture e Clean Code)
 2. `.agents/skills/migrate-crud/SKILL.md` — Pipeline de migração completo (4 fases)
 3. `docs/spec_fentidade.md` — Template padrão de Spec Funcional
 4. `specs/00-INDICE-GERAL.md` — Índice geral dos módulos já mapeados
 5. `specs/03-REGRAS-ANTI-ALUCINACAO.md` — Regras de fidelidade ao legado
 
-## 2. CONTEXTO DO PROJETO
+## 2. CONTEXTO DO PROJETO E PREMISSAS ARQUITETURAIS
+- **Princípios Fundamentais:** SOLID, Clean Architecture, Clean Code e Boas Práticas do .NET 10
 - **Banco de dados:** SQL Server 2008 (sem OFFSET/FETCH — paginação obrigatória em memória)
-- **Backend:** .NET 10, Clean Architecture, EF Core com Fluent API, Result<T> Pattern
-- **Frontend:** React + TypeScript + Material-UI (MUI), BaseCadastroConfig<T> OOP
+- **Backend:** .NET 10, Clean Architecture (Domain POCOs puras, Infrastructure Fluent API, Controllers limpos, Result<T> Pattern para erros funcionais)
+- **Frontend:** React + TypeScript + Material-UI (MUI), BaseCadastroConfig<T> OOP, Zod Validation
 - **Branch atual:** develop (limpa e atualizada)
 - **Formulários já migrados:** FParametro (Padrão B), FCondicaoPagamento e FEntidade (Padrão A)
 
@@ -70,7 +71,7 @@ Ao ler os arquivos acima, produza um mapeamento completo antes de gerar qualquer
 | 3 | Observacao        | string      | SIM       | Sim                 | Não         | Textarea   |
 | 4 | DataAuditoria     | DateTime    | SIM       | Não (sistema)       | —           | Apenas auditoria |
 
-AVISO: Nenhuma propriedade editável pode ficar fora da UI (Regra 2 do AGENTS.md).
+AVISO: Nenhuma propriedade editável pode ficar fora da UI (Regra 3 do AGENTS.md).
 AVISO: Campos com NULL no banco devem virar tipos anuláveis no C# (int?, string?, etc).
 
 ## 5. TAREFA — PIPELINE DE MIGRAÇÃO
@@ -79,17 +80,18 @@ Siga rigorosamente o pipeline da SKILL.md fase a fase:
 **Fase 1 — Spec Funcional:**
 - Classifique o formulário como Padrão A (CRUD) ou Padrão B (Lote)
 - Use o mapeamento da seção 4 para garantir cobertura 100% das propriedades
-- Inclua: endpoints, validações e regras de negócio extraídas do .cs de negócio
+- Inclua: requisitos de Clean Architecture, Result Pattern, endpoints, validações e regras de negócio extraídas do .cs de negócio
 - Inclua: layout de abas e campos extraídos do .cs de formulário
 - Gere a spec em `docs/spec_f[nome].md` com Critérios de Aceite
 - PARE e aguarde minha aprovação antes de gerar qualquer código
 
 **Fase 2 — Backend C#:**
 - Somente após aprovação da Spec
-- Entidade POCO pura + Fluent API (sem DataAnnotations)
+- Entidade POCO pura em Domain (sem DataAnnotations) + Fluent API na Infrastructure
+- Respeitar SOLID (Inversão de Dependência via interfaces IService/IRepository) e Clean Code
+- File-scoped namespaces e Nullable Reference Types habilitados
 - Colunas NULL no banco → tipos anuláveis (int?, string?) na entidade C#
-- Validações e regras de negócio extraídas do .cs legado → Result<T>
-- Nunca usar throw new Exception() para falhas de negócio
+- Validações e regras de negócio extraídas do .cs legado → Result<T> (nunca usar throw new Exception() para falhas de negócio)
 - Execute `dotnet build` e corrija todos os erros antes de continuar
 
 **Fase 3 — Frontend React:**
@@ -106,6 +108,7 @@ Siga rigorosamente o pipeline da SKILL.md fase a fase:
   e alternar o ambiente de trabalho para develop
 
 ## 6. RESTRIÇÕES CRÍTICAS (AGENTS.md)
+- Obrigatorio: seguir SOLID, Clean Architecture, Clean Code e recursos modernos do .NET 10
 - Proibido: commitar em `main` ou `develop` diretamente
 - Proibido: usar .Skip().Take() sobre IQueryable não materializado
 - Proibido: omitir campos editáveis da entidade na UI
