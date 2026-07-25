@@ -235,7 +235,7 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
       },
       {
         field: 'razaoSocial',
-        label: 'Razão Social / Nome',
+        label: 'Nome / Razão Social',
         type: 'text'
       },
       {
