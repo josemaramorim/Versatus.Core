@@ -7,6 +7,9 @@ GO
 IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('GloModulo') AND name = 'IconeMui')
     ALTER TABLE GloModulo ADD IconeMui VARCHAR(50) NULL;
 GO
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID('GloRotina') AND name = 'RotaWeb')
+    ALTER TABLE GloRotina ADD RotaWeb VARCHAR(100) NULL;
+GO
 
 UPDATE GloModulo SET PrefixoRota='/acesso-global',    CorHex='#637381', IconeMui='ManageAccounts'     WHERE IdGloModulo = 1;
 UPDATE GloModulo SET PrefixoRota='/financeiro',       CorHex='#10B981', IconeMui='AccountBalance'     WHERE IdGloModulo = 2;
@@ -37,6 +40,12 @@ UPDATE GloModulo SET PrefixoRota='/mdfe',             CorHex='#374151', IconeMui
 UPDATE GloModulo SET PrefixoRota='/armazem',          CorHex='#78350F', IconeMui='Warehouse'          WHERE IdGloModulo = 27;
 UPDATE GloModulo SET PrefixoRota='/nfse',             CorHex='#0369A1', IconeMui='Receipt'            WHERE IdGloModulo = 28;
 UPDATE GloModulo SET PrefixoRota='/epay',             CorHex='#065F46', IconeMui='Payment'            WHERE IdGloModulo = 29;
+GO
+
+-- Rotas migradas no módulo Acesso Global
+UPDATE GloRotina SET RotaWeb = 'entidade'           WHERE IdGloRotina = 23;
+UPDATE GloRotina SET RotaWeb = 'condicao-pagamento' WHERE IdGloRotina = 24;
+UPDATE GloRotina SET RotaWeb = 'parametro'          WHERE IdGloRotina = 25;
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'GloFavorito')
