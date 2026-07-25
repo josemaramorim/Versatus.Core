@@ -7,7 +7,12 @@ namespace Versatus.GestaoTributo.Infrastructure;
 
 public class TributoDbContext : DbContext
 {
-    public TributoDbContext(DbContextOptions options)
+    public TributoDbContext(DbContextOptions<TributoDbContext> options)
+        : base(options)
+    {
+    }
+
+    protected TributoDbContext(DbContextOptions options)
         : base(options)
     {
     }
