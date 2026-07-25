@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Análise Tecnológica Frontend — Versatus ERP Web</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand: #1e40af;
+      --brand-light: #dbeafe;
+      --brand-dark: #1e3a8a;
+      --accent: #0ea5e9;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --danger: #dc2626;
+      --danger-bg: #fee2e2;
+      --warning: #d97706;
+      --warning-bg: #fef3c7;
+      --neutral: #64748b;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── COVER ── */
+    .cover {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 45%, #0ea5e9 100%);
+      color: white;
+      padding: 80px 60px 60px;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      top: -150px; right: -150px;
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      bottom: -80px; left: 60px;
+    }
+    .cover-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 24px;
+    }
+    .cover h1 {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1.2;
+      max-width: 700px;
+      margin-bottom: 20px;
+    }
+    .cover h1 span { color: #7dd3fc; }
+    .cover-subtitle {
+      font-size: 17px;
+      opacity: 0.85;
+      max-width: 600px;
+      margin-bottom: 50px;
+      font-weight: 300;
+    }
+    .cover-meta {
+      display: flex; gap: 40px; flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 30px;
+      font-size: 13px;
+    }
+    .cover-meta-item label { display: block; opacity: 0.6; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+    .cover-meta-item strong { font-size: 15px; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 40px; }
+    .section { padding: 60px 0 20px; }
+
+    /* ── SECTION HEADER ── */
+    .section-num {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--brand);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .section h2 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 680px;
+      margin-bottom: 36px;
+    }
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+    /* ── CONTEXT BOX ── */
+    .context-box {
+      background: var(--brand-light);
+      border-left: 4px solid var(--brand);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      font-size: 14px;
+      color: var(--brand-dark);
+    }
+    .context-box strong { font-weight: 700; }
+
+    /* ── TECH CARDS ── */
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media(max-width:680px) { .tech-grid { grid-template-columns: 1fr; } }
+
+    .tech-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: box-shadow .2s;
+    }
+    .tech-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+    .tech-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .tech-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .tech-card h3 { font-size: 16px; font-weight: 700; }
+    .tech-card .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+    .badge-ok { background: var(--success-bg); color: var(--success); }
+    .badge-no { background: var(--danger-bg); color: var(--danger); }
+    .badge-warn { background: var(--warning-bg); color: var(--warning); }
+
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .pros, .cons { font-size: 13px; }
+    .pros strong, .cons strong { display: block; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    .pros strong { color: var(--success); }
+    .cons strong { color: var(--danger); }
+    .pros li, .cons li { list-style: none; padding-left: 18px; position: relative; margin-bottom: 5px; color: var(--text-muted); }
+    .pros li::before { content: '✓'; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+    .cons li::before { content: '✗'; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
+
+    .verdict {
+      margin-top: 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .verdict strong { color: var(--text); }
+
+    /* ── FULL-WIDTH CARD ── */
+    .tech-card-full {
+      grid-column: 1 / -1;
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .comparison-wrap { overflow-x: auto; margin-bottom: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: var(--surface);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    thead th {
+      background: var(--brand);
+      color: white;
+      font-weight: 600;
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+    thead th:first-child { border-radius: 0; }
+    tbody tr:nth-child(even) td { background: #f8fafc; }
+    tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody td:first-child { font-weight: 600; color: var(--text); }
+    .stars { color: #f59e0b; letter-spacing: -2px; font-size: 13px; }
+    .td-yes { color: var(--success); font-weight: 700; }
+    .td-no { color: var(--danger); font-weight: 700; }
+    .td-cur { background: #eff6ff !important; font-weight: 700; }
+
+    /* ── RISK TABLE ── */
+    .risk-table td, .risk-table th { font-size: 13.5px; }
+
+    /* ── DECISION CARDS ── */
+    .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    .decision-card {
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid transparent;
+    }
+    .decision-card.green { background: var(--success-bg); border-color: #86efac; }
+    .decision-card.red { background: var(--danger-bg); border-color: #fca5a5; }
+    .decision-card.yellow { background: var(--warning-bg); border-color: #fcd34d; }
+    .decision-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .decision-card.green h4 { color: var(--success); }
+    .decision-card.red h4 { color: var(--danger); }
+    .decision-card.yellow h4 { color: var(--warning); }
+    .decision-card ul { list-style: none; font-size: 13px; color: var(--text-muted); }
+    .decision-card li { padding: 4px 0 4px 20px; position: relative; }
+    .decision-card.green li::before { content: '✓'; position: absolute; left: 0; color: var(--success); font-weight: 700; }
+    .decision-card.red li::before { content: '✗'; position: absolute; left: 0; color: var(--danger); font-weight: 700; }
+    .decision-card.yellow li::before { content: '→'; position: absolute; left: 0; color: var(--warning); font-weight: 700; }
+
+    /* ── RECOMMENDATION ── */
+    .recommendation {
+      background: linear-gradient(135deg, #1e3a8a, #1e40af);
+      color: white;
+      border-radius: 16px;
+      padding: 40px;
+      margin: 40px 0;
+    }
+    .recommendation h3 { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+    .recommendation p { opacity: 0.88; font-size: 15px; max-width: 720px; }
+    .recommendation .rec-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 10px;
+    }
+
+    /* ── ACTION PLAN ── */
+    .steps { counter-reset: step; display: flex; flex-direction: column; gap: 16px; }
+    .step {
+      counter-increment: step;
+      display: flex;
+      gap: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--brand-light);
+      color: var(--brand);
+      font-weight: 800; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-num::before { content: counter(step); }
+    .step-body h4 { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    .step-body p { font-size: 13px; color: var(--text-muted); }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-radius: 10px;
+      padding: 18px 22px;
+      font-size: 14px;
+      margin: 24px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .callout.info { background: var(--brand-light); color: var(--brand-dark); border: 1px solid #93c5fd; }
+    .callout.warn { background: var(--warning-bg); color: #78350f; border: 1px solid #fcd34d; }
+    .callout strong { font-weight: 700; display: block; margin-bottom: 4px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #1e293b;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 30px;
+      font-size: 12px;
+      margin-top: 60px;
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .recommendation { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section { page-break-inside: avoid; }
+      body { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div style="position:relative;z-index:1">
+    <div class="cover-label">Versatus ERP · Análise Técnica · 2025</div>
+    <h1>Escolha da Tecnologia de <span>Frontend Web</span></h1>
+    <p class="cover-subtitle">
+      Análise comparativa entre React, Blazor WebAssembly, Angular e outras alternativas
+      para um time com foco em C# migrando um ERP legado para a web.
+    </p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <label>Projeto</label>
+        <strong>Versatus ERP Web (.NET 10)</strong>
+      </div>
+      <div class="cover-meta-item">
+        <label>Data</label>
+        <strong>Julho 2025</strong>
+      </div>
+      <div class="cover-meta-item">
+        <label>Público-alvo</label>
+        <strong>Equipe Técnica & Gestão</strong>
+      </div>
+      <div class="cover-meta-item">
+        <label>Status</label>
+        <strong>Para deliberação</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="container">
+
+  <!-- SECTION 1: CONTEXTO -->
+  <div class="section">
+    <div class="section-num">01 — Contexto</div>
+    <h2>O que estamos decidindo?</h2>
+    <p class="section-desc">
+      O sistema ERP Versatus está sendo migrado de um cliente desktop (WinForms + C#) para uma plataforma web moderna. O backend já foi definido — .NET 10 com API REST. A decisão em aberto é: <strong>qual tecnologia usaremos no frontend?</strong>
+    </p>
+
+    <div class="context-box">
+      <strong>Restrições do ambiente:</strong><br/>
+      Backend definido em .NET 10 · Banco SQL Server 2008 legado · Time com background predominante em C# ·
+      Objetivo: acesso via browser (zero-install) · Produto ERP corporativo (não SaaS público)
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div>
+        <strong>Sobre a stack atual</strong>
+        O projeto já tem código produzido em <strong>React 19 + TypeScript + MUI v9</strong>: infraestrutura CRUD OOP, 
+        formulários de Entidade e Condição de Pagamento, sistema de menu dinâmico com favoritos, autenticação e layout completo.
+        Qualquer migração agora implica descartar esse trabalho.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SECTION 2: ALTERNATIVAS -->
+  <div class="section">
+    <div class="section-num">02 — Alternativas Avaliadas</div>
+    <h2>As tecnologias sob análise</h2>
+    <p class="section-desc">Avaliamos seis tecnologias considerando o contexto do projeto: time C#, ERP corporativo, acesso via browser.</p>
+
+    <div class="tech-grid">
+
+      <!-- REACT -->
+      <div class="tech-card">
+        <div class="tech-card-header">
+          <div class="tech-icon" style="background:#f0f9ff">⚛️</div>
+          <div>
+            <h3>React 19<span class="badge badge-warn">Stack atual</span></h3>
+            <div style="font-size:12px;color:var(--text-muted)">Meta · TypeScript · MUI v9</div>
+          </div>
+        </div>
+        <div class="pros-cons">
+          <ul class="pros"><strong>Prós</strong>
+            <li>Ecossistema mais rico do mercado</li>
+            <li>Maior pool de vagas/freelancers</li>
+            <li>Performance de renderização excelente</li>
+            <li>Biblioteca de componentes premium (MUI)</li>
+            <li>Debugging avançado (DevTools)</li>
+            <li>Suporte PWA e offline</li>
+          </ul>
+          <ul class="cons"><strong>Contras</strong>
+            <li>Exige JavaScript/TypeScript</li>
+            <li>Curva alta para time 100% C#</li>
+            <li>Ecossistema separado do .NET</li>
+            <li>Sem compartilhamento de modelos</li>
+          </ul>
+        </div>
+        <div class="verdict"><strong>Veredicto:</strong> Melhor opção técnica de mercado, porém exige fluência em TypeScript que o time atual não possui.</div>
+      </div>
+
+      <!-- BLAZOR WASM -->
+      <div class="tech-card">
+        <div class="tech-card-header">
+          <div class="tech-icon" style="background:#eff6ff">🔷</div>
+          <div>
+            <h3>Blazor WebAssembly<span class="badge badge-ok">Recomendado p/ C#</span></h3>
+            <div style="font-size:12px;color:var(--text-muted)">Microsoft · C# · MudBlazor / Radzen</div>
+          </div>
+        </div>
+        <div class="pros-cons">
+          <ul class="pros"><strong>Prós</strong>
+            <li>Time escreve C# puro</li>
+            <li>Compartilha DTOs e validações com o backend</li>
+            <li>IntelliSense e tooling do Visual Studio</li>
+            <li>Fortemente tipado sem configuração extra</li>
+            <li>Suporte offline (PWA)</li>
+            <li>Ecossistema Microsoft (Azure, Entra ID)</li>
+          </ul>
+          <ul class="cons"><strong>Contras</strong>
+            <li>Bundle inicial de 5–15 MB</li>
+            <li>Performance inferior ao React em listas grandes</li>
+            <li>Ecossistema de componentes menor</li>
+            <li>Debugging no browser mais limitado</li>
+            <li>Menos vagas no mercado</li>
+          </ul>
+        </div>
+        <div class="verdict"><strong>Veredicto:</strong> Estrategicamente a melhor opção para times 100% C#. Bundle size é o principal trade-off — aceitável em redes corporativas.</div>
+      </div>
+
+      <!-- BLAZOR SERVER -->
+      <div class="tech-card">
+        <div class="tech-card-header">
+          <div class="tech-icon" style="background:#fff1f2">🔌</div>
+          <div>
+            <h3>Blazor Server<span class="badge badge-no">Não recomendado</span></h3>
+            <div style="font-size:12px;color:var(--text-muted)">Microsoft · C# · SignalR</div>
+          </div>
+        </div>
+        <div class="pros-cons">
+          <ul class="pros"><strong>Prós</strong>
+            <li>Zero bundle size no browser</li>
+            <li>C# puro no servidor</li>
+            <li>Acesso direto ao EF Core</li>
+          </ul>
+          <ul class="cons"><strong>Contras</strong>
+            <li>Requer conexão WebSocket permanente</li>
+            <li>Latência por clique (roundtrip ao servidor)</li>
+            <li>UI congela se a rede cair</li>
+            <li>Escalabilidade cara (RAM por sessão)</li>
+            <li>Não funciona offline</li>
+          </ul>
+        </div>
+        <div class="verdict"><strong>Veredicto:</strong> ❌ Inviável para ERP. A latência por clique em formulários complexos e a dependência de conexão permanente são críticos.</div>
+      </div>
+
+      <!-- MAUI -->
+      <div class="tech-card">
+        <div class="tech-card-header">
+          <div class="tech-icon" style="background:#fff7ed">📱</div>
+          <div>
+            <h3>.NET MAUI<span class="badge badge-no">Fora do escopo</span></h3>
+            <div style="font-size:12px;color:var(--text-muted)">Microsoft · C# + XAML · Windows/iOS/Android</div>
+          </div>
+        </div>
+        <div class="pros-cons">
+          <ul class="pros"><strong>Prós</strong>
+            <li>Performance nativa (sem browser)</li>
+            <li>C# e XAML — familiar para WinForms</li>
+            <li>Acesso a hardware (impressora, câmera)</li>
+            <li>Multiplataforma: Windows, iOS, Android</li>
+          </ul>
+          <ul class="cons"><strong>Contras</strong>
+            <li>NÃO É WEB — requer instalação</li>
+            <li>Distribuição de atualizações por pacote</li>
+            <li>Não roda em browser</li>
+            <li>Ainda imaturo em 2025 (bugs conhecidos)</li>
+          </ul>
+        </div>
+        <div class="verdict"><strong>Veredicto:</strong> ❌ Fora do objetivo. O projeto precisa de acesso web via browser (zero-install). MAUI é para apps desktop/mobile nativos.</div>
+      </div>
+
+      <!-- ANGULAR -->
+      <div class="tech-card">
+        <div class="tech-card-header">
+          <div class="tech-icon" style="background:#fef2f2">🅰️</div>
+          <div>
+            <h3>Angular 18<span class="badge badge-warn">Alternativa válida</span></h3>
+            <div style="font-size:12px;color:var(--text-muted)">Google · TypeScript obrigatório · Angular Material</div>
+          </div>
+        </div>
+        <div class="pros-cons">
+          <ul class="pros"><strong>Prós</strong>
+            <li>Fortemente tipado (TypeScript)</li>
+            <li>Opinativo — reduz debate de arquitetura</li>
+            <li>Injeção de dependência nativa (familiar ao .NET)</li>
+            <li>Ótimo para ERPs corporativos</li>
+            <li>Angular Material maduro</li>
+          </ul>
+          <ul class="cons"><strong>Contras</strong>
+            <li>TypeScript obrigatório (mesmo obstáculo do React)</li>
+            <li>Curva de aprendizado íngreme (RxJS, decoradores)</li>
+            <li>Mais verboso que React/Vue</li>
+          </ul>
+        </div>
+        <div class="verdict"><strong>Veredicto:</strong> Boa alternativa se o time aceitar aprender TypeScript. A Injeção de Dependência nativa é familiar para quem vem do .NET.</div>
+      </div>
+
+      <!-- VUE -->
+      <div class="tech-card">
+        <div class="tech-card-header">
+          <div class="tech-icon" style="background:#f0fdf4">🟢</div>
+          <div>
+            <h3>Vue.js 3<span class="badge badge-warn">Alternativa válida</span></h3>
+            <div style="font-size:12px;color:var(--text-muted)">Evan You · JS/TypeScript · Vuetify / PrimeVue</div>
+          </div>
+        </div>
+        <div class="pros-cons">
+          <ul class="pros"><strong>Prós</strong>
+            <li>Curva de aprendizado mais suave</li>
+            <li>Documentação excelente</li>
+            <li>Vuetify e PrimeVue são libs maduras</li>
+            <li>Componentes Single File (.vue) intuitivos</li>
+          </ul>
+          <ul class="cons"><strong>Contras</strong>
+            <li>Ainda exige JavaScript/TypeScript</li>
+            <li>Ecossistema menor que React</li>
+            <li>Sem respaldo corporativo forte (Meta/Google)</li>
+          </ul>
+        </div>
+        <div class="verdict"><strong>Veredicto:</strong> Opção de menor fricção se o time quiser aprender JS. Porém, não resolve o problema principal: o time é C# e não JS.</div>
+      </div>
+
+    </div><!-- /tech-grid -->
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SECTION 3: TABELA COMPARATIVA -->
+  <div class="section">
+    <div class="section-num">03 — Comparativo</div>
+    <h2>Tabela de Decisão</h2>
+    <p class="section-desc">Pontuação de 1 a 5 estrelas por critério para cada tecnologia web (MAUI excluído por não ser web).</p>
+
+    <div class="comparison-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Critério</th>
+            <th>React ⚛️ <small>(atual)</small></th>
+            <th>Blazor WASM 🔷</th>
+            <th>Blazor Server 🔌</th>
+            <th>Angular 🅰️</th>
+            <th>Vue.js 🟢</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Linguagem</td>
+            <td class="td-cur">TypeScript</td>
+            <td><strong>C#</strong></td>
+            <td><strong>C#</strong></td>
+            <td>TypeScript</td>
+            <td>JS / TS</td>
+          </tr>
+          <tr>
+            <td>Curva p/ time C#</td>
+            <td class="td-cur"><span class="stars">★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★</span></td>
+            <td><span class="stars">★★★</span></td>
+          </tr>
+          <tr>
+            <td>Performance UI</td>
+            <td class="td-cur"><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Bundle size (1ª carga)</td>
+            <td class="td-cur"><span class="stars">★★★★</span></td>
+            <td><span class="stars">★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Ecossistema de componentes UI</td>
+            <td class="td-cur"><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Compartilha código com .NET</td>
+            <td class="td-cur"><span class="td-no">Não</span></td>
+            <td><span class="td-yes">Sim</span></td>
+            <td><span class="td-yes">Sim</span></td>
+            <td><span class="td-no">Não</span></td>
+            <td><span class="td-no">Não</span></td>
+          </tr>
+          <tr>
+            <td>Debugging no browser</td>
+            <td class="td-cur"><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Mercado / Vagas disponíveis</td>
+            <td class="td-cur"><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★</span></td>
+            <td><span class="stars">★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+          </tr>
+          <tr>
+            <td>Maturidade (2025)</td>
+            <td class="td-cur"><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★</span></td>
+          </tr>
+          <tr>
+            <td>Suporte offline (PWA)</td>
+            <td class="td-cur"><span class="td-yes">Sim</span></td>
+            <td><span class="td-yes">Sim</span></td>
+            <td><span class="td-no">Não</span></td>
+            <td><span class="td-yes">Sim</span></td>
+            <td><span class="td-yes">Sim</span></td>
+          </tr>
+          <tr style="background:#f0fdf4">
+            <td><strong>Total geral</strong></td>
+            <td class="td-cur"><strong>38/50</strong></td>
+            <td><strong>33/50</strong></td>
+            <td><strong>28/50</strong></td>
+            <td><strong>32/50</strong></td>
+            <td><strong>33/50</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div>
+        <strong>Nota sobre a pontuação</strong>
+        O React lidera no total geral, mas o critério mais estratégico para este time é a <strong>curva de aprendizado para C#</strong>, onde o Blazor WASM é imbatível (5 estrelas vs 2 do React). A decisão deve considerar o perfil do time, não apenas a pontuação total.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SECTION 4: RISCO DE MIGRAÇÃO -->
+  <div class="section">
+    <div class="section-num">04 — Análise de Risco</div>
+    <h2>E se migrarmos agora para Blazor?</h2>
+    <p class="section-desc">O projeto já tem código produzido em React. Migrar agora tem um custo que precisa ser avaliado.</p>
+
+    <div class="comparison-wrap">
+      <table class="risk-table">
+        <thead>
+          <tr>
+            <th style="width:30%">Ponto de Análise</th>
+            <th>Detalhe</th>
+            <th style="width:120px">Impacto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Código já produzido</td>
+            <td>Infraestrutura OOP de CRUD (BaseCadastroConfig, hooks, 12+ componentes MUI), formulários de Entidade, Condição de Pagamento, Parâmetro e menu dinâmico precisariam ser reescritos em Razor.</td>
+            <td style="color:var(--danger);font-weight:700">Alto</td>
+          </tr>
+          <tr>
+            <td>Esforço estimado</td>
+            <td>Estimativa mínima de 2 a 4 meses de retrabalho, dependendo do escopo já migrado na data da decisão.</td>
+            <td style="color:var(--danger);font-weight:700">Alto</td>
+          </tr>
+          <tr>
+            <td>Risco de regressão</td>
+            <td>Todos os comportamentos testados manualmente (filtros, paginação, modal de edição, favoritos, menu contextual) precisariam ser revalidados.</td>
+            <td style="color:var(--warning);font-weight:700">Médio</td>
+          </tr>
+          <tr>
+            <td>Ganho real do time</td>
+            <td>O time passa a escrever C# em vez de TypeScript — ganho real de produtividade para devs sem experiência JS.</td>
+            <td style="color:var(--success);font-weight:700">Alto</td>
+          </tr>
+          <tr>
+            <td>Componentes UI disponíveis</td>
+            <td>MudBlazor e Radzen oferecem DataGrid, Formulários, Modal e Charts. Menos opções de UI premium que o MUI, mas suficientes para um ERP.</td>
+            <td style="color:var(--warning);font-weight:700">Médio</td>
+          </tr>
+          <tr>
+            <td>Impacto no prazo de entrega</td>
+            <td>O produto entrará em produção mais tarde. As telas legadas continuarão sem equivalente web durante o período de reescrita.</td>
+            <td style="color:var(--danger);font-weight:700">Alto</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SECTION 5: DECISÃO -->
+  <div class="section">
+    <div class="section-num">05 — Recomendação</div>
+    <h2>Qual caminho seguir?</h2>
+    <p class="section-desc">A recomendação depende da composição do time e da prioridade do projeto.</p>
+
+    <div class="decision-grid">
+      <div class="decision-card green">
+        <h4>✅ Permaneça em React SE…</h4>
+        <ul>
+          <li>O time tem ou planeja contratar um especialista em JS/TypeScript</li>
+          <li>A prioridade é entregar o produto o mais rápido possível</li>
+          <li>UI premium, dashboards e animações são requisitos do produto</li>
+          <li>O sistema será eventualmente aberto para clientes externos (SaaS)</li>
+          <li>Não há plano de compartilhar modelos entre frontend e backend</li>
+        </ul>
+      </div>
+
+      <div class="decision-card yellow">
+        <h4>🔄 Migre para Blazor WASM SE…</h4>
+        <ul>
+          <li>O time é 100% C# e não planeja contratar especialistas em JS</li>
+          <li>A manutenção de longo prazo será feita pelo mesmo time do backend</li>
+          <li>O produto é um ERP corporativo interno (rede controlada)</li>
+          <li>O bundle size inicial de 10–15 MB é aceitável (Intranet/VPN)</li>
+          <li>A decisão é adiada para após terminar as telas críticas em React</li>
+        </ul>
+      </div>
+
+      <div class="decision-card red" style="grid-column:1/-1">
+        <h4>❌ Não recomendamos Blazor Server nem MAUI para este contexto</h4>
+        <ul>
+          <li>Blazor Server: dependência de conexão permanente + latência por clique = incompatível com formulários ERP</li>
+          <li>MAUI: não é web — requer instalação. Foge completamente do objetivo de acesso via browser (zero-install)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECOMMENDATION BOX -->
+  <div class="recommendation">
+    <div class="rec-label">Nossa recomendação técnica</div>
+    <h3>Continue em React agora. Valide o Blazor em paralelo.</h3>
+    <p>
+      Dado o código já produzido, a melhor estratégia é não interromper a migração atual.
+      Em paralelo, crie um <strong>projeto Blazor WASM de prova de conceito</strong> com um formulário real (ex: Condição de Pagamento)
+      e deixe o time usar ambos por 2–4 semanas. A decisão final deve vir da <strong>experiência prática</strong>, não apenas da teoria.
+      Isso evita uma aposta cega e permite uma escolha embasada antes de qualquer reescrita.
+    </p>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SECTION 6: PLANO DE AÇÃO -->
+  <div class="section">
+    <div class="section-num">06 — Plano de Ação Proposto</div>
+    <h2>Próximos passos</h2>
+    <p class="section-desc">Independentemente da decisão final, sugerimos este plano de ação para mitigar riscos.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <h4>Continuar a migração em React até concluir os formulários críticos do ERP</h4>
+          <p>Priorize as telas que estão bloqueando a operação: Entidade, Condição de Pagamento, Parâmetros. O produto precisa estar funcional independentemente da decisão de stack.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <h4>Criar uma branch de prova de conceito Blazor WASM</h4>
+          <p>Implemente 1 formulário real (recomendamos FCondicaoPagamento) em Blazor WASM + MudBlazor, consumindo a mesma Web API .NET 10. O time vai sentir na prática a diferença de produtividade.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <h4>Avaliação técnica com o time após 2–4 semanas de uso</h4>
+          <p>Responda com dados reais: qual stack entregou mais rápido? Qual foi mais fácil de debugar? Qual a preferência do time para manutenção de longo prazo?</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div class="step-body">
+          <h4>Tomada de decisão formal</h4>
+          <p>Com base na avaliação prática, decidir se: (a) permanece em React; (b) inicia a migração para Blazor WASM após a entrega das telas críticas; (c) mantém arquitetura híbrida (API .NET + qualquer frontend).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<footer>
+  <p>Versatus ERP Web · Análise Técnica de Frontend · Julho 2025 · Confidencial — uso interno</p>
+</footer>
+
+</body>
+</html>
