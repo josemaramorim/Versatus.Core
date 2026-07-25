@@ -250,11 +250,6 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
         type: 'text'
       },
       {
-        field: 'apelido',
-        label: 'Apelido / Fantasia',
-        type: 'text'
-      },
-      {
         field: 'tipoPessoa',
         label: 'Tipo de Pessoa',
         type: 'select',
