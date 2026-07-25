@@ -8,4 +8,5 @@ public class GloRotina
     public string Nome { get; set; } = string.Empty;
     public int TipoRotina { get; set; }
     public string? Objeto { get; set; }
+    public string? RotaWeb { get; set; }
 }

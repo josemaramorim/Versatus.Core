@@ -22,6 +22,7 @@ public record RotinaItemDto(
     int IdRotina,
     string Nome,
     string? Objeto,
+    string? RotaWeb,
     int Ordem,
     string RotaCompleta
 );

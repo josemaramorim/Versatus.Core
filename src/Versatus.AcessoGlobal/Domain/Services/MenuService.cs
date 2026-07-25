@@ -101,7 +101,7 @@ public class MenuService : IMenuService
                         fav.IdFavorito,
                         fav.IdRotina,
                         rotina.Nome,
-                        FormatRota("/acesso-global", rotina.Objeto),
+                        FormatRota("/acesso-global", rotina.RotaWeb, rotina.Objeto),
                         "Sistema",
                         "#637381",
                         $"Sistema → {rotina.Nome}"
@@ -197,8 +197,8 @@ public class MenuService : IMenuService
         {
             if (dictRotinas.TryGetValue(mr.IdRotina, out var rotina))
             {
-                var rotaCompleta = FormatRota(modulo.PrefixoRota, rotina.Objeto);
-                rotinaDtos.Add(new RotinaItemDto(rotina.IdRotina, rotina.Nome, rotina.Objeto, mr.Ordem, rotaCompleta));
+                var rotaCompleta = FormatRota(modulo.PrefixoRota, rotina.RotaWeb, rotina.Objeto);
+                rotinaDtos.Add(new RotinaItemDto(rotina.IdRotina, rotina.Nome, rotina.Objeto, rotina.RotaWeb, mr.Ordem, rotaCompleta));
             }
         }
 
@@ -244,13 +244,19 @@ public class MenuService : IMenuService
         }
     }
 
-    private static string FormatRota(string? prefixo, string? objeto)
+    private static string FormatRota(string? prefixo, string? rotaWeb, string? objeto)
     {
-        if (string.IsNullOrWhiteSpace(objeto))
+        var pathSegment = !string.IsNullOrWhiteSpace(rotaWeb)
+            ? rotaWeb
+            : (!string.IsNullOrWhiteSpace(objeto)
+                ? (objeto.StartsWith("F") && objeto.Length > 1 ? objeto.Substring(1).ToLowerInvariant() : objeto.ToLowerInvariant())
+                : string.Empty);
+
+        if (string.IsNullOrWhiteSpace(pathSegment))
             return prefixo ?? string.Empty;
 
         var cleanPrefix = (prefixo ?? string.Empty).TrimEnd('/');
-        var cleanObjeto = objeto.TrimStart('/');
-        return $"{cleanPrefix}/{cleanObjeto}";
+        var cleanSegment = pathSegment.TrimStart('/');
+        return $"{cleanPrefix}/{cleanSegment}";
     }
 }

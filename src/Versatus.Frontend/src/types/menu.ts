@@ -20,6 +20,7 @@ export interface RotinaItemDto {
   idRotina: number;
   nome: string;
   objeto: string | null;
+  rotaWeb: string | null;
   ordem: number;
   rotaCompleta: string;
 }

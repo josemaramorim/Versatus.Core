@@ -13,5 +13,6 @@ public class GloRotinaMapping : IEntityTypeConfiguration<GloRotina>
         builder.Property(x => x.IdRotina).HasColumnName("IdGloRotina");
         builder.Property(x => x.TipoRotina).HasColumnName("IdTipoRotina");
         builder.Property(x => x.Objeto).HasMaxLength(200).IsRequired(false);
+        builder.Property(x => x.RotaWeb).HasMaxLength(100).IsRequired(false);
     }
 }
