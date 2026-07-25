@@ -23,11 +23,18 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import * as MuiIcons from '@mui/icons-material';
 import { useMenu } from '../../context/MenuContext';
 import type { MenuItemDto, RotinaItemDto } from '../../types/menu';
 
 const SIDEBAR_WIDTH_EXPANDED = 260;
 const SIDEBAR_WIDTH_COLLAPSED = 88;
+
+function getIconComponent(iconName: string | null) {
+  if (!iconName) return MuiIcons.Folder;
+  const Component = (MuiIcons as Record<string, any>)[iconName];
+  return Component || MuiIcons.Folder;
+}
 
 export const ContextualSidebar: React.FC = () => {
   const { modulos, moduloAtivo, setModuloAtivo, favoritos, adicionarFavorito, removerFavorito } = useMenu();
@@ -182,12 +189,14 @@ export const ContextualSidebar: React.FC = () => {
     );
   };
 
-  // Renderiza item de menu no modo colapsado (Estilo Minimals Pro: Ícone + Label Vertical + Chevron + Flyout)
+  // Renderiza item de menu no modo colapsado com ícone do módulo
   const renderCollapsedMenuItem = (menu: MenuItemDto) => {
     const hasChildren = menu.subMenus.length > 0 || menu.rotinas.length > 0;
     const isChildActive =
       menu.rotinas.some((r) => r.rotaCompleta === location.pathname) ||
       menu.subMenus.some((s) => s.rotinas.some((r) => r.rotaCompleta === location.pathname));
+
+    const ModuleIcon = moduloAtivo?.iconeMui ? getIconComponent(moduloAtivo.iconeMui) : FolderIcon;
 
     return (
       <Box key={menu.idMenu} sx={{ display: 'flex', justifyContent: 'center', mb: 1, position: 'relative' }}>
@@ -211,7 +220,7 @@ export const ContextualSidebar: React.FC = () => {
             }
           }}
         >
-          <FolderIcon style={{ fontSize: 24, color: isChildActive ? corHex : alpha('#212B36', 0.6) }} />
+          <ModuleIcon style={{ fontSize: 24, color: isChildActive ? corHex : alpha(corHex, 0.8) }} />
 
           <Typography
             variant="caption"
@@ -248,9 +257,13 @@ export const ContextualSidebar: React.FC = () => {
     );
   };
 
-  // Renderiza item de menu no modo expandido (Accordion)
+  // Renderiza item de menu no modo expandido (Accordion) usando ícone do módulo no nível 0
   const renderExpandedMenuItem = (menu: MenuItemDto, level = 0) => {
     const isOpen = openAccordionIds.includes(menu.idMenu);
+    const isRootLevel = level === 0;
+
+    const MenuIcon = isRootLevel && moduloAtivo?.iconeMui ? getIconComponent(moduloAtivo.iconeMui) : FolderIcon;
+    const iconColor = isRootLevel ? corHex : alpha('#212B36', 0.6);
 
     return (
       <Accordion
@@ -277,7 +290,7 @@ export const ContextualSidebar: React.FC = () => {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FolderIcon style={{ fontSize: 18, color: alpha('#212B36', 0.6) }} />
+            <MenuIcon style={{ fontSize: 18, color: iconColor }} />
             <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.8125rem', color: 'text.primary' }}>
               {menu.descricao}
             </Typography>
