@@ -222,6 +222,23 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
             </Box>
           );
         }
+      },
+      {
+        header: 'Situação',
+        field: 'ativo',
+        width: 120,
+        sortable: true,
+        renderCell: (record) => (
+          <Box
+            component="span"
+            sx={{
+              fontWeight: 600,
+              color: record.ativo ? 'success.main' : 'error.main'
+            }}
+          >
+            {record.ativo ? 'Ativo' : 'Inativo'}
+          </Box>
+        )
       }
     ];
   }
