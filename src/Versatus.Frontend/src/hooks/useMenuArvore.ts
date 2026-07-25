@@ -36,18 +36,30 @@ export function useMenuArvore() {
 
       if (data.length > 0) {
         let moduloSelecionado: ModuloMenuDto | undefined;
-        try {
-          const savedId = localStorage.getItem(LOCAL_STORAGE_KEY_MODULO);
-          if (savedId) {
-            const parsedId = JSON.parse(savedId);
-            moduloSelecionado = data.find((m) => m.idModulo === parsedId);
-          }
-        } catch {
-          // Fallback para primeiro módulo
+
+        // 1. Tenta encontrar módulo correspondente à URL atual no carregamento
+        const currentPath = window.location.pathname;
+        if (currentPath && currentPath !== '/') {
+          moduloSelecionado = data.find(
+            (m) => m.prefixoRota && m.prefixoRota !== '/' && currentPath.startsWith(m.prefixoRota)
+          );
         }
 
+        // 2. Se não encontrou pela URL, busca no localStorage
         if (!moduloSelecionado) {
-          // Prioriza o módulo Acesso Global (id 1) ou o primeiro da lista
+          try {
+            const savedId = localStorage.getItem(LOCAL_STORAGE_KEY_MODULO);
+            if (savedId) {
+              const parsedId = JSON.parse(savedId);
+              moduloSelecionado = data.find((m) => m.idModulo === parsedId);
+            }
+          } catch {
+            // Fallback
+          }
+        }
+
+        // 3. Fallback para Acesso Global (id 1) ou primeiro módulo
+        if (!moduloSelecionado) {
           moduloSelecionado = data.find((m) => m.idModulo === 1) || data[0];
         }
 

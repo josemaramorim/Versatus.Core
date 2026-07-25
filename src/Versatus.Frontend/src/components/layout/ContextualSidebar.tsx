@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   Box,
@@ -31,25 +31,30 @@ const SIDEBAR_WIDTH_COLLAPSED = 64;
 export const ContextualSidebar: React.FC = () => {
   const { modulos, moduloAtivo, setModuloAtivo, favoritos, adicionarFavorito, removerFavorito } = useMenu();
   const location = useLocation();
+  const prevPathRef = useRef(location.pathname);
 
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [openAccordionIds, setOpenAccordionIds] = useState<number[]>([]);
 
   const corHex = moduloAtivo?.corHex || '#2065D1';
 
-  // Sincroniza o módulo ativo com a rota atual da URL quando o usuário navega (ex: via Favoritos ou Link direto)
+  // Sincroniza o módulo ativo APENAS quando a rota da URL de fato muda por navegação (ex: via Favoritos ou Link direto)
   useEffect(() => {
     if (!modulos || modulos.length === 0) return;
-    const currentPath = location.pathname;
 
-    const targetModulo = modulos.find(
-      (m) => m.prefixoRota && m.prefixoRota !== '/' && currentPath.startsWith(m.prefixoRota)
-    );
+    if (prevPathRef.current !== location.pathname) {
+      prevPathRef.current = location.pathname;
+      const currentPath = location.pathname;
 
-    if (targetModulo && moduloAtivo?.idModulo !== targetModulo.idModulo) {
-      setModuloAtivo(targetModulo);
+      const targetModulo = modulos.find(
+        (m) => m.prefixoRota && m.prefixoRota !== '/' && currentPath.startsWith(m.prefixoRota)
+      );
+
+      if (targetModulo) {
+        setModuloAtivo(targetModulo);
+      }
     }
-  }, [location.pathname, modulos, moduloAtivo, setModuloAtivo]);
+  }, [location.pathname, modulos, setModuloAtivo]);
 
   // Carrega estado dos accordions do localStorage por módulo
   useEffect(() => {
