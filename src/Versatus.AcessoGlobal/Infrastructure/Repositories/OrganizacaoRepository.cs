@@ -6,12 +6,13 @@ namespace Versatus.AcessoGlobal.Infrastructure.Repositories;
 
 /// <summary>
 /// Repositório para entidades de organização (Grupo → Empresa → Filial).
+/// Opera diretamente sobre a réplica de leitura (Read Replica) com NoTracking.
 /// </summary>
 public class OrganizacaoRepository : IOrganizacaoRepository
 {
-    private readonly AcessoGlobalDbContext _context;
+    private readonly AcessoGlobalReadDbContext _context;
 
-    public OrganizacaoRepository(AcessoGlobalDbContext context)
+    public OrganizacaoRepository(AcessoGlobalReadDbContext context)
     {
         _context = context;
     }

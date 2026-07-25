@@ -6,13 +6,13 @@ namespace Versatus.AcessoGlobal.Infrastructure.Repositories;
 
 /// <summary>
 /// Repositório para entidades geográficas de lookup (Pais, Estado, Cidade, Bairro).
-/// Acesso somente-leitura; nenhuma escrita é esperada nessas tabelas via API.
+/// Opera diretamente sobre a réplica de leitura (Read Replica) com NoTracking.
 /// </summary>
 public class LocalizacaoRepository : ILocalizacaoRepository
 {
-    private readonly AcessoGlobalDbContext _context;
+    private readonly AcessoGlobalReadDbContext _context;
 
-    public LocalizacaoRepository(AcessoGlobalDbContext context)
+    public LocalizacaoRepository(AcessoGlobalReadDbContext context)
     {
         _context = context;
     }
@@ -40,9 +40,6 @@ public class LocalizacaoRepository : ILocalizacaoRepository
         => await _context.Estados.FirstOrDefaultAsync(e => e.Sigla == sigla, cancellationToken);
 
     // ── Cidade ────────────────────────────────────────────────────────────────
-    /// <summary>
-    /// Cidade usa SiglaEstado (string) como FK — filtra diretamente pela sigla.
-    /// </summary>
     public async Task<IEnumerable<Cidade>> ListarCidadesAsync(string? siglaEstado = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Cidades.AsQueryable();

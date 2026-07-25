@@ -14,7 +14,7 @@ namespace Versatus.AcessoGlobal.Infrastructure;
 /// </summary>
 public class AcessoGlobalDbContext : DbContext
 {
-    public AcessoGlobalDbContext(DbContextOptions<AcessoGlobalDbContext> options)
+    public AcessoGlobalDbContext(DbContextOptions options)
         : base(options)
     {
     }

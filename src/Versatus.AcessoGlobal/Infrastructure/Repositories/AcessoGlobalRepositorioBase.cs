@@ -4,27 +4,33 @@ using Versatus.Framework.Repositories;
 namespace Versatus.AcessoGlobal.Infrastructure.Repositories;
 
 /// <summary>
-/// Implementação base para repositórios do módulo AcessoGlobal.
+/// Implementação base para repositórios do módulo AcessoGlobal com suporte a segregação de conexões (CQRS):
+/// - Context / DbSet: Escrita na instância principal (Write Connection).
+/// - ReadContext / ReadDbSet: Leitura na réplica desabilitada de tracking (Read Connection).
 /// </summary>
 public abstract class AcessoGlobalRepositorioBase<TEntity> : IRepositorio<TEntity> where TEntity : class
 {
     protected readonly AcessoGlobalDbContext Context;
+    protected readonly AcessoGlobalReadDbContext ReadContext;
     protected readonly DbSet<TEntity> DbSet;
+    protected readonly DbSet<TEntity> ReadDbSet;
 
-    protected AcessoGlobalRepositorioBase(AcessoGlobalDbContext context)
+    protected AcessoGlobalRepositorioBase(AcessoGlobalDbContext context, AcessoGlobalReadDbContext readContext)
     {
         Context = context ?? throw new ArgumentNullException(nameof(context));
+        ReadContext = readContext ?? throw new ArgumentNullException(nameof(readContext));
         DbSet = context.Set<TEntity>();
+        ReadDbSet = readContext.Set<TEntity>();
     }
 
     public virtual async Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
     {
-        return await DbSet.FindAsync(new[] { id }, cancellationToken);
+        return await ReadDbSet.FindAsync(new[] { id }, cancellationToken);
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await DbSet.ToListAsync(cancellationToken);
+        return await ReadDbSet.ToListAsync(cancellationToken);
     }
 
     public virtual async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)

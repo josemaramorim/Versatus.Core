@@ -12,27 +12,28 @@ namespace Versatus.AcessoGlobal.Infrastructure.Repositories;
 
 public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntidadeRepository
 {
-    public EntidadeRepository(AcessoGlobalDbContext context) : base(context)
+    public EntidadeRepository(AcessoGlobalDbContext context, AcessoGlobalReadDbContext readContext) 
+        : base(context, readContext)
     {
     }
 
     public async Task<Entidade?> GetByCpfAsync(string cpf, CancellationToken cancellationToken = default)
     {
-        return await Context.Entidades
+        return await ReadContext.Entidades
             .Include(e => e.PessoaFisica)
             .FirstOrDefaultAsync(e => e.PessoaFisica != null && e.PessoaFisica.Cpf == cpf, cancellationToken);
     }
 
     public async Task<Entidade?> GetByCnpjAsync(string cnpj, CancellationToken cancellationToken = default)
     {
-        return await Context.Entidades
+        return await ReadContext.Entidades
             .Include(e => e.PessoaJuridica)
             .FirstOrDefaultAsync(e => e.PessoaJuridica != null && e.PessoaJuridica.Cnpj == cnpj, cancellationToken);
     }
 
     public override async Task<Entidade?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
     {
-        return await Context.Entidades
+        return await ReadContext.Entidades
             .Include(e => e.PessoaFisica)
             .Include(e => e.PessoaJuridica)
             .Include(e => e.Enderecos)
@@ -41,7 +42,7 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
 
     public async Task<int?> GetPaisIdPorCidadeAsync(int idCidade, CancellationToken cancellationToken = default)
     {
-        return await Context.Cidades
+        return await ReadContext.Cidades
             .Where(c => c.IdCidade == idCidade)
             .Select(c => (int?)c.IdPais)
             .FirstOrDefaultAsync(cancellationToken);
@@ -49,8 +50,8 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
 
     public async Task<int?> GetPaisIdPorFilialAsync(int idFilial, CancellationToken cancellationToken = default)
     {
-        return await (from ee in Context.EntidadeEnderecos
-                      join c in Context.Cidades on ee.IdCidade equals c.IdCidade
+        return await (from ee in ReadContext.EntidadeEnderecos
+                      join c in ReadContext.Cidades on ee.IdCidade equals c.IdCidade
                       where ee.IdEntidade == idFilial && ee.TipoEndereco == EnderecoTipo.ComercialResidencial
                       select (int?)c.IdPais)
                      .FirstOrDefaultAsync(cancellationToken);
@@ -58,7 +59,7 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
 
     public async Task<IEnumerable<Entidade>> ListarEntidadesAsync(int limit = 50, CancellationToken cancellationToken = default)
     {
-        return await Context.Entidades
+        return await ReadContext.Entidades
             .Include(e => e.PessoaFisica)
             .Include(e => e.PessoaJuridica)
             .OrderByDescending(e => e.IdEntidade)
@@ -76,7 +77,7 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
         int? tipoPessoa = null,
         CancellationToken cancellationToken = default)
     {
-        var query = Context.Entidades
+        var query = ReadContext.Entidades
             .Include(e => e.PessoaFisica)
             .Include(e => e.PessoaJuridica)
             .AsQueryable();
@@ -168,7 +169,7 @@ public class EntidadeRepository : AcessoGlobalRepositorioBase<Entidade>, IEntida
 
     public async Task<Entidade?> GetCompletoPorIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await Context.Entidades
+        return await ReadContext.Entidades
             .Include(e => e.PessoaFisica)
             .Include(e => e.PessoaJuridica)
             .Include(e => e.Enderecos)

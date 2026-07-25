@@ -6,11 +6,12 @@ namespace Versatus.AcessoGlobal.Infrastructure.Repositories;
 
 public class UsuarioRepository : AcessoGlobalRepositorioBase<Usuario>, IUsuarioRepository
 {
-    public UsuarioRepository(AcessoGlobalDbContext context) : base(context) { }
+    public UsuarioRepository(AcessoGlobalDbContext context, AcessoGlobalReadDbContext readContext) 
+        : base(context, readContext) { }
 
     public async Task<Usuario?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
     {
-        return await Context.Usuarios
+        return await ReadContext.Usuarios
             .Include(u => u.Perfis)
             .FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
     }

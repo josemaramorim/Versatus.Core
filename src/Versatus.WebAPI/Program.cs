@@ -17,16 +17,29 @@ using Versatus.Infra.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Connection String
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+// Connection Strings (CQRS: Write vs Read Split)
+var writeConnectionString = builder.Configuration.GetConnectionString("WriteConnection")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=localhost\\SQLEXPRESS2008;Database=versatus;User Id=sa;Password=V#v070804s;TrustServerCertificate=True;";
 
-// DbContexts
+var readConnectionString = builder.Configuration.GetConnectionString("ReadConnection")
+    ?? writeConnectionString;
+
+// DbContexts para ESCRITA (Master DB)
 builder.Services.AddDbContext<AcessoGlobalDbContext>(options =>
-    options.UseSqlServer(connectionString).EnableSensitiveDataLogging());
+    options.UseSqlServer(writeConnectionString).EnableSensitiveDataLogging());
 
 builder.Services.AddDbContext<TributoDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(writeConnectionString));
+
+// DbContexts para LEITURA (Read Replica DB desativado de tracking para alta performance)
+builder.Services.AddDbContext<AcessoGlobalReadDbContext>(options =>
+    options.UseSqlServer(readConnectionString)
+           .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
+builder.Services.AddDbContext<TributoReadDbContext>(options =>
+    options.UseSqlServer(readConnectionString)
+           .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
 // Registrar dependências de negócio
 builder.Services.AddAcessoGlobal();
@@ -37,7 +50,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IContextoExecucao, ClaimsContextoExecucao>();
 
 // Registrar gerador sequencial e infraestrutura real do banco de dados
-builder.Services.AddVersatusInfraData(connectionString);
+builder.Services.AddVersatusInfraData(writeConnectionString);
 builder.Services.AddScoped<IGeradorSequencial, GeradorSequencialService>();
 
 // Autenticação JWT
