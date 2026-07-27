@@ -11,6 +11,9 @@ Escreva o teste primeiro. Veja o teste falhar. Escreva o código mínimo para pa
 
 **Princípio Fundamental:** Se você não viu o teste falhar primeiro, você não sabe se ele está testando a coisa certa.
 
+> [!NOTE]
+> Para consultar o guia avançado de criação de cenários, asserções literais e prevenção de detectores de mudança superficiais, consulte o documento auxiliar [references/como-escrever-bons-testes.md](references/como-escrever-bons-testes.md).
+
 ---
 
 ## Quando Usar
