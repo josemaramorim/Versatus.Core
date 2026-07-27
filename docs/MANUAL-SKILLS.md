@@ -23,7 +23,11 @@
    - [Propósito](#propósito-create-api-module)
    - [Quando Usar](#quando-usar-create-api-module)
    - [Exemplo de Uso Prático](#exemplo-de-uso-prático-create-api-module)
-6. [Boas Práticas de Manutenção do Manual](#6-boas-práticas-de-manutenção-do-manual)
+6. [Skill 5: `test-driven-development`](#6-skill-5-test-driven-development)
+   - [Propósito](#propósito-test-driven-development)
+   - [Quando Usar](#quando-usar-test-driven-development)
+   - [Exemplo de Uso Prático](#exemplo-de-uso-prático-test-driven-development)
+7. [Boas Práticas de Manutenção do Manual](#7-boas-práticas-de-manutenção-do-manual)
 
 ---
 
@@ -111,7 +115,7 @@ Usar a skill spec-generator para analisar a entidade FProduto no módulo Estoque
 
 <a id="propósito-code-auditor"></a>
 ### 🎯 Propósito
-Skill de auditoria de qualidade que inspeciona o código C# e React de um formulário migrado para garantir 100% de conformidade com as **11 leis do `AGENTS.md`**.
+Skill de auditoria de qualidade que inspeciona o código C# e React de um formulário migrado para garantir 100% de conformidade com as **12 leis do `AGENTS.md`**.
 
 <a id="quando-usar-code-auditor"></a>
 ### 📅 Quando Usar
@@ -161,7 +165,34 @@ Usar a skill create-api-module para criar a estrutura do novo módulo Versatus.E
 
 ---
 
-## 6. Boas Práticas de Manutenção do Manual
+## 6. Skill 5: `test-driven-development`
+
+<a id="propósito-test-driven-development"></a>
+### 🎯 Propósito
+Guia o desenvolvimento orientado a testes (TDD — Red-Green-Refactor). Garante que nenhum código de produção seja escrito antes de ter um teste unitário que falhe primeiro.
+
+<a id="quando-usar-test-driven-development"></a>
+### 📅 Quando Usar
+Ao implementar qualquer nova regra de negócio, serviço de domínio, ajuste de comportamento ou correção de bug.
+
+<a id="exemplo-de-uso-prático-test-driven-development"></a>
+### 💡 Exemplo de Uso Prático
+
+#### Prompt no Chat da IA:
+```
+Usar a skill test-driven-development para implementar o método ObterPorIdAsync no EntidadeService.
+```
+
+#### O que a IA fará automaticamente:
+1. Escreverá primeiro o teste unitário (`RED`) em `tests/Versatus.AcessoGlobal.Tests/`.
+2. Executará `dotnet test` e confirmará que o teste **falhou do jeito certo**.
+3. Escreverá o código de produção mínimo (`GREEN`) no `EntidadeService.cs`.
+4. Reexecutará `dotnet test` e confirmará que ficou tudo verde.
+5. Refatorará o código garantindo legibilidade e boas práticas (`REFACTOR`).
+
+---
+
+## 7. Boas Práticas de Manutenção do Manual
 
 1. **Atualização Contínua:** Sempre que uma nova skill for adicionada em `.agents/skills/`, inclua sua entrada no Índice e crie uma seção correspondente neste manual.
 2. **Exemplos Reais:** Mantenha os prompts de exemplo alinhados aos nomes reais de arquivos e módulos do ERP.
