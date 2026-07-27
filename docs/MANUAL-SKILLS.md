@@ -27,7 +27,11 @@
    - [Propósito](#propósito-test-driven-development)
    - [Quando Usar](#quando-usar-test-driven-development)
    - [Exemplo de Uso Prático](#exemplo-de-uso-prático-test-driven-development)
-7. [Boas Práticas de Manutenção do Manual](#7-boas-práticas-de-manutenção-do-manual)
+7. [Skill 6: `writing-skills`](#7-skill-6-writing-skills)
+   - [Propósito](#propósito-writing-skills)
+   - [Quando Usar](#quando-usar-writing-skills)
+   - [Exemplo de Uso Prático](#exemplo-de-uso-prático-writing-skills)
+8. [Boas Práticas de Manutenção do Manual](#8-boas-práticas-de-manutenção-do-manual)
 
 ---
 
@@ -192,7 +196,33 @@ Usar a skill test-driven-development para implementar o método ObterPorIdAsync 
 
 ---
 
-## 7. Boas Práticas de Manutenção do Manual
+## 7. Skill 6: `writing-skills`
+
+<a id="propósito-writing-skills"></a>
+### 🎯 Propósito
+Aplica a metodologia de TDD à criação e auditoria de novas skills para a IA. Garante que qualquer nova skill criada ou editada seja concisa, otimizada para descoberta e testada na prática contra falhas reais.
+
+<a id="quando-usar-writing-skills"></a>
+### 📅 Quando Usar
+Quando for criar uma nova skill em `.agents/skills/`, refatorar uma skill existente ou auditar se as skills criadas anteriormente funcionam corretamente.
+
+<a id="exemplo-de-uso-prático-writing-skills"></a>
+### 💡 Exemplo de Uso Prático
+
+#### Prompt no Chat da IA:
+```
+Usar a skill writing-skills para criar ou auditar a nova skill gerar-relatorio-tributario em .agents/skills/.
+```
+
+#### O que a IA fará automaticamente:
+1. Simulará o cenário de teste (baseline sem a skill) para identificar onde a IA erra.
+2. Criará o arquivo `SKILL.md` com cabeçalho YAML (`name` e `description` focados apenas em condições de disparo).
+3. Moverá conteúdos extensos para subpastas `references/` ou `templates/`.
+4. Atualizará o manual `docs/MANUAL-SKILLS.md` conforme a Regra 12 do `AGENTS.md`.
+
+---
+
+## 8. Boas Práticas de Manutenção do Manual
 
 1. **Atualização Contínua:** Sempre que uma nova skill for adicionada em `.agents/skills/`, inclua sua entrada no Índice e crie uma seção correspondente neste manual.
 2. **Exemplos Reais:** Mantenha os prompts de exemplo alinhados aos nomes reais de arquivos e módulos do ERP.
