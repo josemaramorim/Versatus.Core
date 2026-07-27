@@ -1,6 +1,6 @@
 ---
 name: create-api-module
-description: Skill para criação padronizada de novos módulos de negócio no backend C# (.NET 10) seguindo Clean Architecture, SOLID e segregação de banco CQRS.
+description: Use ao criar um novo módulo de negócio no backend C# (.NET 10) para estruturar pastas, DbContexts (Write/Read) e injeção de dependência.
 ---
 
 # Skill: create-api-module

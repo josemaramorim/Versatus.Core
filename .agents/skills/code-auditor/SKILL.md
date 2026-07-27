@@ -1,6 +1,6 @@
 ---
 name: code-auditor
-description: Skill de auditoria automatizada de código C# (.NET 10) e React (TypeScript) para verificar a conformidade estrita com as 11 leis do AGENTS.md.
+description: Use ao concluir a migração de um formulário para auditar se o código C# e React cumpre as 12 leis do AGENTS.md.
 ---
 
 # Skill: code-auditor

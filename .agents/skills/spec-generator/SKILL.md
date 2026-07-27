@@ -1,6 +1,6 @@
 ---
 name: spec-generator
-description: Skill para análise rigorosa do código C# legado e geração automatizada de Especificações Funcionais padronizadas em docs/spec_f[nome].md.
+description: Use ao mapear formulários legados para elaborar especificações funcionais em docs/spec_f[nome].md antes de escrever código C# ou React.
 ---
 
 # Skill: spec-generator
