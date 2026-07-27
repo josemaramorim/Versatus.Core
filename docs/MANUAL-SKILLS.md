@@ -200,24 +200,44 @@ Usar a skill test-driven-development para implementar o método ObterPorIdAsync 
 
 <a id="propósito-writing-skills"></a>
 ### 🎯 Propósito
-Aplica a metodologia de TDD à criação e auditoria de novas skills para a IA. Garante que qualquer nova skill criada ou editada seja concisa, otimizada para descoberta e testada na prática contra falhas reais.
+Aplica a metodologia de **TDD (Test-Driven Development)** para a criação, edição e auditoria de **skills da própria IA**. Garante que qualquer nova skill criada seja concisa, otimizada para descoberta (SDO) e testada na prática contra falhas reais.
 
 <a id="quando-usar-writing-skills"></a>
 ### 📅 Quando Usar
-Quando for criar uma nova skill em `.agents/skills/`, refatorar uma skill existente ou auditar se as skills criadas anteriormente funcionam corretamente.
+- Para **criar uma nova skill** no projeto (`.agents/skills/`) ou no ambiente global (`C:\Users\WIN10\.gemini\config\skills\`).
+- Para **auditar e refatorar** uma skill existente, ajustando o cabeçalho YAML `description` para focar estritamente em condições de disparo (evitando que a IA pule o corpo da skill).
+- Para **reorganizar skills extensas** (>100 linhas) movendo manuais ou esquemas para a subpasta `references/`.
 
 <a id="exemplo-de-uso-prático-writing-skills"></a>
-### 💡 Exemplo de Uso Prático
+### 💡 Exemplos de Uso Prático por Cenário
 
-#### Prompt no Chat da IA:
+#### Cenário A: Criar uma Nova Skill do Zero
 ```
-Usar a skill writing-skills para criar ou auditar a nova skill gerar-relatorio-tributario em .agents/skills/.
+Usar a skill writing-skills para criar a nova skill gerar-relatorio-tributario em .agents/skills/.
 ```
+- **O que a IA faz:** Simula o cenário de erro sem a skill (baseline), cria a pasta `.agents/skills/gerar-relatorio-tributario/`, grava o `SKILL.md` com YAML `description` iniciando em `"Use ao..."` e **atualiza o `docs/MANUAL-SKILLS.md`** (Regra 12).
 
-#### O que a IA fará automaticamente:
-1. Simulará o cenário de teste (baseline sem a skill) para identificar onde a IA erra.
-2. Criará o arquivo `SKILL.md` com cabeçalho YAML (`name` e `description` focados apenas em condições de disparo).
-3. Moverá conteúdos extensos para subpastas `references/` ou `templates/`.
+#### Cenário B: Auditar ou Refatorar uma Skill Existente
+```
+Usar a skill writing-skills para auditar e refatorar a skill spec-generator em .agents/skills/spec-generator/SKILL.md.
+```
+- **O que a IA faz:** Inspeciona o arquivo `SKILL.md`, corrige o campo `description` para focar em momentos de uso (sem resumir o fluxo) e fecha brechas de interpretação.
+
+#### Cenário C: Reorganizar Arquivos Extensos em Subpastas (`references/`, `templates/`)
+```
+Usar a skill writing-skills para mover a documentação de nulidades da skill spec-generator para a subpasta references/.
+```
+- **O que a IA faz:** Cria a subpasta `.agents/skills/spec-generator/references/`, move o texto extenso para `sql_nullability_guide.md` e deixa o `SKILL.md` principal curto e enxuto.
+
+---
+
+### 📋 Tabela de Prompts Práticos:
+
+| Ação Desejada | Exemplo de Prompt no Chat da IA |
+|---|---|
+| **Criar Nova Skill** | `Usar a skill writing-skills para criar a skill [nome-da-skill]` |
+| **Auditar Skill Existente** | `Usar a skill writing-skills para auditar a skill [nome-da-skill]` |
+| **Refatorar/Enxugar Skill** | `Usar a skill writing-skills para otimizar os tokens da skill [nome-da-skill]` |
 4. Atualizará o manual `docs/MANUAL-SKILLS.md` conforme a Regra 12 do `AGENTS.md`.
 
 ---
