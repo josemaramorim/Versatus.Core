@@ -112,3 +112,7 @@ Todo formulário migrado deve ser classificado em um dos dois padrões antes de 
   - **Consultas / Paginações / Lookups (`GET`):** Executadas na conexão de leitura desabilitada de tracking (`ReadConnection` / `AcessoGlobalReadDbContext` / `TributoReadDbContext`).
 - Os repositórios herdados de `AcessoGlobalRepositorioBase<TEntity>` utilizam automaticamente `ReadContext` / `ReadDbSet` para leitura e `Context` / `DbSet` para escrita.
 - Configuração de conexão via variáveis `WriteConnection` e `ReadConnection` no `appsettings.json` / ICP.
+
+## 12. Manutenção do Manual de Skills (`docs/MANUAL-SKILLS.md`)
+- **Obrigatorio:** Toda criação, alteração ou exclusão de qualquer skill no diretório `.agents/skills/` DEVE obrigatoriamente ser refletida e atualizada no manual `docs/MANUAL-SKILLS.md`.
+- O manual deve manter seu Índice Geral atualizado, explicando o propósito da skill, quando utilizá-la e fornecendo um exemplo de uso prático.
