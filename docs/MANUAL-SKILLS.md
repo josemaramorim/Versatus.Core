@@ -46,18 +46,36 @@ Quando for migrar qualquer formulário desktop do sistema legado para o novo sis
 <a id="exemplo-de-uso-prático-migrate-crud"></a>
 ### 💡 Exemplo de Uso Prático
 
+Para utilizar esta skill, copie e preencha o prompt genérico oficial mantido em [`docs/PROMPT-MIGRACAO-LEGADO.md`](file:///c:/Pasta%20de%20Trabalho/Projetos/Analises/Versatus/Versatus.Net8/docs/PROMPT-MIGRACAO-LEGADO.md):
+
 #### Prompt no Chat da IA:
-```
-Ativar skill migrate-crud para migrar o formulário FCondicaoPagamento do módulo AcessoGlobal.
-Objeto legado: projeto_tag_1906/servidor/objeto de negócio/acessoglobal/CondicaoPagamento.cs
-Formulário legado: projeto_tag_1906/cliente/cliente.aplicativo/acessoglobal/FCondicaoPagamento.cs
+```markdown
+Você é um agente especializado na migração do sistema legado Versatus (Delphi/C#) para a arquitetura moderna .NET 10 + React/TypeScript.
+
+## 1. LEITURA OBRIGATÓRIA ANTES DE QUALQUER AÇÃO
+Leia os seguintes arquivos nesta ordem antes de escrever qualquer código ou spec:
+1. `.agents/AGENTS.md` — Regras e leis do projeto (SOLID, Clean Arch, CQRS, Result Pattern)
+2. `.agents/skills/migrate-crud/SKILL.md` — Pipeline de migração completo (4 fases)
+3. `docs/spec_fentidade.md` — Template padrão de Spec Funcional
+4. `specs/00-INDICE-GERAL.md` — Índice geral dos módulos já mapeados
+5. `specs/03-REGRAS-ANTI-ALUCINACAO.md` — Regras de fidelidade ao legado
+
+## 2. CONTEXTO DO PROJETO E PREMISSAS ARQUITETURAIS
+- **Módulo Target:** AcessoGlobal
+- **Formulário Target:** FCondicaoPagamento
+- **Branch atual:** develop
+
+## 3. ARQUIVOS LEGADOS PARA ANÁLISE
+- **3a. Objeto de Negócio:** `projeto_tag_1906/.../CondicaoPagamento.cs`
+- **3b. Formulário Legado:** `projeto_tag_1906/.../FCondicaoPagamento.cs`
+- **3c. Tabelas do Banco:** `GloCondicaoPagamento`, `GloCondicaoPagtoRegra`
 ```
 
 #### O que a IA fará automaticamente:
-1. Classificará a tela como Padrão A (CRUD Padrão).
+1. Classificará a tela como Padrão A (CRUD Padrão) ou Padrão B (Lote).
 2. Gerará a Spec Funcional em `docs/spec_fcondicaopagamento.md`.
 3. Aguardará sua aprovação da Spec.
-4. Após aprovação, gerará DTOs, Entidade POCO, Fluent API Mappings, Service e Controller C#.
+4. Após aprovação, gerará DTOs, Entidade POCO, Fluent API Mappings, Service (com CQRS Read/Write) e Controller C#.
 5. Gerará a página React em `src/pages/AcessoGlobal/FCondicaoPagamento/` estendendo `BaseCadastroConfig<T>`.
 6. Integrará as rotas no `App.tsx` e menu lateral.
 
