@@ -132,9 +132,13 @@ Após aprovação da Spec Funcional pelo usuário:
    - Controller enxuto delegando para `I[Nome]Service`.
    - Exponha parâmetros adicionais de filtro via `[FromQuery]`.
    - Trate retornos do tipo `Result<T>`, convertendo falhas de validação em `400 BadRequest`.
-6. Encerre o servidor se necessário.
-7. Execute `dotnet build` na pasta raiz. Corrija todos os erros de compilação imediatamente.
-8. Crie o commit: `git commit -m "feat(backend): Add [Nome] DTOs, Service and Controller"`.
+6. **[OBRIGATÓRIO] Crie os Testes Unitários de Negócio (TDD):**
+   - Crie `tests/Versatus.[Modulo].Tests/[Nome]ServiceTests.cs`.
+   - Escreva 1 teste unitário (`[Fact]`) para **CADA LINHA DA MATRIZ RTV** mapeada na Spec.
+   - Teste todos os cenários de falha funcional (`Result.IsSuccess == false`) e o cenário de sucesso.
+7. Encerre o servidor se necessário.
+8. Execute `dotnet build` e `dotnet test tests/Versatus.[Modulo].Tests/`. Corrija todos os erros de compilação ou testes com falha imediatamente.
+9. Crie o commit: `git commit -m "feat(backend): Add [Nome] DTOs, Service, Controller and 100% RTV Unit Tests"`.
 
 ---
 
