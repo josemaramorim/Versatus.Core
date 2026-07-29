@@ -316,8 +316,9 @@ public class CondicaoPagamentoServiceTests : IDisposable
     public async Task CriarAsync_DeveRetornarSucesso_QuandoDadosValidos()
     {
         var dto = ObterDtoBaseComValoresValidos();
+        int seq = 1;
         _geradorSequencialMock.Setup(g => g.ProximoAsync(It.IsAny<string>(), It.IsAny<SequencialTipo>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(1);
+            .ReturnsAsync(() => seq++);
 
         var result = await _service.CriarAsync(dto);
 
