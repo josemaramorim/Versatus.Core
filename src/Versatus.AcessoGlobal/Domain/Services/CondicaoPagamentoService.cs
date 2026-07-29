@@ -289,6 +289,11 @@ public class CondicaoPagamentoService : ICondicaoPagamentoService
     {
         var errors = new List<ValidationError>();
 
+        if (dto.RecebeAcrescimo && dto.RecebeDesconto)
+        {
+            errors.Add(new ValidationError("RecebeAcrescimo", "A condição de pagamento não pode receber acréscimo e desconto ao mesmo tempo."));
+        }
+
         if (dto.IdTipoCondicaoPagto == CondicaoPagtoTipo.Semanal)
         {
             if (dto.IdDiaSemana == 0)
