@@ -91,14 +91,18 @@ A spec gerada DEVE conter rigorosamente as 8 seções abaixo:
 - **Sinalização Visual de Obrigatoriedade:** Prop `required` nos campos obrigatórios do MUI (asterisco vermelho `*`).
 - **Indicador de Status:** Coluna `Ativo` com cor verde quando ativa e vermelha quando inativa.
 
-## 6. Regras de Negócio e Validações
-- [Regra 1 extraída do .cs legado]
-- [Regra 2 extraída do .cs legado]
+## 6. Regras de Negócio e Matriz RTV (Rastreabilidade Total de Validações)
+- **Rastreamento de Herança:** Indicar se o objeto ou formulário herda de classe base (`EntPessoa`, `FormBaseCadastro`) e consolidar suas validações.
+- **Matriz RTV de Validações:**
+  | ID | Origem Legada | Camada / Classe | Regra / Condição Legada | Mensagem Legada Exata | Destino Backend (.NET Result<T>) | Destino Frontend (Zod + MUI) |
+  |---|---|---|---|---|---|---|
+  | **VAL-01** | `[Arquivo.cs:Linha]` | `[UI/Domínio/Pai]` | `[Regra Legada]` | `"[Mensagem Legada]"` | `[Destino .NET]` | `[Destino Zod/MUI]` |
 
-## 7. Critérios de Aceite (Cenários de Teste)
+## 7. Critérios de Aceite (Cenários de Teste & Testes Unitários TDD)
 - **Cenário 1 (Sucesso na listagem):** GET paginado retorna status `200 OK` com os itens e o total.
 - **Cenário 2 (Validação de negócio):** Dados inválidos retornam `400 BadRequest` com mensagens do Result Pattern.
 - **Cenário 3 (Sinalização visual):** Campos obrigatórios exibem `*` vermelho e validam via Zod schema.
+- **Cenário 4 (Testes Unitários C#):** Cobertura por testes unitários TDD em `Versatus.Tests` para 100% dos itens da Matriz RTV.
 
 ## 8. Pendências e Dúvidas
 - [Listar qualquer ponto incerto para validação do usuário]

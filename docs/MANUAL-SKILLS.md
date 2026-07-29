@@ -31,7 +31,11 @@
    - [Propósito](#propósito-writing-skills)
    - [Quando Usar](#quando-usar-writing-skills)
    - [Exemplo de Uso Prático](#exemplo-de-uso-prático-writing-skills)
-8. [Boas Práticas de Manutenção do Manual](#8-boas-práticas-de-manutenção-do-manual)
+8. [Skill 7: `legacy-validation-audit`](#8-skill-7-legacy-validation-audit)
+   - [Propósito](#propósito-legacy-validation-audit)
+   - [Quando Usar](#quando-usar-legacy-validation-audit)
+   - [Exemplo de Uso Prático](#exemplo-de-uso-prático-legacy-validation-audit)
+9. [Boas Práticas de Manutenção do Manual](#9-boas-práticas-de-manutenção-do-manual)
 
 ---
 
@@ -238,11 +242,38 @@ Usar a skill writing-skills para mover a documentação de nulidades da skill sp
 | **Criar Nova Skill** | `Usar a skill writing-skills para criar a skill [nome-da-skill]` |
 | **Auditar Skill Existente** | `Usar a skill writing-skills para auditar a skill [nome-da-skill]` |
 | **Refatorar/Enxugar Skill** | `Usar a skill writing-skills para otimizar os tokens da skill [nome-da-skill]` |
-4. Atualizará o manual `docs/MANUAL-SKILLS.md` conforme a Regra 12 do `AGENTS.md`.
 
 ---
 
-## 8. Boas Práticas de Manutenção do Manual
+## 8. Skill 7: `legacy-validation-audit`
+
+<a id="propósito-legacy-validation-audit"></a>
+### 🎯 Propósito
+Garantir a **Rastreabilidade Total de Validações (Matriz RTV)** e a correta identificação de regras de herança (classes pai backend e frontend) do sistema legado. Impõe a varredura em 4 camadas (UI, Domínio, Helpers e Banco) e a criação de testes unitários TDD no C# para dar 100% de segurança de conversão.
+
+<a id="quando-usar-legacy-validation-audit"></a>
+### 📅 Quando Usar
+- Durante a **Fase 1 (Elaboração da Spec)** de qualquer formulário legado.
+- Sempre que houver suspeita de perda de validações visuais (`_Validating`, `ErrorProvider`, `MessageBox`) ou regras de herança (`EntPessoa`, `FormBaseCadastro`).
+- Ao preparar a suíte de testes unitários C# para validar regras de negócio.
+
+<a id="exemplo-de-uso-prático-legacy-validation-audit"></a>
+### 💡 Exemplo de Uso Prático
+```
+Usar a skill legacy-validation-audit para auditar o formulário FCliente.cs, sua entidade EntCliente.cs e a classe pai EntPessoa.cs gerando a Matriz RTV.
+```
+
+#### 📋 Tabela de Prompts Práticos:
+
+| Ação Desejada | Exemplo de Prompt no Chat da IA |
+|---|---|
+| **Auditoria com Herança** | `Usar a skill legacy-validation-audit para mapear a herança de EntPessoa em EntCliente.cs` |
+| **Gerar Matriz RTV** | `Usar a skill legacy-validation-audit para gerar a Matriz RTV do formulário FCondicaoPagamento` |
+| **Validar Cobertura TDD** | `Usar a skill legacy-validation-audit para criar testes C# cobrindo a Matriz RTV` |
+
+---
+
+## 9. Boas Práticas de Manutenção do Manual
 
 1. **Atualização Contínua:** Sempre que uma nova skill for adicionada em `.agents/skills/`, inclua sua entrada no Índice e crie uma seção correspondente neste manual.
 2. **Exemplos Reais:** Mantenha os prompts de exemplo alinhados aos nomes reais de arquivos e módulos do ERP.

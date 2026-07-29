@@ -32,23 +32,20 @@ Leia os seguintes arquivos nesta ordem antes de escrever qualquer código ou spe
 Analise os seguintes arquivos do sistema legado antes de gerar qualquer artefato.
 Use `view_file` para lê-los integralmente — nunca assuma o conteúdo sem ler.
 
-### 3a. Objeto de Negócio / Regras (.cs)
+### 3a. Objeto de Negócio / Regras (.cs) e Classes Pai (Herança)
 > Classe de entidade com propriedades, validações, regras de negócio,
 > enums e valores padrão do legado.
-> Extraia: propriedades, tipos, nullabilidade, validações obrigatórias
-> e regras condicionais.
+> SE A CLASSE HERDAR DE UMA CLASSE PAI (Ex: EntPessoa), INFORME TAMBÉM A CLASSE PAI!
 
-[INFORME O CAMINHO ou COLE O CONTEÚDO]
+[INFORME O CAMINHO OU COLE O CONTEÚDO DA CLASSE FILHA E DA CLASSE PAI]
 Exemplo: `projeto_tag_1906/servidor/objeto de negócio/acessoglobal/[Nome].cs`
 
-### 3b. Formulário Legado (.cs — classe de Form)
+### 3b. Formulário Legado (.cs — classe de Form) e Forms Pai
 > Classe de formulário com a definição visual da tela: campos, abas,
-> grids, botões, eventos de UI e lógica de apresentação.
-> Extraia: todos os campos visíveis, abas existentes, campos obrigatórios,
-> campos condicionais (Enabled/Visible por condição), grids filhos
-> e labels de cada campo.
+> grids, botões, eventos de UI (_Validating, _Leave, _Click) e lógica de apresentação.
+> SE O FORMULARIO HERDAR DE UM FORM PAI, INFORME O FORM PAI!
 
-[INFORME O CAMINHO ou COLE O CONTEÚDO]
+[INFORME O CAMINHO OU COLE O CONTEÚDO]
 Exemplo: `projeto_tag_1906/cliente/formularios/F[Nome].cs`
 
 ### 3c. Tabelas do Banco de Dados
@@ -62,8 +59,9 @@ Tabelas filhas: `Glo[Nome]Item` — Colunas: ...
 
 ## 4. O QUE EXTRAIR DA ANÁLISE DOS ARQUIVOS LEGADOS
 
-Ao ler os arquivos acima, produza um mapeamento completo antes de gerar qualquer spec:
+Ao ler os arquivos acima (incluindo herança e eventos de formulário), produza dois mapeamentos completos antes de gerar qualquer spec:
 
+### 4a. Mapeamento de Propriedades vs. UI
 | # | Propriedade Legada | Tipo Legado | Nullable? | Campo no Formulário? | Obrigatório? | Observação |
 |---|-------------------|-------------|-----------|---------------------|-------------|------------|
 | 1 | Descricao         | string      | NÃO       | Sim                 | Sim         | Label "Descrição" |
@@ -71,7 +69,14 @@ Ao ler os arquivos acima, produza um mapeamento completo antes de gerar qualquer
 | 3 | Observacao        | string      | SIM       | Sim                 | Não         | Textarea   |
 | 4 | DataAuditoria     | DateTime    | SIM       | Não (sistema)       | —           | Apenas auditoria |
 
+### 4b. Matriz RTV (Rastreabilidade Total de Validações e Regras de Negócio)
+| ID | Origem Legada (Arquivo:Linha) | Camada / Nível | Regra / Condição Legada | Mensagem Legada Exata | Destino Backend (.NET Result<T>) | Destino Frontend (Zod + MUI) |
+|---|---|---|---|---|---|---|
+| VAL-01 | `F[Nome].cs:tbCPF_Validating` | UI / Filho | CPF válido se `TipoPessoa == 'F'` | "CPF inválido." | `ValidadorCpf.Validar(dto.Cpf)` | `zod.refine(validaCPF)` |
+| VAL-02 | `EntPessoa.cs:Validar()` | Domínio / Pai | UF obrigatória se Brasil | "Informe a UF." | `if (string.IsNullOrEmpty(dto.Uf))` | `zod.string().length(2)` |
+
 AVISO: Nenhuma propriedade editável pode ficar fora da UI (Regra 3 do AGENTS.md).
+AVISO: 100% das validações legadas (inclusive herdadas e de eventos de UI) devem estar mapeadas na Matriz RTV.
 AVISO: Campos com NULL no banco devem virar tipos anuláveis no C# (int?, string?, etc).
 
 ## 5. TAREFA — PIPELINE DE MIGRAÇÃO
@@ -79,10 +84,10 @@ Siga rigorosamente o pipeline da SKILL.md fase a fase:
 
 **Fase 1 — Spec Funcional:**
 - Classifique o formulário como Padrão A (CRUD) ou Padrão B (Lote)
-- Use o mapeamento da seção 4 para garantir cobertura 100% das propriedades
-- Inclua: requisitos de Clean Architecture, Result Pattern, endpoints, validações e regras de negócio extraídas do .cs de negócio
+- Use os mapeamentos das seções 4a e 4b para garantir cobertura 100% das propriedades e validações
+- Inclua: requisitos de Clean Architecture, Result Pattern, endpoints, Matriz RTV e regras de herança
 - Inclua: layout de abas e campos extraídos do .cs de formulário
-- Gere a spec em `docs/spec_f[nome].md` com Critérios de Aceite
+- Gere a spec em `docs/spec_f[nome].md` com Critérios de Aceite e plano de testes unitários TDD
 - PARE e aguarde minha aprovação antes de gerar qualquer código
 
 **Fase 2 — Backend C#:**
