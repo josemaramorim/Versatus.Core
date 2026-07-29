@@ -117,8 +117,8 @@ Todo formulário migrado deve ser classificado em um dos dois padrões antes de 
 - **Obrigatorio:** Toda criação, alteração ou exclusão de qualquer skill no diretório `.agents/skills/` DEVE obrigatoriamente ser refletida e atualizada no manual `docs/MANUAL-SKILLS.md`.
 - O manual deve manter seu Índice Geral atualizado, explicando o propósito da skill, quando utilizá-la e fornecendo um exemplo de uso prático.
 
-## 13. Cobertura Obrigatória de Testes Unitários de Negócio (Matriz RTV & Coverlet)
-- **Obrigatorio (Sem Exceção):** Nenhum serviço backend C# (`Domain/Services/[Nome]Service.cs`) pode ser entregue ou considerado concluído sem que exista sua respectiva classe de testes unitários em `tests/[Modulo].Tests/[Nome]ServiceTests.cs`.
-- **Obrigatorio (Fidelidade à Matriz RTV):** Para cada validação ou regra mapeada na **Matriz RTV**, a classe de testes DEVE conter pelo menos 1 método `[Fact]` testando a falha funcional (`Result.IsSuccess == false` com a mensagem exata) e o cenário de sucesso.
-- **Obrigatorio (Validação Automatizada):** O agente deve obrigatoriamente rodar `dotnet test` e garantir 100% de aprovação na suíte de testes unitários antes de avançar para o frontend ou finalizar a migração.
+## 13. Cobertura Obrigatória de Testes Unitários (Dupla Trava: Backend + Frontend)
+- **Obrigatorio Backend C#:** Nenhum serviço backend C# (`Domain/Services/[Nome]Service.cs`) pode ser entregue sem sua respectiva classe de testes unitários em `tests/[Modulo].Tests/[Nome]ServiceTests.cs` cobrindo 100% dos itens da **Matriz RTV**.
+- **Obrigatorio Frontend React:** Todo formulário React DEVE conter o arquivo de testes unitários do schema Zod em `src/pages/[Modulo]/F[Nome]/schema.test.ts` testando todas as regras de validação visual e de formulário via **Vitest**.
+- **Obrigatorio (Validação Automatizada Dupla):** O agente deve obrigatoriamente executar `dotnet test` (backend) e `npm test` (frontend) e comprovar 100% de aprovação em ambas as suítes antes de considerar a migração concluída.
 
