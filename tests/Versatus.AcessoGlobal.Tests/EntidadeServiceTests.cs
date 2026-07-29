@@ -349,4 +349,95 @@ public class EntidadeServiceTests
         resultado.Should().NotBeNull();
         _repositoryMock.Verify(r => r.AddAsync(entidade, It.IsAny<CancellationToken>()), Times.Once);
     }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoNenhumPapelForSelecionado()
+    {
+        // Arrange
+        var entidade = new Entidade { Nome = "Sem Papel" }; // Nenhum IsCliente, IsFornecedor etc marcado
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Pelo menos um tipo de entidade (papel) deve ser selecionado.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoFilialPessoaFisicaSemCaracteristicaJuridica()
+    {
+        // Arrange
+        var entidade = new Entidade 
+        { 
+            Nome = "Filial PF", 
+            IsFilial = true, 
+            TipoPessoa = EntidadeTipoPessoa.Fisica,
+            PessoaFisica = new DadosPessoaFisica { FisicaTipoJuridica = false }
+        };
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Para entidade do tipo 'Filial' definida como pessoa 'Física', deve estar marcado 'Pessoa física com característica de jurídica'.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoFuncionarioForPessoaJuridica()
+    {
+        // Arrange
+        var entidade = new Entidade 
+        { 
+            Nome = "Funcionario PJ", 
+            IsFuncionario = true, 
+            TipoPessoa = EntidadeTipoPessoa.Juridica 
+        };
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Para a entidade do tipo 'Funcionário', deve ser pessoa física e não possuir característica de pessoa jurídica.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoIntermediadorForPessoaFisica()
+    {
+        // Arrange
+        var entidade = new Entidade 
+        { 
+            Nome = "Intermediador PF", 
+            IsIntermediadorComercial = true, 
+            TipoPessoa = EntidadeTipoPessoa.Fisica 
+        };
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Para a entidade do tipo 'Intermediador', deve ser SOMENTE pessoa definida como jurídica.");
+    }
+
+    [Fact]
+    public async Task CriarAsync_DeveLancarExcecao_QuandoInscricaoSuframaComecarComZeroZero()
+    {
+        // Arrange
+        var entidade = new Entidade 
+        { 
+            Nome = "Suframa Invalida", 
+            IsCliente = true,
+            InscricaoSuframa = "001234567"
+        };
+
+        // Act
+        var act = () => _service.CriarAsync(entidade);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Os dois primeiros caracteres da inscrição SUFRAMA, NÃO pode ser '00'.");
+    }
 }
