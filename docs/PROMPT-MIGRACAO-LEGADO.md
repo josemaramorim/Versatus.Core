@@ -105,6 +105,18 @@ Siga rigorosamente o pipeline da SKILL.md fase a fase:
 - Todos os campos obrigatórios com prop `required` no MUI (asterisco vermelho)
 - Checklist: cada linha do mapeamento da seção 4 com Sim deve ter campo na UI
 - Organizar em `src/pages/[Modulo]/F[Nome]/`
+- **[OBRIGATÓRIO] Padrão Visual de Campos MUI — Floating Label:**
+  - Todos os campos DEVEM usar `variant="outlined"` (`TextField`, `Select`, `FormControl`).
+  - O label NUNCA deve ser externo ao campo — usar sempre `InputLabel` do MUI (label flutua sobre a borda).
+  - Estado normal: borda cinza, label cinza pequeno flutuando sobre a borda.
+  - Estado focado: borda azul (2px), label azul flutuando sobre a borda.
+  - Estado de erro: borda vermelha (2px), label vermelho, `helperText` com mensagem Zod abaixo do campo.
+  - Proibido: usar apenas `placeholder` como substituto de label.
+- **[OBRIGATÓRIO] Formulário Inline na Aba (sem modal):**
+  - Clicar em `+ Novo` ou `Editar` NÃO abre modal/dialog. O formulário ocupa inline a área de conteúdo da aba.
+  - A lógica de transição `grid ↔ formulário` (viewMode: 'list' | 'form') é centralizada no `BaseCadastro.tsx` (herança automática).
+  - Ao salvar com sucesso: retorna automaticamente para a listagem (viewMode = 'list').
+  - Ao cancelar: retorna para a listagem sem salvar.
 - Execute `npm run build` e corrija todos os erros
 
 **Fase 4 — Integração e Finalização:**
@@ -120,6 +132,8 @@ Siga rigorosamente o pipeline da SKILL.md fase a fase:
 - Proibido: avançar para código sem aprovação da Spec
 - Proibido: lançar throw new Exception() para validações de negócio
 - Proibido: inventar ou otimizar funcionalidades além do que está no legado
+- Proibido: abrir formulários de Novo/Editar em modal/dialog — sempre inline na aba (viewMode no BaseCadastro)
+- Proibido: usar label externo ao campo MUI ou apenas placeholder — floating label obrigatório (variant="outlined")
 - Obrigatório: criar branch `feat/migrate-[nome]` para todo desenvolvimento
 - Obrigatório: manter nomes de tabelas e colunas idênticos ao legado
 - Obrigatório: sempre perguntar sobre exclusão da branch após merge na develop
