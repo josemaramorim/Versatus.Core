@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Box, Tooltip, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import BusinessIcon from '@mui/icons-material/Business';
@@ -30,27 +30,33 @@ export const TabBar: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visivelCount, setVisivelCount] = useState(abas.length);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    let animId: number;
     const calcular = () => {
-      if (!containerRef.current) return;
-      const containerWidth = containerRef.current.offsetWidth;
-      const larguraParaAbas = containerWidth - PADDING_TOTAL;
+      animId = requestAnimationFrame(() => {
+        if (!containerRef.current) return;
+        const containerWidth = containerRef.current.offsetWidth;
+        const larguraParaAbas = containerWidth - PADDING_TOTAL;
 
-      const cabemSemOverflow = Math.floor(larguraParaAbas / TAB_SLOT_WIDTH);
+        const cabemSemOverflow = Math.floor(larguraParaAbas / TAB_SLOT_WIDTH);
 
-      if (abas.length <= cabemSemOverflow) {
-        setVisivelCount(abas.length);
-      } else {
-        const larguraComButton = larguraParaAbas - OVERFLOW_BTN_WIDTH;
-        const cabemComOverflow = Math.max(1, Math.floor(larguraComButton / TAB_SLOT_WIDTH));
-        setVisivelCount(cabemComOverflow);
-      }
+        if (abas.length <= cabemSemOverflow) {
+          setVisivelCount(abas.length);
+        } else {
+          const larguraComButton = larguraParaAbas - OVERFLOW_BTN_WIDTH;
+          const cabemComOverflow = Math.max(1, Math.floor(larguraComButton / TAB_SLOT_WIDTH));
+          setVisivelCount(cabemComOverflow);
+        }
+      });
     };
 
     calcular();
     const observer = new ResizeObserver(calcular);
     if (containerRef.current) observer.observe(containerRef.current);
-    return () => observer.disconnect();
+    return () => {
+      cancelAnimationFrame(animId);
+      observer.disconnect();
+    };
   }, [abas.length]);
 
   if (abas.length === 0) return null;

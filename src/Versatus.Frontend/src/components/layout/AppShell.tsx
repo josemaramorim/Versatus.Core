@@ -26,6 +26,24 @@ const ROTA_TITULO_MAP: Record<string, string> = {
   '/acesso-global/condicao-pagamento': 'Condições de Pagamento',
 };
 
+/** Componente memoizado para congelar renderizações de abas inativas */
+const TabKeepAliveWrapper = React.memo<{
+  isAtiva: boolean;
+  children: React.ReactNode;
+}>(
+  ({ isAtiva, children }) => (
+    <Box
+      sx={{
+        display: isAtiva ? 'block' : 'none',
+        height: '100%',
+      }}
+    >
+      {children}
+    </Box>
+  ),
+  (prevProps, nextProps) => prevProps.isAtiva === nextProps.isAtiva
+);
+
 export const AppShell: React.FC = () => {
   const { abas, abaAtivaId, abrirAba } = useTabs();
   const location = useLocation();
@@ -37,7 +55,6 @@ export const AppShell: React.FC = () => {
     const titulo = ROTA_TITULO_MAP[currentPath];
 
     if (titulo) {
-      // Se não há abas abertas ainda OU no carregamento inicial da página
       if (!initializedRef.current || abas.length === 0) {
         initializedRef.current = true;
         abrirAba({ titulo, rota: currentPath });
@@ -73,20 +90,14 @@ export const AppShell: React.FC = () => {
             {/* Tela de boas-vindas quando não há abas abertas */}
             {abas.length === 0 && <WelcomeScreen />}
 
-            {/* Keep-Alive: cada aba fica montada, apenas oculta via display:none */}
+            {/* Keep-Alive Memoizado: cada aba fica montada em memória e congelada quando inativa */}
             {abas.map(aba => {
               const Pagina = PAGINA_MAP[aba.rota];
               if (!Pagina) return null;
               return (
-                <Box
-                  key={aba.id}
-                  sx={{
-                    display: abaAtivaId === aba.id ? 'block' : 'none',
-                    height: '100%',
-                  }}
-                >
+                <TabKeepAliveWrapper key={aba.id} isAtiva={aba.id === abaAtivaId}>
                   <Pagina />
-                </Box>
+                </TabKeepAliveWrapper>
               );
             })}
           </Box>
