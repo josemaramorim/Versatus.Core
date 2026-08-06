@@ -173,7 +173,7 @@ export function CadastroBasePage<T>({
           mb: 2.5 
         }}
       >
-        <Typography variant="h4" component="h1" sx={{ color: 'text.primary', fontWeight: 800 }}>
+        <Typography variant="h5" component="h1" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '1.35rem' }}>
           {config.getTitulo()}
         </Typography>
 

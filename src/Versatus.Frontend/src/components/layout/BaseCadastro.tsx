@@ -100,7 +100,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
               <ArrowLeft size={20} />
             </IconButton>
           )}
-          <Typography variant="h4" component="h1" sx={{ color: 'text.primary', fontWeight: 800 }}>
+          <Typography variant="h5" component="h1" sx={{ color: 'text.primary', fontWeight: 700, fontSize: '1.35rem' }}>
             {subtituloBreadcrumb ? `${subtituloBreadcrumb} ${titulo}` : titulo}
           </Typography>
         </Box>
