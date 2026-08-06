@@ -50,43 +50,46 @@ export const AppShell: React.FC = () => {
       {/* Barra superior fixa */}
       <TopBar />
 
-      {/* Barra de abas — só aparece quando há abas abertas */}
-      <TabBar />
-
       <Box sx={{ display: 'flex', flexGrow: 1, position: 'relative', overflow: 'hidden' }}>
         {/* Sidebar de navegação */}
         <ContextualSidebar />
 
-        {/* Área de conteúdo principal */}
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            minWidth: 0,
-            overflowX: 'auto',
-            bgcolor: 'background.default',
-            position: 'relative',
-          }}
-        >
-          {/* Tela de boas-vindas quando não há abas abertas */}
-          {abas.length === 0 && <WelcomeScreen />}
+        {/* Coluna Direita: Barra de Abas + Conteúdo Principal */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0, overflow: 'hidden' }}>
+          {/* Barra de abas — posicionada à direita da Sidebar */}
+          <TabBar />
 
-          {/* Keep-Alive: cada aba fica montada, apenas oculta via display:none */}
-          {abas.map(aba => {
-            const Pagina = PAGINA_MAP[aba.rota];
-            if (!Pagina) return null;
-            return (
-              <Box
-                key={aba.id}
-                sx={{
-                  display: abaAtivaId === aba.id ? 'block' : 'none',
-                  height: '100%',
-                }}
-              >
-                <Pagina />
-              </Box>
-            );
-          })}
+          {/* Área de conteúdo principal */}
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              minWidth: 0,
+              overflowX: 'auto',
+              bgcolor: 'background.default',
+              position: 'relative',
+            }}
+          >
+            {/* Tela de boas-vindas quando não há abas abertas */}
+            {abas.length === 0 && <WelcomeScreen />}
+
+            {/* Keep-Alive: cada aba fica montada, apenas oculta via display:none */}
+            {abas.map(aba => {
+              const Pagina = PAGINA_MAP[aba.rota];
+              if (!Pagina) return null;
+              return (
+                <Box
+                  key={aba.id}
+                  sx={{
+                    display: abaAtivaId === aba.id ? 'block' : 'none',
+                    height: '100%',
+                  }}
+                >
+                  <Pagina />
+                </Box>
+              );
+            })}
+          </Box>
         </Box>
       </Box>
     </Box>

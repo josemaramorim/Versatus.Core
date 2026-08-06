@@ -1,19 +1,35 @@
 import React, { useRef, useLayoutEffect, useState } from 'react';
 import { Box, Tooltip, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import BusinessIcon from '@mui/icons-material/Business';
+import TuneIcon from '@mui/icons-material/Tune';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useTabs } from '../../context/TabsContext';
 import { TabOverflowMenu } from './TabOverflowMenu';
 
-const TAB_MIN_WIDTH = 160;
+const TAB_MIN_WIDTH = 150;
 const TAB_MAX_WIDTH = 220;
-const OVERFLOW_BTN_WIDTH = 56;
+const OVERFLOW_BTN_WIDTH = 64;
+
+function getTabIcon(rota: string) {
+  if (rota.includes('entidade')) {
+    return <BusinessIcon sx={{ fontSize: 16, color: 'primary.main', mr: 0.75, flexShrink: 0 }} />;
+  }
+  if (rota.includes('parametro')) {
+    return <TuneIcon sx={{ fontSize: 16, color: 'primary.main', mr: 0.75, flexShrink: 0 }} />;
+  }
+  if (rota.includes('condicao')) {
+    return <CreditCardIcon sx={{ fontSize: 16, color: 'primary.main', mr: 0.75, flexShrink: 0 }} />;
+  }
+  return <InsertDriveFileIcon sx={{ fontSize: 16, color: 'primary.main', mr: 0.75, flexShrink: 0 }} />;
+}
 
 export const TabBar: React.FC = () => {
   const { abas, abaAtivaId, ativarAba, fecharAba } = useTabs();
   const containerRef = useRef<HTMLDivElement>(null);
   const [visivelCount, setVisivelCount] = useState(abas.length);
 
-  // Recalcula quantas abas cabem sempre que a lista ou o tamanho muda
   useLayoutEffect(() => {
     const calcular = () => {
       if (!containerRef.current) return;
@@ -46,11 +62,12 @@ export const TabBar: React.FC = () => {
         bgcolor: 'grey.100',
         borderBottom: '1px solid',
         borderColor: 'divider',
-        px: 1,
-        pt: 0.5,
-        minHeight: 40,
+        px: 1.5,
+        pt: 0.75,
+        minHeight: 42,
         overflow: 'hidden',
         flexShrink: 0,
+        width: '100%',
       }}
     >
       {/* Abas visíveis */}
@@ -63,13 +80,12 @@ export const TabBar: React.FC = () => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.5,
                 minWidth: TAB_MIN_WIDTH,
                 maxWidth: TAB_MAX_WIDTH,
                 height: 36,
                 px: 1.5,
-                mr: 0.5,
-                borderRadius: '6px 6px 0 0',
+                mr: 0.75,
+                borderRadius: '8px 8px 0 0',
                 border: '1px solid',
                 borderBottom: 'none',
                 cursor: 'pointer',
@@ -80,18 +96,22 @@ export const TabBar: React.FC = () => {
                 borderColor: isAtiva ? 'divider' : 'transparent',
                 borderBottomWidth: isAtiva ? 2 : 0,
                 borderBottomColor: isAtiva ? 'primary.main' : 'transparent',
+                boxShadow: isAtiva ? '0 -2px 6px rgba(0,0,0,0.04)' : 'none',
                 '&:hover': {
                   bgcolor: isAtiva ? 'background.paper' : 'grey.300',
                 },
               }}
             >
+              {/* Ícone da aba */}
+              {getTabIcon(aba.rota)}
+
               {/* Título da aba */}
               <Box
                 component="span"
                 sx={{
                   flexGrow: 1,
-                  fontSize: '0.78rem',
-                  fontWeight: isAtiva ? 600 : 400,
+                  fontSize: '0.8rem',
+                  fontWeight: isAtiva ? 700 : 500,
                   color: isAtiva ? 'text.primary' : 'text.secondary',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -109,14 +129,15 @@ export const TabBar: React.FC = () => {
                 size="small"
                 onClick={(e) => handleFechar(e, aba.id)}
                 sx={{
-                  width: 18,
-                  height: 18,
+                  width: 20,
+                  height: 20,
+                  ml: 0.5,
                   flexShrink: 0,
                   color: 'text.disabled',
                   '&:hover': { color: 'text.primary', bgcolor: 'action.hover' },
                 }}
               >
-                <CloseIcon sx={{ fontSize: 12 }} />
+                <CloseIcon sx={{ fontSize: 13 }} />
               </IconButton>
             </Box>
           </Tooltip>
