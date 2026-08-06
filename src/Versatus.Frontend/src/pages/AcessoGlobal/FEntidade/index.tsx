@@ -480,8 +480,8 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
               <Controller
                 name="tipoPessoa"
                 control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth disabled={isBrowse}>
+                render={({ field, fieldState: { error } }) => (
+                  <FormControl fullWidth required disabled={isBrowse} error={!!error}>
                     <InputLabel>Tipo de Pessoa</InputLabel>
                     <Select
                       {...field}
@@ -495,6 +495,9 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                         </MenuItem>
                       ))}
                     </Select>
+                    {error && (
+                      <FormHelperText>{error.message}</FormHelperText>
+                    )}
                   </FormControl>
                 )}
               />

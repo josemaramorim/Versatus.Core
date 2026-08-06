@@ -31,19 +31,25 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
         <Box>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField 
-                {...register('cpf')}
-                fullWidth 
-                required
-                label="CPF" 
-                disabled={isBrowse} 
-                error={!!errors.cpf}
-                helperText={errors.cpf?.message}
-                slotProps={{
-                  input: {
-                    inputComponent: CPFMask as any
-                  }
-                }}
+              <Controller
+                name="cpf"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <TextField 
+                    {...field}
+                    fullWidth 
+                    required
+                    label="CPF" 
+                    disabled={isBrowse} 
+                    error={!!error}
+                    helperText={error?.message}
+                    slotProps={{
+                      input: {
+                        inputComponent: CPFMask as any
+                      }
+                    }}
+                  />
+                )}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>
@@ -272,19 +278,25 @@ export const DadosGeraisTab: React.FC<ITabProps> = ({ isBrowse }) => {
         <Box>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, sm: 3 }}>
-              <TextField 
-                {...register('cnpj')}
-                fullWidth 
-                required
-                label="CNPJ" 
-                disabled={isBrowse} 
-                error={!!errors.cnpj}
-                helperText={errors.cnpj?.message}
-                slotProps={{
-                  input: {
-                    inputComponent: CNPJMask as any
-                  }
-                }}
+              <Controller
+                name="cnpj"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <TextField 
+                    {...field}
+                    fullWidth 
+                    required
+                    label="CNPJ" 
+                    disabled={isBrowse} 
+                    error={!!error}
+                    helperText={error?.message}
+                    slotProps={{
+                      input: {
+                        inputComponent: CNPJMask as any
+                      }
+                    }}
+                  />
+                )}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 3 }}>
