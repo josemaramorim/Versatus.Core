@@ -159,6 +159,15 @@ Após a compilação limpa do backend:
 5. Crie `index.tsx` com a View do formulário:
    - **[CRUD]** Grid paginado + botões Novo/Editar/Excluir usando MUI.
    - **[LOTE]** Accordions **fechados por padrão**, agrupados pelo campo Agrupador. Cada item exibe: (a) Descrição em destaque, (b) Chave técnica como subtexto, (c) campo de edição inline condicionado ao tipo. Botões Novo e Excluir completamente ausentes do JSX.
+   - **[OBRIGATÓRIO] Padrão Visual de Campos MUI — Floating Label:**
+      - Todos os campos do formulário DEVEM usar `variant="outlined"` no MUI (`TextField`, `Select`, `FormControl`).
+      - O label NUNCA deve ser externo (acima do campo). Ele deve ser o `InputLabel` do próprio MUI, que flutua sobre a borda superior do campo no padrão floating label.
+      - **Estado normal:** borda cinza (1px), label pequeno flutuando sobre a borda em cinza.
+      - **Estado focado:** borda azul (2px, `primary.main`), label em azul flutuando sobre a borda.
+      - **Estado de erro:** borda vermelha (2px), label em vermelho, `helperText` abaixo em vermelho com a mensagem de validação Zod.
+      - **Proibido:** usar `placeholder` como substituto de label. O `label` prop do MUI é obrigatório em todos os campos.
+      - Exemplo correto `TextField`: `<TextField variant="outlined" label="Descrição" required error={!!errors.descricao} helperText={errors.descricao?.message} />`
+      - Exemplo correto `Select`: `<FormControl variant="outlined" fullWidth required error={!!errors.tipo}><InputLabel>Tipo Condição</InputLabel><Select label="Tipo Condição" ...>`
    - **[OBRIGATÓRIO] Sinalização visual de obrigatoriedade:** Todo campo definido como obrigatório na Spec (`✅`) DEVE receber a prop `required` no componente MUI (`TextField`, `FormControl`). O MUI exibirá o asterisco `*` automaticamente no label. Omitir `required` é proibido pela Regra 10 do AGENTS.md.
    - **[OBRIGATÓRIO] Checklist de Cobertura de Propriedades:** Antes de finalizar o JSX de `index.tsx`, compare a lista de propriedades da interface `I[Nome]Form` com o formulário e garanta que TODAS as propriedades editáveis (como `ativo`/`situacao`, flags, observações) tenham componentes de entrada (TextField, Switch, Checkbox, Select) correspondentes na tela. Omitir campos do DTO na UI é proibido pela Regra 3 do AGENTS.md.
 6. **[OBRIGATÓRIO] Crie os Testes Unitários de Schema Zod (`schema.test.ts`):**

@@ -65,6 +65,7 @@ Dado um formulário `F[Nome]` ou Módulo `[Modulo]`, o auditor inspeciona os seg
 
 ### 11. Sinalização Visual MUI (`required`) e CQRS DB Split
 - [ ] **MUI required:** Prop `required` nos componentes MUI para todos os campos obrigatórios.
+- [ ] **MUI Floating Label (variant="outlined"):** Todos os campos usam `variant="outlined"` — label flutua sobre a borda superior do campo. Proibido label externo (acima/fora do campo) ou usar apenas `placeholder`. Verificar estados: cinza (normal), azul (focado), vermelho + helperText (erro).
 - [ ] **CQRS DB Split:** Repositório usa `ReadContext` (`ReadConnection` com `NoTracking`) para consultas e `Context` (`WriteConnection`) para gravações.
 
 ---
