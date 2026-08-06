@@ -1,22 +1,32 @@
 import React from 'react';
-import { 
-  Box, 
-  Card, 
-  Button, 
-  Typography, 
-  Breadcrumbs, 
+import {
+  Box,
+  Card,
+  Button,
+  Typography,
+  Breadcrumbs,
   Link,
   IconButton
 } from '@mui/material';
-import { 
-  Plus, 
-  Save, 
-  RotateCcw, 
-  Trash2, 
-  ArrowLeft 
+import {
+  Plus,
+  Save,
+  RotateCcw,
+  Trash2,
+  ArrowLeft
 } from 'lucide-react';
 import type { BaseCadastroProps } from '../../types/cadastro';
 
+/**
+ * BaseCadastro — Componente base herdado por todos os formulários CRUD do ERP.
+ *
+ * Controla a transição entre dois modos de exibição na aba:
+ *   • 'list': exibe a grid/listagem (children do modo browse)
+ *   • 'form': exibe o formulário inline (children do modo insert/edit)
+ *
+ * REGRA: Nenhum modal/dialog é aberto. O formulário ocupa a área de conteúdo da aba.
+ * Ao salvar com sucesso (onSalvar) ou cancelar (onDesfazer/onSair): retorna para 'list'.
+ */
 export const BaseCadastro: React.FC<BaseCadastroProps> = ({
   titulo,
   state,
@@ -30,10 +40,21 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
 }) => {
   const isBrowse = state === 'browse';
 
+  // viewMode interno: derivado do state para manter compatibilidade com o código existente
+  // browse → list | insert/edit → form
+  const viewMode = isBrowse ? 'list' : 'form';
+
+  // Título dinâmico da aba/breadcrumb baseado no modo
+  const subtituloBreadcrumb = state === 'insert'
+    ? 'Novo'
+    : state === 'edit'
+    ? 'Editar'
+    : null;
+
   return (
-    <Box sx={{ p: 4, minHeight: '100vh', bgcolor: 'background.default' }}>
-      
-      {/* 1. Breadcrumbs (Estilo Minimals.cc) */}
+    <Box sx={{ p: { xs: 2, sm: 4 }, minHeight: '100%', bgcolor: 'background.default' }}>
+
+      {/* 1. Breadcrumbs */}
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
         <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
           Dashboard
@@ -41,98 +62,132 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
         <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
           Cadastros
         </Link>
-        <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
-          {titulo}
-        </Typography>
+        {subtituloBreadcrumb ? (
+          <>
+            <Link
+              underline="hover"
+              color="inherit"
+              onClick={onSair}
+              sx={{ fontSize: '0.85rem', cursor: 'pointer' }}
+            >
+              {titulo}
+            </Link>
+            <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
+              {subtituloBreadcrumb}
+            </Typography>
+          </>
+        ) : (
+          <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
+            {titulo}
+          </Typography>
+        )}
       </Breadcrumbs>
 
-      {/* 2. Top Header (Título + Botões de Ações CRUD) */}
-      <Box 
-        sx={{ 
+      {/* 2. Top Header — Título + Botões de Ação CRUD */}
+      <Box
+        sx={{
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
           alignItems: { xs: 'flex-start', sm: 'center' },
           gap: 2,
-          mb: 4 
+          mb: 4
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 1 }}>
-          {onSair && (
-            <IconButton onClick={onSair} size="small" sx={{ mr: 1 }}>
+          {/* Botão voltar — visível no modo form para voltar à listagem */}
+          {!isBrowse && onSair && (
+            <IconButton
+              onClick={onSair}
+              size="small"
+              sx={{ mr: 1 }}
+              title="Voltar para a listagem"
+            >
               <ArrowLeft size={20} />
             </IconButton>
           )}
           <Typography variant="h4" component="h1" sx={{ color: 'text.primary', fontWeight: 800 }}>
-            {titulo}
+            {subtituloBreadcrumb ? `${subtituloBreadcrumb} ${titulo}` : titulo}
           </Typography>
         </Box>
 
-        {/* Barra de Ferramentas CRUD */}
+        {/* Barra de Ferramentas CRUD — exibida condicionalmente por viewMode */}
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5, flexWrap: 'wrap' }}>
-          {/* Adicionar */}
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Plus size={16} />}
-            onClick={onAdicionar}
-            disabled={!isBrowse}
-          >
-            Novo
-          </Button>
 
-          {/* Editar */}
-          {onEditar && (
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={onEditar}
-              disabled={!isBrowse}
-            >
-              Alterar
-            </Button>
+          {/* Modo LIST: botões Novo, Editar, Excluir */}
+          {viewMode === 'list' && (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<Plus size={16} />}
+                onClick={onAdicionar}
+              >
+                Novo
+              </Button>
+
+              {onEditar && (
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  onClick={onEditar}
+                >
+                  Alterar
+                </Button>
+              )}
+
+              {onExcluir && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Trash2 size={16} />}
+                  onClick={onExcluir}
+                >
+                  Excluir
+                </Button>
+              )}
+            </>
           )}
 
-          {/* Salvar */}
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Save size={16} />}
-            onClick={onSalvar}
-            disabled={isBrowse}
-          >
-            Salvar
-          </Button>
+          {/* Modo FORM: botões Salvar, Desfazer, Cancelar */}
+          {viewMode === 'form' && (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<Save size={16} />}
+                onClick={onSalvar}
+              >
+                Salvar
+              </Button>
 
-          {/* Desfazer / Cancelar */}
-          <Button
-            variant="outlined"
-            color="inherit"
-            startIcon={<RotateCcw size={16} />}
-            onClick={onDesfazer}
-            disabled={isBrowse}
-            sx={{ borderColor: 'divider' }}
-          >
-            Desfazer
-          </Button>
+              <Button
+                variant="outlined"
+                color="inherit"
+                startIcon={<RotateCcw size={16} />}
+                onClick={onDesfazer}
+                sx={{ borderColor: 'divider' }}
+              >
+                Desfazer
+              </Button>
 
-          {/* Excluir */}
-          {onExcluir && (
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<Trash2 size={16} />}
-              onClick={onExcluir}
-              disabled={!isBrowse}
-            >
-              Excluir
-            </Button>
+              {onSair && (
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  onClick={onSair}
+                  sx={{ borderColor: 'divider' }}
+                >
+                  Cancelar
+                </Button>
+              )}
+            </>
           )}
         </Box>
       </Box>
 
-      {/* 3. Container Card do Formulário específico (children) */}
-      <Card sx={{ p: 4, overflow: 'visible' }}>
+      {/* 3. Área de conteúdo — grid (list) ou formulário (form) */}
+      <Card sx={{ p: { xs: 2, sm: 4 }, overflow: 'visible' }}>
         {children}
       </Card>
     </Box>

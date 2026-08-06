@@ -3,6 +3,8 @@ import type { ZodTypeAny } from 'zod';
 
 export type CadastroState = 'browse' | 'insert' | 'edit';
 export type CadastroModalMode = 'insert' | 'edit' | 'delete' | 'view' | 'none';
+/** Controla se a área de conteúdo da aba exibe a grid (list) ou o formulário (form) */
+export type CadastroViewMode = 'list' | 'form';
 
 export interface BaseCadastroProps {
   titulo: string;

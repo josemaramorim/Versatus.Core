@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useTabs } from '../../context/TabsContext';
 import {
   Box,
   Drawer,
@@ -38,6 +39,7 @@ function getIconComponent(iconName: string | null) {
 
 export const ContextualSidebar: React.FC = () => {
   const { modulos, moduloAtivo, setModuloAtivo, favoritos, adicionarFavorito, removerFavorito } = useMenu();
+  const { abrirAba } = useTabs();
   const location = useLocation();
   const prevPathRef = useRef(location.pathname);
 
@@ -113,6 +115,14 @@ export const ContextualSidebar: React.FC = () => {
     const active = location.pathname === rotina.rotaCompleta;
     const favorited = isFavorited(rotina.idRotina);
 
+    const handleRotinaClick = () => {
+      abrirAba({
+        titulo: rotina.nome,
+        rota: rotina.rotaCompleta,
+      });
+      if (onRotinaClick) onRotinaClick();
+    };
+
     return (
       <Tooltip
         key={rotina.idRotina}
@@ -123,9 +133,7 @@ export const ContextualSidebar: React.FC = () => {
         arrow
       >
         <ListItemButton
-          component={NavLink}
-          to={rotina.rotaCompleta}
-          onClick={onRotinaClick}
+          onClick={handleRotinaClick}
           sx={{
             pl: collapsed && onRotinaClick ? 1.5 : 2 + level * 1.5,
             pr: 1,
