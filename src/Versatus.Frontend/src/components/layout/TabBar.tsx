@@ -8,9 +8,9 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useTabs } from '../../context/TabsContext';
 import { TabOverflowMenu } from './TabOverflowMenu';
 
-const TAB_MIN_WIDTH = 150;
-const TAB_MAX_WIDTH = 220;
-const OVERFLOW_BTN_WIDTH = 64;
+const TAB_SLOT_WIDTH = 170; // Largura do slot da aba (largura + margem)
+const OVERFLOW_BTN_WIDTH = 80; // Largura reservada para o botão +N
+const PADDING_TOTAL = 24; // Padding horizontal total do container
 
 function getTabIcon(rota: string) {
   if (rota.includes('entidade')) {
@@ -33,10 +33,20 @@ export const TabBar: React.FC = () => {
   useLayoutEffect(() => {
     const calcular = () => {
       if (!containerRef.current) return;
-      const larguraTotal = containerRef.current.offsetWidth - OVERFLOW_BTN_WIDTH;
-      const cabem = Math.max(1, Math.floor(larguraTotal / TAB_MIN_WIDTH));
-      setVisivelCount(Math.min(cabem, abas.length));
+      const containerWidth = containerRef.current.offsetWidth;
+      const larguraParaAbas = containerWidth - PADDING_TOTAL;
+
+      const cabemSemOverflow = Math.floor(larguraParaAbas / TAB_SLOT_WIDTH);
+
+      if (abas.length <= cabemSemOverflow) {
+        setVisivelCount(abas.length);
+      } else {
+        const larguraComButton = larguraParaAbas - OVERFLOW_BTN_WIDTH;
+        const cabemComOverflow = Math.max(1, Math.floor(larguraComButton / TAB_SLOT_WIDTH));
+        setVisivelCount(cabemComOverflow);
+      }
     };
+
     calcular();
     const observer = new ResizeObserver(calcular);
     if (containerRef.current) observer.observe(containerRef.current);
@@ -45,8 +55,18 @@ export const TabBar: React.FC = () => {
 
   if (abas.length === 0) return null;
 
-  const abasVisiveis = abas.slice(0, visivelCount);
-  const abasOcultas = abas.slice(visivelCount);
+  // Garante que a aba ativa esteja SEMPRE visível na barra de abas
+  let abasOrdenadas = [...abas];
+  if (abaAtivaId) {
+    const ativaIndex = abasOrdenadas.findIndex(a => a.id === abaAtivaId);
+    if (ativaIndex >= visivelCount && visivelCount > 0) {
+      const [abaAtiva] = abasOrdenadas.splice(ativaIndex, 1);
+      abasOrdenadas.splice(visivelCount - 1, 0, abaAtiva);
+    }
+  }
+
+  const abasVisiveis = abasOrdenadas.slice(0, visivelCount);
+  const abasOcultas = abasOrdenadas.slice(visivelCount);
 
   const handleFechar = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -80,8 +100,7 @@ export const TabBar: React.FC = () => {
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                minWidth: TAB_MIN_WIDTH,
-                maxWidth: TAB_MAX_WIDTH,
+                width: 160,
                 height: 36,
                 px: 1.5,
                 mr: 0.75,
