@@ -18,9 +18,11 @@ import StarIcon from '@mui/icons-material/Star';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CloseIcon from '@mui/icons-material/Close';
 import { useMenu } from '../../context/MenuContext';
+import { useTabs } from '../../context/TabsContext';
 
 export const FavoritesSelectorButton: React.FC = () => {
   const { favoritos, removerFavorito } = useMenu();
+  const { abrirAba } = useTabs();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
@@ -132,6 +134,10 @@ export const FavoritesSelectorButton: React.FC = () => {
                 >
                   <ListItemButton
                     onClick={() => {
+                      abrirAba({
+                        titulo: fav.nomeRotina,
+                        rota: fav.rotaCompleta
+                      });
                       navigate(fav.rotaCompleta);
                       handleClose();
                     }}

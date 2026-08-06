@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { TopBar } from './TopBar';
 import { TabBar } from './TabBar';
@@ -18,8 +19,31 @@ const PAGINA_MAP: Record<string, React.ComponentType> = {
   '/acesso-global/condicao-pagamento': FCondicaoPagamento,
 };
 
+/** Mapa de rota → título legível da aba */
+const ROTA_TITULO_MAP: Record<string, string> = {
+  '/acesso-global/entidade': 'Cadastro Entidade',
+  '/acesso-global/parametro': 'Parâmetros',
+  '/acesso-global/condicao-pagamento': 'Condições de Pagamento',
+};
+
 export const AppShell: React.FC = () => {
-  const { abas, abaAtivaId } = useTabs();
+  const { abas, abaAtivaId, abrirAba } = useTabs();
+  const location = useLocation();
+  const initializedRef = useRef(false);
+
+  // Sincronização da URL inicial (ex: acessar direto /acesso-global/entidade ou via Favoritos)
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const titulo = ROTA_TITULO_MAP[currentPath];
+
+    if (titulo) {
+      // Se não há abas abertas ainda OU no carregamento inicial da página
+      if (!initializedRef.current || abas.length === 0) {
+        initializedRef.current = true;
+        abrirAba({ titulo, rota: currentPath });
+      }
+    }
+  }, [location.pathname, abrirAba, abas.length]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
