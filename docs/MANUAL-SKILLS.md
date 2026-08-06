@@ -35,7 +35,11 @@
    - [Propósito](#propósito-legacy-validation-audit)
    - [Quando Usar](#quando-usar-legacy-validation-audit)
    - [Exemplo de Uso Prático](#exemplo-de-uso-prático-legacy-validation-audit)
-9. [Boas Práticas de Manutenção do Manual](#9-boas-práticas-de-manutenção-do-manual)
+9. [Skill 8: `project-analyzer`](#9-skill-8-project-analyzer)
+   - [Propósito](#propósito-project-analyzer)
+   - [Quando Usar](#quando-usar-project-analyzer)
+   - [Exemplo de Uso Prático](#exemplo-de-uso-prático-project-analyzer)
+10. [Boas Práticas de Manutenção do Manual](#10-boas-práticas-de-manutenção-do-manual)
 
 ---
 
@@ -273,7 +277,37 @@ Usar a skill legacy-validation-audit para auditar o formulário FCliente.cs, sua
 
 ---
 
-## 9. Boas Práticas de Manutenção do Manual
+## 9. Skill 8: `project-analyzer`
+
+<a id="propósito-project-analyzer"></a>
+### 🎯 Propósito
+Skill genérica de **análise profunda e estruturada** de qualquer artefato do projeto. Pode analisar código C#, componentes React, arquitetura de módulos, processos de negócio, regras fiscais, cobertura de testes, segurança, performance, documentação e oportunidades de inovação/IA. Produz sempre um **Relatório de Análise padronizado** com descobertas, riscos classificados por severidade e recomendações priorizadas.
+
+<a id="quando-usar-project-analyzer"></a>
+### 📅 Quando Usar
+- Antes de uma revisão de qualidade em serviços, schemas ou componentes existentes.
+- Para investigar gargalos de UX, performance ou violações arquiteturais sem alterar código.
+- Para explorar oportunidades de inovação, automação ou IA em um módulo ou processo.
+- Para validar se uma spec funcional está 100% refletida no schema Zod e no código C#.
+- Para qualquer análise ad-hoc que exija investigação, diagnóstico e recomendações estruturadas.
+
+<a id="exemplo-de-uso-prático-project-analyzer"></a>
+### 💡 Exemplos de Uso Prático
+
+#### 📋 Tabela de Prompts Práticos:
+
+| Alvo da Análise | Exemplo de Prompt no Chat da IA |
+|---|---|
+| **Serviço C#** | `Usar a skill project-analyzer para analisar o EntidadeService.cs e identificar riscos de performance e violações de AGENTS.md.` |
+| **Schema Zod** | `Usar a skill project-analyzer para analisar o schema.ts da FEntidade e verificar se todas as regras da spec estão refletidas.` |
+| **Arquitetura do Módulo** | `Usar a skill project-analyzer para analisar a arquitetura do módulo Versatus.AcessoGlobal.` |
+| **Processo de Negócio** | `Usar a skill project-analyzer para analisar o processo de liquidação de Contas a Pagar e sugerir melhorias de UX.` |
+| **Cobertura de Testes** | `Usar a skill project-analyzer para analisar a cobertura de testes do FCondicaoPagamento e apontar cenários não cobertos.` |
+| **Inovação / IA** | `Usar a skill project-analyzer para analisar o módulo Financeiro e sugerir onde aplicar IA para ganho de produtividade.` |
+
+---
+
+## 10. Boas Práticas de Manutenção do Manual
 
 1. **Atualização Contínua:** Sempre que uma nova skill for adicionada em `.agents/skills/`, inclua sua entrada no Índice e crie uma seção correspondente neste manual.
 2. **Exemplos Reais:** Mantenha os prompts de exemplo alinhados aos nomes reais de arquivos e módulos do ERP.
