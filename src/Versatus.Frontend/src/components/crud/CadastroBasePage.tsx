@@ -21,6 +21,7 @@ import { useCrudListState } from '../../hooks/useCrudListState';
 import { CrudTable } from './CrudTable';
 import { CrudModal } from './CrudModal';
 import { CrudFilterDrawer } from './CrudFilterDrawer';
+import { BaseCadastro } from '../layout/BaseCadastro';
 
 export interface ICadastroBasePageProps<T> {
   config: BaseCadastroConfig<T>;
@@ -45,7 +46,6 @@ export function CadastroBasePage<T>({
     sortConfig,
     modalMode,
     selectedRecord,
-    isModalOpen,
     handleFilterChange,
     handleOpenFilterDrawer,
     handleApplyFilters,
@@ -105,7 +105,6 @@ export function CadastroBasePage<T>({
     }
 
     if (filterConfig.type === 'date') {
-      // Converte data YYYY-MM-DD para DD/MM/YYYY
       const dateParts = value.split('-');
       if (dateParts.length === 3) {
         return `${filterConfig.label}: ${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
@@ -115,6 +114,40 @@ export function CadastroBasePage<T>({
     return `${filterConfig.label}: ${value}`;
   };
 
+  // ---------------------------------------------------------------------------
+  // MODO FORMULÁRIO INLINE: Inserção ('insert') ou Edição ('edit')
+  // Renderizado ocupando a área de conteúdo da aba (SEM MODAL / SEM OVERLAY DIALOG)
+  // ---------------------------------------------------------------------------
+  if (modalMode === 'insert' || modalMode === 'edit') {
+    const cadastroState = modalMode === 'insert' ? 'insert' : 'edit';
+
+    return (
+      <BaseCadastro
+        titulo={config.getTitulo()}
+        state={cadastroState}
+        onAdicionar={onAdicionarClick}
+        onSalvar={() => {
+          const submitBtn = document.getElementById('crud-submit-btn');
+          if (submitBtn) {
+            submitBtn.click();
+          }
+        }}
+        onDesfazer={() => {
+          const resetBtn = document.getElementById('crud-reset-btn');
+          if (resetBtn) {
+            resetBtn.click();
+          }
+        }}
+        onSair={onModalClose}
+      >
+        {renderForm(modalMode, selectedRecord, handleSaveWrapper)}
+      </BaseCadastro>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // MODO LISTAGEM (GRID / BROWSE)
+  // ---------------------------------------------------------------------------
   return (
     <Box sx={{ p: 0, bgcolor: 'background.default' }}>
       
@@ -258,29 +291,21 @@ export function CadastroBasePage<T>({
         loading={loading}
       />
 
-      {/* 6. Modal Genérico de Inserção / Edição / Exclusão */}
-      <CrudModal
-        open={isModalOpen}
-        mode={modalMode}
-        titulo={config.getTitulo()}
-        onClose={onModalClose}
-        onSave={() => {
-          const submitBtn = document.getElementById('crud-submit-btn');
-          if (submitBtn) {
-            submitBtn.click();
-          }
-        }}
-        onDeleteConfirm={handleDeleteConfirmWrapper}
-        onUndo={() => {
-          const resetBtn = document.getElementById('crud-reset-btn');
-          if (resetBtn) {
-            resetBtn.click();
-          }
-        }}
-        loading={loading}
-      >
-        {isModalOpen && renderForm(modalMode, selectedRecord, handleSaveWrapper)}
-      </CrudModal>
+      {/* 6. Modal de Confirmação de Exclusão (apenas para o modo 'delete') */}
+      {modalMode === 'delete' && (
+        <CrudModal
+          open={true}
+          mode="delete"
+          titulo={config.getTitulo()}
+          onClose={onModalClose}
+          onSave={() => {}}
+          onDeleteConfirm={handleDeleteConfirmWrapper}
+          onUndo={() => {}}
+          loading={loading}
+        >
+          <Box />
+        </CrudModal>
+      )}
 
       {/* Toast de Notificações */}
       <Snackbar

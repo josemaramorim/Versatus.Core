@@ -62,25 +62,19 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
         <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
           Cadastros
         </Link>
-        {subtituloBreadcrumb ? (
-          <>
-            <Link
-              underline="hover"
-              color="inherit"
-              onClick={onSair}
-              sx={{ fontSize: '0.85rem', cursor: 'pointer' }}
-            >
-              {titulo}
-            </Link>
-            <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
-              {subtituloBreadcrumb}
-            </Typography>
-          </>
-        ) : (
-          <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
+        {subtituloBreadcrumb && (
+          <Link
+            underline="hover"
+            color="inherit"
+            onClick={onSair}
+            sx={{ fontSize: '0.85rem', cursor: 'pointer' }}
+          >
             {titulo}
-          </Typography>
+          </Link>
         )}
+        <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
+          {subtituloBreadcrumb || titulo}
+        </Typography>
       </Breadcrumbs>
 
       {/* 2. Top Header — Título + Botões de Ação CRUD */}
