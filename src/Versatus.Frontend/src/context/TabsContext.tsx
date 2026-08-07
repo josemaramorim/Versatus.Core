@@ -42,7 +42,7 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const abaParaFechar = prev.find(a => a.id === id);
       if (abaParaFechar?.isDirty && !force) {
         const confirmou = window.confirm(
-          `A aba "${abaParaFechar.titulo}" possui alterações não salvas. Deseja realmente fechar e descartar as alterações?`
+          `Você possui alterações não salvas na aba "${abaParaFechar.titulo}". Deseja realmente fechar e descartar as alterações?`
         );
         if (!confirmou) return prev;
       }

@@ -103,11 +103,11 @@ Siga rigorosamente o pipeline da SKILL.md fase a fase:
 - Types, Schema Zod, Config (BaseCadastroConfig<T>), View (index.tsx)
 - Reproduzir abas e estrutura visual conforme o .cs de formulário legado
 - Todos os campos obrigatórios com prop `required` no MUI (asterisco vermelho)
-- Checklist: cada linha do mapeamento da seção 4 com Sim deve ter campo na UI
-- Organizar em `src/pages/[Modulo]/F[Nome]/`
-- **[OBRIGATÓRIO] Padrão Visual de Campos MUI — Floating Label:**
-  - Todos os campos DEVEM usar `variant="outlined"` (`TextField`, `Select`, `FormControl`).
-  - O label NUNCA deve ser externo ao campo — usar sempre `InputLabel` do MUI (label flutua sobre a borda).
+- **[OBRIGATÓRIO] Layout do Formulário Inline (Sem Modals Flutuantes):** Formulários de inclusão/edição/exclusão ocupam 100% da área da aba. Proibido abrir diálogos modais para formulários CRUD ou exclusão. Exclusão utiliza banner inline de confirmação de exclusão vermelho.
+- **[OBRIGATÓRIO] Confirmação de Alterações Não Salvas:**
+  - **Botão Cancelar / Voltar:** Exibe banner inline amarelo com Título `"Alterações não salvas"` e Mensagem `"Você possui alterações não salvas no formulário. Deseja realmente cancelar e descartar as alterações?"` com botões `[Descartar e Sair]` e `[Continuar Editando]`.
+  - **Fechamento de Aba [X]:** Exibe confirmação com o texto `"Você possui alterações não salvas na aba \"[Nome da Aba]\". Deseja realmente fechar e descartar as alterações?"`.
+- **[OBRIGATÓRIO] Padrão Visual MUI — Floating Labels:** Todos os campos DEVEM usar `variant="outlined"` com `InputLabel` flutuante e bordas coloridas de estado (cinza / azul focado / vermelho erro).
   - Estado normal: borda cinza, label cinza pequeno flutuando sobre a borda.
   - Estado focado: borda azul (2px), label azul flutuando sobre a borda.
   - Estado de erro: borda vermelha (2px), label vermelho, `helperText` com mensagem Zod abaixo do campo.

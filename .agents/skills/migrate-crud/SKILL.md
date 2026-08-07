@@ -159,6 +159,9 @@ Após a compilação limpa do backend:
 5. Crie `index.tsx` com a View do formulário:
    - **[CRUD]** Grid paginado + botões Novo/Editar/Excluir usando MUI.
    - **[LOTE]** Accordions **fechados por padrão**, agrupados pelo campo Agrupador. Cada item exibe: (a) Descrição em destaque, (b) Chave técnica como subtexto, (c) campo de edição inline condicionado ao tipo. Botões Novo e Excluir completamente ausentes do JSX.
+   - **[OBRIGATÓRIO] Confirmação de Alterações Não Salvas:**
+       - **Botão Cancelar / Voltar:** Exibe banner inline amarelo com Título `"Alterações não salvas"` e Mensagem `"Você possui alterações não salvas no formulário. Deseja realmente cancelar e descartar as alterações?"` com botões `[Descartar e Sair]` e `[Continuar Editando]`.
+       - **Fechamento de Aba [X]:** Exibe confirmação com o texto `"Você possui alterações não salvas na aba \"[Nome da Aba]\". Deseja realmente fechar e descartar as alterações?"`.
    - **[OBRIGATÓRIO] Padrão Visual de Campos MUI — Floating Label:**
       - Todos os campos do formulário DEVEM usar `variant="outlined"` no MUI (`TextField`, `Select`, `FormControl`).
       - O label NUNCA deve ser externo (acima do campo). Ele deve ser o `InputLabel` do próprio MUI, que flutua sobre a borda superior do campo no padrão floating label.

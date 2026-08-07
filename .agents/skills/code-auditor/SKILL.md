@@ -63,10 +63,14 @@ Dado um formulário `F[Nome]` ou Módulo `[Modulo]`, o auditor inspeciona os seg
 - [ ] **Sem Throw exception:** Proibido `throw new ...Exception(...)` para erros de negócio.
 - [ ] **Retorno Funcional:** Uso de `Result<T>` retornando `400 BadRequest` com `ValidationError`.
 
-### 11. Sinalização Visual MUI (`required`) e CQRS DB Split
+### 11. Sinalização Visual MUI (`required`), Floating Labels e CQRS DB Split
 - [ ] **MUI required:** Prop `required` nos componentes MUI para todos os campos obrigatórios.
 - [ ] **MUI Floating Label (variant="outlined"):** Todos os campos usam `variant="outlined"` — label flutua sobre a borda superior do campo. Proibido label externo (acima/fora do campo) ou usar apenas `placeholder`. Verificar estados: cinza (normal), azul (focado), vermelho + helperText (erro).
 - [ ] **CQRS DB Split:** Repositório usa `ReadContext` (`ReadConnection` com `NoTracking`) para consultas e `Context` (`WriteConnection`) para gravações.
+
+### 12. Confirmação de Alterações Não Salvas (Descarte e Fechamento)
+- [ ] **Banner Inline de Cancelamento:** Botão Cancelar ou Voltar exibe banner inline amarelo ("Alterações não salvas" / "Você possui alterações não salvas no formulário. Deseja realmente cancelar e descartar as alterações?") com botões `[Descartar e Sair]` e `[Continuar Editando]`.
+- [ ] **Fechamento de Aba [X]:** Fechamento de aba suja exibe a mensagem padronizada ("Você possui alterações não salvas na aba \"[Nome da Aba]\". Deseja realmente fechar e descartar as alterações?").
 
 ---
 
