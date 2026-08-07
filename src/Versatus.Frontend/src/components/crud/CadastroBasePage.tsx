@@ -14,12 +14,11 @@ import {
   Stack,
   LinearProgress
 } from '@mui/material';
-import { SlidersHorizontal, Plus } from 'lucide-react';
+import { SlidersHorizontal, Plus, Trash2 } from 'lucide-react';
 import { BaseCadastroConfig } from '../../types/cadastro';
 import type { CadastroModalMode } from '../../types/cadastro';
 import { useCrudListState } from '../../hooks/useCrudListState';
 import { CrudTable } from './CrudTable';
-import { CrudModal } from './CrudModal';
 import { CrudFilterDrawer } from './CrudFilterDrawer';
 import { BaseCadastro } from '../layout/BaseCadastro';
 
@@ -86,6 +85,19 @@ export function CadastroBasePage<T>({
 
   const activeFilters = config.getFiltros();
   const activeFilterCount = Object.keys(filters).length;
+
+  // Obter o label amigável do registro selecionado para exclusão
+  const getRecordDisplayName = (record: any): string => {
+    if (!record) return 'selecionado';
+    return (
+      record.descricao ||
+      record.razaoSocial ||
+      record.nome ||
+      record.nomeFantasia ||
+      record.apelido ||
+      (record.codigo ? `#${record.codigo}` : 'selecionado')
+    );
+  };
 
   // Obter o label amigável de exibição do filtro ativo
   const getFilterDisplayLabel = (key: string, value: any) => {
@@ -208,7 +220,53 @@ export function CadastroBasePage<T>({
         </Stack>
       </Box>
 
-      {/* 3. Chips de Filtros Aplicados */}
+      {/* 3. Banner Inline de Confirmação de Exclusão (SEM MODAL / SEM POPUP DIALOG) */}
+      {modalMode === 'delete' && selectedRecord && (
+        <Alert
+          severity="error"
+          variant="outlined"
+          action={
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <Button
+                color="error"
+                variant="contained"
+                size="small"
+                startIcon={<Trash2 size={16} />}
+                onClick={handleDeleteConfirmWrapper}
+                disabled={loading}
+              >
+                Confirmar Exclusão
+              </Button>
+              <Button
+                color="inherit"
+                variant="outlined"
+                size="small"
+                onClick={onModalClose}
+                disabled={loading}
+                sx={{ borderColor: 'divider' }}
+              >
+                Cancelar
+              </Button>
+            </Stack>
+          }
+          sx={{
+            mb: 3,
+            bgcolor: 'error.50',
+            borderColor: 'error.main',
+            alignItems: 'center',
+            borderRadius: 1.5,
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'error.main' }}>
+            Confirmação de Exclusão
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.primary', mt: 0.25 }}>
+            Deseja realmente excluir o registro <strong>"{getRecordDisplayName(selectedRecord)}"</strong>? Esta ação não poderá ser desfeita.
+          </Typography>
+        </Alert>
+      )}
+
+      {/* 4. Chips de Filtros Aplicados */}
       {activeFilterCount > 0 && (
         <Box 
           sx={{ 
@@ -241,7 +299,7 @@ export function CadastroBasePage<T>({
         </Box>
       )}
 
-      {/* 4. Grade Principal de Dados */}
+      {/* 5. Grade Principal de Dados */}
       <Card sx={{ p: 3, borderRadius: 1.5, boxShadow: 'rgba(145, 158, 171, 0.08) 0px 0px 2px 0px, rgba(145, 158, 171, 0.08) 0px 12px 24px -4px', position: 'relative' }}>
         {loading && (
           <LinearProgress 
@@ -279,7 +337,7 @@ export function CadastroBasePage<T>({
         />
       </Card>
 
-      {/* 5. Gaveta de Filtros Responsiva */}
+      {/* 6. Gaveta de Filtros Responsiva */}
       <CrudFilterDrawer
         open={isFilterDrawerOpen}
         onClose={() => setIsFilterDrawerOpen(false)}
@@ -290,22 +348,6 @@ export function CadastroBasePage<T>({
         onClearFilters={handleClearFilters}
         loading={loading}
       />
-
-      {/* 6. Modal de Confirmação de Exclusão (apenas para o modo 'delete') */}
-      {modalMode === 'delete' && (
-        <CrudModal
-          open={true}
-          mode="delete"
-          titulo={config.getTitulo()}
-          onClose={onModalClose}
-          onSave={() => {}}
-          onDeleteConfirm={handleDeleteConfirmWrapper}
-          onUndo={() => {}}
-          loading={loading}
-        >
-          <Box />
-        </CrudModal>
-      )}
 
       {/* Toast de Notificações */}
       <Snackbar
