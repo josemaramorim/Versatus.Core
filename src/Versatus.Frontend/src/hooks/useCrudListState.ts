@@ -138,40 +138,47 @@ export function useCrudListState<T>(
   const onEditarClick = async (record: T) => {
     setLoading(true);
     try {
-      const id = config.getRecordId(record);
-      if (!id) {
-        setSelectedRecord(config.mapBackendToForm(record));
-        setModalMode('edit');
-        return;
-      }
+      // 1. Mapear e definir IMEDIATAMENTE o registro selecionado a partir da linha clicada na grid
+      const initialMapped = config.mapBackendToForm(record);
+      setSelectedRecord(initialMapped);
 
-      let data: any = null;
+      const id = config.getRecordId(record) || config.getRecordId(initialMapped);
+      if (id) {
+        let data: any = null;
 
-      // 1. Tentar primeiro o endpoint de busca completa /completo/{id}
-      try {
-        const resCompleto = await fetch(`${config.getApiEndpoint()}/completo/${id}`, {
-          headers: getApiHeaders()
-        });
-        if (resCompleto.ok) {
-          data = await resCompleto.json();
+        // 2. Tentar buscar detalhes completos via /completo/{id}
+        try {
+          const resCompleto = await fetch(`${config.getApiEndpoint()}/completo/${id}`, {
+            headers: getApiHeaders()
+          });
+          if (resCompleto.ok) {
+            data = await resCompleto.json();
+          }
+        } catch (err) {
+          console.warn('Endpoint /completo indisponível:', err);
         }
-      } catch (err) {
-        console.warn('Endpoint /completo indisponível, buscando por id direto:', err);
-      }
 
-      // 2. Se /completo/{id} não retornou dados, tentar o endpoint padrão /{id}
-      if (!data) {
-        const resBase = await fetch(`${config.getApiEndpoint()}/${id}`, {
-          headers: getApiHeaders()
-        });
-        if (resBase.ok) {
-          data = await resBase.json();
+        // 3. Se /completo não respondeu, tentar o endpoint base /{id}
+        if (!data) {
+          try {
+            const resBase = await fetch(`${config.getApiEndpoint()}/${id}`, {
+              headers: getApiHeaders()
+            });
+            if (resBase.ok) {
+              data = await resBase.json();
+            }
+          } catch (err) {
+            console.warn('Endpoint base /id indisponível:', err);
+          }
+        }
+
+        // 4. Se a API retornou os dados detalhados, atualiza selectedRecord com os detalhes
+        if (data) {
+          const detailedMapped = config.mapBackendToForm(data);
+          setSelectedRecord(detailedMapped);
         }
       }
 
-      // 3. Mapear os dados detalhados da API (ou fallback do registro da grid) para a estrutura do formulário
-      const mappedRecord = config.mapBackendToForm(data || record);
-      setSelectedRecord(mappedRecord);
       setModalMode('edit');
     } catch (err) {
       console.error('Erro ao buscar detalhes para edição:', err);

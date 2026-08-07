@@ -61,7 +61,13 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
   record,
   onSave
 }) => {
-  const { options: tipoPessoaOptions, loading: loadingTipoPessoa } = useEnumOptions(1); // 1 = EntidadeFisicaJuridica
+  const { options: fetchedOptions } = useEnumOptions(1); // 1 = EntidadeFisicaJuridica
+  const tipoPessoaOptions = fetchedOptions && fetchedOptions.length > 0
+    ? fetchedOptions
+    : [
+        { value: 2, label: 'Física' },
+        { value: 3, label: 'Jurídica' }
+      ];
 
   const [toast, setToast] = useState<{
     open: boolean;
@@ -496,7 +502,7 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
                     <Select
                       {...field}
                       label="Tipo de Pessoa"
-                      disabled={isBrowse || loadingTipoPessoa}
+                      disabled={isBrowse}
                     >
                       {tipoPessoaOptions.map((opt) => (
                         <MenuItem key={opt.value} value={opt.value}>
