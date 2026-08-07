@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import { TopBar } from './TopBar';
 import { TabBar } from './TabBar';
 import { ContextualSidebar } from './ContextualSidebar';
-import { useTabs } from '../../context/TabsContext';
+import { useTabs, TabScopeContext } from '../../context/TabsContext';
 
 // Importações de todas as páginas — keep-alive: ficam montadas, apenas ocultas por CSS
 import { FEntidade } from '../../pages/AcessoGlobal/FEntidade';
@@ -90,13 +90,15 @@ export const AppShell: React.FC = () => {
             {/* Tela de boas-vindas quando não há abas abertas */}
             {abas.length === 0 && <WelcomeScreen />}
 
-            {/* Keep-Alive Memoizado: cada aba fica montada em memória e congelada quando inativa */}
+            {/* Keep-Alive Memoizado: cada aba fica montada em memória e isolada com seu próprio ID no TabScopeContext */}
             {abas.map(aba => {
               const Pagina = PAGINA_MAP[aba.rota];
               if (!Pagina) return null;
               return (
                 <TabKeepAliveWrapper key={aba.id} isAtiva={aba.id === abaAtivaId}>
-                  <Pagina />
+                  <TabScopeContext.Provider value={aba.id}>
+                    <Pagina />
+                  </TabScopeContext.Provider>
                 </TabKeepAliveWrapper>
               );
             })}

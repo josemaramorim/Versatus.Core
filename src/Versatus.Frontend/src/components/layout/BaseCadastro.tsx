@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -18,7 +18,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import type { BaseCadastroProps } from '../../types/cadastro';
-import { useTabs } from '../../context/TabsContext';
+import { useTabs, useCurrentTabId } from '../../context/TabsContext';
 
 /**
  * BaseCadastro — Componente base herdado por todos os formulários CRUD do ERP.
@@ -42,33 +42,26 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
   onSair,
   children
 }) => {
-  const { abas, abaAtivaId, idAbaParaFechar, fecharAba, cancelarFechamento, marcarDirty, marcarModo } = useTabs();
+  const { abas, idAbaParaFechar, fecharAba, cancelarFechamento, marcarDirty, marcarModo } = useTabs();
+  const tabId = useCurrentTabId();
   const [confirmarCancelamento, setConfirmarCancelamento] = useState(false);
 
-  const abaAtiva = abas.find(a => a.id === abaAtivaId);
-  const isDirty = abaAtiva?.isDirty ?? false;
+  const abaDaInstancia = abas.find(a => a.id === tabId);
+  const isDirty = abaDaInstancia?.isDirty ?? false;
 
   // Confirmação de fechamento via [X] da aba — usa o mesmo banner inline
-  const querFecharAba = idAbaParaFechar === abaAtivaId;
-
-  // Captura o ID da aba no momento em que BaseCadastro monta.
-  // Nunca muda — garante que marcarModo sempre opere na aba correta,
-  // mesmo quando o usuário troca de aba (abaAtivaId mudaria, mas não queremos isso).
-  const abaIdNoMount = useRef(abaAtivaId);
+  const querFecharAba = Boolean(tabId && idAbaParaFechar === tabId);
 
   // Sinaliza o modo do formulário na aba (bolinha indicadora no TabBar)
   useEffect(() => {
-    const abaId = abaIdNoMount.current;
-    if (!abaId) return;
+    if (!tabId) return;
     const modo = state === 'insert' ? 'insert' : state === 'edit' ? 'edit' : 'browse';
-    marcarModo(abaId, modo);
+    marcarModo(tabId, modo);
     return () => {
       // Ao desmontar (voltar para listagem), limpa o modo na aba correta
-      marcarModo(abaId, 'browse');
+      marcarModo(tabId, 'browse');
     };
-  // Apenas o state é dependência — abaId é fixo via ref
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [tabId, state, marcarModo]);
 
   const isBrowse = state === 'browse';
   const viewMode = isBrowse ? 'list' : 'form';
@@ -89,16 +82,16 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
 
   const handleConfirmarDescarte = () => {
     setConfirmarCancelamento(false);
-    if (abaAtivaId) {
-      marcarDirty(abaAtivaId, false);
+    if (tabId) {
+      marcarDirty(tabId, false);
     }
     if (onSair) onSair();
   };
 
   const handleConfirmarFechamento = () => {
-    if (abaAtivaId) {
-      marcarDirty(abaAtivaId, false);
-      fecharAba(abaAtivaId, true);
+    if (tabId) {
+      marcarDirty(tabId, false);
+      fecharAba(tabId, true);
     }
   };
 
@@ -207,7 +200,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
                 startIcon={<Save size={16} />}
                 onClick={() => {
                   setConfirmarCancelamento(false);
-                  if (abaAtivaId) marcarDirty(abaAtivaId, false);
+                  if (tabId) marcarDirty(tabId, false);
                   onSalvar();
                 }}
               >

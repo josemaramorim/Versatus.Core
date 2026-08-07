@@ -23,12 +23,11 @@ import {
   CardContent,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import SaveIcon from '@mui/icons-material/Save';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
+import { Save, RotateCcw } from 'lucide-react';
 
 import { buildApiEndpoint, getApiHeaders } from '../../../config/api';
-import { useTabs } from '../../../context/TabsContext';
+import { useTabs, useCurrentTabId } from '../../../context/TabsContext';
 import type { IParametroForm } from './types';
 
 const AGRUPADOR_NAMES: Record<number, string> = {
@@ -282,7 +281,8 @@ export const FParametro: React.FC = () => {
     return groups;
   }, [filteredParametros]);
 
-  const { abaAtivaId, marcarDirty } = useTabs();
+  const { marcarDirty } = useTabs();
+  const tabId = useCurrentTabId();
 
   // Verificar se há alterações para habilitar botão salvar
   const temAlteracoes = useMemo(() => {
@@ -290,10 +290,10 @@ export const FParametro: React.FC = () => {
   }, [parametros, originalParametros]);
 
   useEffect(() => {
-    if (abaAtivaId) {
-      marcarDirty(abaAtivaId, temAlteracoes);
+    if (tabId) {
+      marcarDirty(tabId, temAlteracoes);
     }
-  }, [temAlteracoes, abaAtivaId, marcarDirty]);
+  }, [temAlteracoes, tabId, marcarDirty]);
 
   // Salvar alterações em lote
   const handleSave = () => {
@@ -448,24 +448,25 @@ export const FParametro: React.FC = () => {
           Configuração de Parâmetros
         </Typography>
 
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={1.5}>
           <Button
             variant="contained"
             color="primary"
-            startIcon={<SaveIcon />}
+            startIcon={<Save size={16} />}
             disabled={!temAlteracoes || loading}
             onClick={handleSave}
           >
-            Confirmar (Salvar)
+            Salvar
           </Button>
           <Button
             variant="outlined"
-            color="secondary"
-            startIcon={<RefreshIcon />}
+            color="inherit"
+            startIcon={<RotateCcw size={16} />}
             disabled={!temAlteracoes || loading}
             onClick={handleCancel}
+            sx={{ borderColor: 'divider' }}
           >
-            Cancelar
+            Desfazer
           </Button>
         </Stack>
       </Paper>

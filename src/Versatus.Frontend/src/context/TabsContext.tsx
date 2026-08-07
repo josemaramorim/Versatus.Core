@@ -30,6 +30,16 @@ interface TabsContextState {
   marcarModo: (id: string, mode: TabFormMode) => void;
 }
 
+// ── Contexto de Escopo da Aba ──────────────────────────────────────────────
+export const TabScopeContext = createContext<string | null>(null);
+
+/** Hook para obter o ID único da aba onde o componente atual está fisicamente renderizado */
+export const useCurrentTabId = (): string | null => {
+  const tabIdFromScope = useContext(TabScopeContext);
+  const tabsContext = useContext(TabsContext);
+  return tabIdFromScope ?? tabsContext?.abaAtivaId ?? null;
+};
+
 // ── Criação do Contexto ─────────────────────────────────────────────────────
 
 const TabsContext = createContext<TabsContextState | undefined>(undefined);

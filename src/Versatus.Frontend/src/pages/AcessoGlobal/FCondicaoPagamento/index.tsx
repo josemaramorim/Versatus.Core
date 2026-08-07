@@ -30,7 +30,7 @@ import {
 import { useForm, FormProvider, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEnumOptions } from '../../../hooks/useEnums';
-import { useTabs } from '../../../context/TabsContext';
+import { useTabs, useCurrentTabId } from '../../../context/TabsContext';
 import { buildApiEndpoint, getApiHeaders } from '../../../config/api';
 
 import { CadastroBasePage } from '../../../components/crud/CadastroBasePage';
@@ -70,7 +70,8 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
 
   const isBrowse = mode === 'delete' || mode === 'view';
 
-  const { abaAtivaId, marcarDirty } = useTabs();
+  const { marcarDirty } = useTabs();
+  const tabId = useCurrentTabId();
 
   // Configuração do React Hook Form
   const methods = useForm<ICondicaoPagamentoForm>({
@@ -81,12 +82,12 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
 
   const { handleSubmit, reset, control, formState: { errors, isDirty }, watch, setValue } = methods;
 
-  // Sincronizar estado de formulário alterado (dirty) com a aba ativa
+  // Sincronizar estado de formulário alterado (dirty) com a aba proprietária
   useEffect(() => {
-    if (abaAtivaId && mode !== 'view' && mode !== 'delete') {
-      marcarDirty(abaAtivaId, isDirty);
+    if (tabId && mode !== 'view' && mode !== 'delete') {
+      marcarDirty(tabId, isDirty);
     }
-  }, [isDirty, abaAtivaId, mode, marcarDirty]);
+  }, [isDirty, tabId, mode, marcarDirty]);
 
   const { fields: parcelasFields, replace: replaceParcelas } = useFieldArray({
     control,
