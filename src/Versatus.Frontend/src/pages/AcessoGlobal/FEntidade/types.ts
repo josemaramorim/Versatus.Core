@@ -133,6 +133,7 @@ export interface IFilialVinculada {
 }
 
 export interface IEntidadeForm {
+  idEntidade?: number;
   codigo: string;
   razaoSocial: string;
   apelido: string;
@@ -395,6 +396,7 @@ export interface IEntidadeForm {
 }
 
 export const defaultValues: IEntidadeForm = {
+  idEntidade: 0,
   codigo: '',
   razaoSocial: '',
   apelido: '',

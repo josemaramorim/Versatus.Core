@@ -36,6 +36,13 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
     return defaultValues;
   }
 
+  /** Retorna o ID da entidade, evitando colisão com idCondicaoPagamento dos defaultValues */
+  override getRecordId(record: any): any {
+    if (!record) return undefined;
+    const id = (record.idEntidade ?? Number(record.codigo)) || undefined;
+    return id || undefined;
+  }
+
   getValidationSchema(): ZodTypeAny {
     return entidadeSchema;
   }
