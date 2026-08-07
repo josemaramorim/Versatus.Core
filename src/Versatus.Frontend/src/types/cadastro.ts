@@ -47,6 +47,7 @@ export interface IFiltroConfig {
 
 // Classe abstrata para configuração de qualquer tela de cadastro no ERP (OOP)
 export abstract class BaseCadastroConfig<T> {
+  hasCompletoEndpoint?: boolean = false;
   abstract getTitulo(): string;
   abstract getApiEndpoint(): string;
   abstract getDefaultValues(): T;

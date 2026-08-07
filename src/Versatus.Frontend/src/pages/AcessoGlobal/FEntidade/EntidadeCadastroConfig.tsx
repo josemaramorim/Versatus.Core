@@ -22,6 +22,8 @@ function formatCpfCnpj(value: string | undefined): string {
 }
 
 export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
+  override hasCompletoEndpoint = true;
+
   getTitulo(): string {
     return 'Entidade';
   }
@@ -49,6 +51,7 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
 
     return {
       ...defaultValues,
+      idEntidade: Number(rawId || 0),
       codigo: String(rawId || ''),
       razaoSocial: backend.razaoSocial || backend.nome || '',
       apelido: backend.apelido || backend.pessoaJuridica?.razaoSocial || '',

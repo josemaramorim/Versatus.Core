@@ -158,13 +158,56 @@ export const CondicaoPagamentoFormView: React.FC<ICondicaoPagamentoFormViewProps
   ] = watchedValues;
 
   // Carregar enums dinâmicos
-  const { options: tipoCondicaoOptions } = useEnumOptions(35);
-  const { options: disponibilidadeOptions } = useEnumOptions(55);
-  const { options: vencimentoTipoOptions } = useEnumOptions(58);
-  const { options: parcelamentoTipoOptions } = useEnumOptions(118);
-  const { options: diaSemanaOptions } = useEnumOptions(163);
-  const { options: divisaoTipoOptions } = useEnumOptions(602);
-  const { options: arredondamentoOptions } = useEnumOptions(45);
+  const { options: fetchedTipoCondicao } = useEnumOptions(35);
+  const tipoCondicaoOptions = fetchedTipoCondicao?.length ? fetchedTipoCondicao : [
+    { value: 36, label: 'Parcelada' },
+    { value: 37, label: 'Faixa Dias' },
+    { value: 38, label: 'Semanal' },
+  ];
+
+  const { options: fetchedDisponibilidade } = useEnumOptions(55);
+  const disponibilidadeOptions = fetchedDisponibilidade?.length ? fetchedDisponibilidade : [
+    { value: 56, label: 'Pagamento' },
+    { value: 57, label: 'Recebimento' },
+    { value: 101, label: 'Ambas' },
+  ];
+
+  const { options: fetchedVencimentoTipo } = useEnumOptions(58);
+  const vencimentoTipoOptions = fetchedVencimentoTipo?.length ? fetchedVencimentoTipo : [
+    { value: 59, label: 'Normal' },
+    { value: 60, label: 'Antecipa' },
+    { value: 61, label: 'Posterga' },
+  ];
+
+  const { options: fetchedParcelamentoTipo } = useEnumOptions(118);
+  const parcelamentoTipoOptions = fetchedParcelamentoTipo?.length ? fetchedParcelamentoTipo : [
+    { value: 119, label: 'Fixo' },
+    { value: 120, label: 'Dias' },
+    { value: 693, label: 'Dia Útil Mês' },
+  ];
+
+  const { options: fetchedDiaSemana } = useEnumOptions(163);
+  const diaSemanaOptions = fetchedDiaSemana?.length ? fetchedDiaSemana : [
+    { value: 164, label: 'Domingo' },
+    { value: 165, label: 'Segunda-feira' },
+    { value: 166, label: 'Terça-feira' },
+    { value: 167, label: 'Quarta-feira' },
+    { value: 168, label: 'Quinta-feira' },
+    { value: 169, label: 'Sexta-feira' },
+    { value: 170, label: 'Sábado' },
+  ];
+
+  const { options: fetchedDivisaoTipo } = useEnumOptions(602);
+  const divisaoTipoOptions = fetchedDivisaoTipo?.length ? fetchedDivisaoTipo : [
+    { value: 603, label: 'Informado' },
+    { value: 604, label: 'Igual' },
+  ];
+
+  const { options: fetchedArredondamento } = useEnumOptions(45);
+  const arredondamentoOptions = fetchedArredondamento?.length ? fetchedArredondamento : [
+    { value: 46, label: 'Primeira Parcela' },
+    { value: 47, label: 'Última Parcela' },
+  ];
 
   // Monitorar quantidade de parcelas e gerar grade automaticamente
   useEffect(() => {

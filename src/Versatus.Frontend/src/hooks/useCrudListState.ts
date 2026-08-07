@@ -146,19 +146,21 @@ export function useCrudListState<T>(
       if (id) {
         let data: any = null;
 
-        // 2. Tentar buscar detalhes completos via /completo/{id}
-        try {
-          const resCompleto = await fetch(`${config.getApiEndpoint()}/completo/${id}`, {
-            headers: getApiHeaders()
-          });
-          if (resCompleto.ok) {
-            data = await resCompleto.json();
+        // 2. Tentar buscar detalhes completos via /completo/{id} apenas se o controller suportar
+        if (config.hasCompletoEndpoint) {
+          try {
+            const resCompleto = await fetch(`${config.getApiEndpoint()}/completo/${id}`, {
+              headers: getApiHeaders()
+            });
+            if (resCompleto.ok) {
+              data = await resCompleto.json();
+            }
+          } catch (err) {
+            console.warn('Endpoint /completo indisponível:', err);
           }
-        } catch (err) {
-          console.warn('Endpoint /completo indisponível:', err);
         }
 
-        // 3. Se /completo não respondeu, tentar o endpoint base /{id}
+        // 3. Se /completo não foi usado ou não retornou dados, tentar o endpoint base /{id}
         if (!data) {
           try {
             const resBase = await fetch(`${config.getApiEndpoint()}/${id}`, {
