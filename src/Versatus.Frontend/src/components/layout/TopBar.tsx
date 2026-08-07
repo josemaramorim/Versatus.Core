@@ -6,14 +6,19 @@ import {
   Box,
   IconButton,
   Avatar,
-  Tooltip
+  Tooltip,
+  alpha
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import { Sun, Moon } from 'lucide-react';
 import { ModuleSelectorButton } from './ModuleSelectorButton';
 import { FavoritesSelectorButton } from './FavoritesSelectorButton';
+import { useThemeMode } from '../../context/ThemeContext';
 
 export const TopBar: React.FC = () => {
+  const { mode, toggleTheme } = useThemeMode();
+
   return (
     <AppBar
       position="sticky"
@@ -23,8 +28,9 @@ export const TopBar: React.FC = () => {
         top: 0,
         zIndex: (theme) => theme.zIndex.drawer + 1,
         backdropFilter: 'blur(6px)',
-        bgcolor: 'rgba(255, 255, 255, 0.85)',
-        borderBottom: '1px solid rgba(145, 158, 171, 0.12)'
+        bgcolor: (theme) => alpha(theme.palette.background.paper, 0.85),
+        borderBottom: '1px solid',
+        borderColor: 'divider'
       }}
     >
       <Toolbar variant="dense" sx={{ height: 64, px: { xs: 2, sm: 3 } }}>
@@ -61,6 +67,21 @@ export const TopBar: React.FC = () => {
         <Box sx={{ flexGrow: 1 }} />
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+          {/* Seletor discreto de Tema Claro / Escuro (IconButton puro com Sol/Lua) */}
+          <Tooltip title={mode === 'dark' ? 'Alternar para tema claro' : 'Alternar para tema escuro'}>
+            <IconButton
+              size="small"
+              onClick={toggleTheme}
+              sx={{
+                color: mode === 'dark' ? 'warning.light' : 'text.secondary',
+                transition: 'transform 0.2s ease',
+                '&:hover': { transform: 'scale(1.1)' }
+              }}
+            >
+              {mode === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            </IconButton>
+          </Tooltip>
+
           <Tooltip title="Busca (⌘K — Em breve)">
             <IconButton size="small" sx={{ color: 'text.secondary' }}>
               <SearchIcon />

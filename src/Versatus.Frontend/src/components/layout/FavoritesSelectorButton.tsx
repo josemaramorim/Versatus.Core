@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Button,
   Popover,
@@ -23,7 +22,6 @@ import { useTabs } from '../../context/TabsContext';
 export const FavoritesSelectorButton: React.FC = () => {
   const { favoritos, removerFavorito } = useMenu();
   const { abrirAba } = useTabs();
-  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -138,7 +136,6 @@ export const FavoritesSelectorButton: React.FC = () => {
                         titulo: fav.nomeRotina,
                         rota: fav.rotaCompleta
                       });
-                      navigate(fav.rotaCompleta);
                       handleClose();
                     }}
                     sx={{

@@ -29,6 +29,11 @@ public class Usuario
 
     public bool Ativo { get; set; } = true;
 
+    /// <summary>
+    /// Modo de tema preferido do usuário ("light" | "dark").
+    /// </summary>
+    public string? TemaModo { get; set; }
+
     // Auditoria (Nullables para suportar registros legados)
     public int? IdUsuarioInclusao { get; set; }
     public DateTime? DataInclusao { get; set; }

@@ -56,8 +56,9 @@ export const AppShell: React.FC = () => {
     const titulo = ROTA_TITULO_MAP[currentPath];
 
     if (titulo) {
+      const jaExisteAbaParaPath = abas.some(a => a.rota === currentPath);
       const pathMudou = lastPathRef.current !== null && lastPathRef.current !== currentPath;
-      if (!initializedRef.current || pathMudou) {
+      if (!initializedRef.current || (pathMudou && !jaExisteAbaParaPath)) {
         initializedRef.current = true;
         abrirAba({ titulo, rota: currentPath });
       }
