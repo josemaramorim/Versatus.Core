@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -6,7 +6,9 @@ import {
   Typography,
   Breadcrumbs,
   Link,
-  IconButton
+  IconButton,
+  Alert,
+  Stack
 } from '@mui/material';
 import {
   Plus,
@@ -16,6 +18,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import type { BaseCadastroProps } from '../../types/cadastro';
+import { useTabs } from '../../context/TabsContext';
 
 /**
  * BaseCadastro — Componente base herdado por todos os formulários CRUD do ERP.
@@ -26,6 +29,7 @@ import type { BaseCadastroProps } from '../../types/cadastro';
  *
  * REGRA: Nenhum modal/dialog é aberto. O formulário ocupa a área de conteúdo da aba.
  * Ao salvar com sucesso (onSalvar) ou cancelar (onDesfazer/onSair): retorna para 'list'.
+ * Se houver alterações não salvas ao cancelar ou fechar, solicita confirmação do usuário.
  */
 export const BaseCadastro: React.FC<BaseCadastroProps> = ({
   titulo,
@@ -38,18 +42,36 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
   onSair,
   children
 }) => {
-  const isBrowse = state === 'browse';
+  const { abas, abaAtivaId, marcarDirty } = useTabs();
+  const [confirmarCancelamento, setConfirmarCancelamento] = useState(false);
 
-  // viewMode interno: derivado do state para manter compatibilidade com o código existente
-  // browse → list | insert/edit → form
+  const abaAtiva = abas.find(a => a.id === abaAtivaId);
+  const isDirty = abaAtiva?.isDirty ?? false;
+
+  const isBrowse = state === 'browse';
   const viewMode = isBrowse ? 'list' : 'form';
 
-  // Título dinâmico da aba/breadcrumb baseado no modo
   const subtituloBreadcrumb = state === 'insert'
     ? 'Novo'
     : state === 'edit'
     ? 'Editar'
     : null;
+
+  const handleSairClick = () => {
+    if (isDirty) {
+      setConfirmarCancelamento(true);
+    } else {
+      if (onSair) onSair();
+    }
+  };
+
+  const handleConfirmarDescarte = () => {
+    setConfirmarCancelamento(false);
+    if (abaAtivaId) {
+      marcarDirty(abaAtivaId, false);
+    }
+    if (onSair) onSair();
+  };
 
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5, pb: 3, minHeight: '100%', bgcolor: 'background.default' }}>
@@ -66,7 +88,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
           <Link
             underline="hover"
             color="inherit"
-            onClick={onSair}
+            onClick={handleSairClick}
             sx={{ fontSize: '0.85rem', cursor: 'pointer' }}
           >
             {titulo}
@@ -92,7 +114,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
           {/* Botão voltar — visível no modo form para voltar à listagem */}
           {!isBrowse && onSair && (
             <IconButton
-              onClick={onSair}
+              onClick={handleSairClick}
               size="small"
               sx={{ mr: 1 }}
               title="Voltar para a listagem"
@@ -150,7 +172,11 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
                 variant="contained"
                 color="primary"
                 startIcon={<Save size={16} />}
-                onClick={onSalvar}
+                onClick={() => {
+                  setConfirmarCancelamento(false);
+                  if (abaAtivaId) marcarDirty(abaAtivaId, false);
+                  onSalvar();
+                }}
               >
                 Salvar
               </Button>
@@ -169,7 +195,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
                 <Button
                   variant="outlined"
                   color="inherit"
-                  onClick={onSair}
+                  onClick={handleSairClick}
                   sx={{ borderColor: 'divider' }}
                 >
                   Cancelar
@@ -180,7 +206,50 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
         </Box>
       </Box>
 
-      {/* 3. Área de conteúdo — grid (list) ou formulário (form) */}
+      {/* 3. Banner Inline de Confirmação de Cancelamento (quando há alterações não salvas) */}
+      {confirmarCancelamento && (
+        <Alert
+          severity="warning"
+          variant="outlined"
+          action={
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <Button
+                color="warning"
+                variant="contained"
+                size="small"
+                onClick={handleConfirmarDescarte}
+              >
+                Descartar e Sair
+              </Button>
+              <Button
+                color="inherit"
+                variant="outlined"
+                size="small"
+                onClick={() => setConfirmarCancelamento(false)}
+                sx={{ borderColor: 'divider' }}
+              >
+                Continuar Editando
+              </Button>
+            </Stack>
+          }
+          sx={{
+            mb: 3,
+            bgcolor: 'warning.50',
+            borderColor: 'warning.main',
+            alignItems: 'center',
+            borderRadius: 1.5,
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'warning.dark' }}>
+            Alterações não salvas
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.primary', mt: 0.25 }}>
+            Você possui alterações não salvas no formulário. Deseja realmente cancelar e descartar as alterações?
+          </Typography>
+        </Alert>
+      )}
+
+      {/* 4. Área de conteúdo — grid (list) ou formulário (form) */}
       <Card sx={{ p: { xs: 2, sm: 4 }, overflow: 'visible' }}>
         {children}
       </Card>

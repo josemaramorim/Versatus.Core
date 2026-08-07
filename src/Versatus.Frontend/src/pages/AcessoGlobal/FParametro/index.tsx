@@ -28,6 +28,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 
 import { buildApiEndpoint, getApiHeaders } from '../../../config/api';
+import { useTabs } from '../../../context/TabsContext';
 import type { IParametroForm } from './types';
 
 const AGRUPADOR_NAMES: Record<number, string> = {
@@ -281,10 +282,18 @@ export const FParametro: React.FC = () => {
     return groups;
   }, [filteredParametros]);
 
+  const { abaAtivaId, marcarDirty } = useTabs();
+
   // Verificar se há alterações para habilitar botão salvar
   const temAlteracoes = useMemo(() => {
     return JSON.stringify(parametros) !== JSON.stringify(originalParametros);
   }, [parametros, originalParametros]);
+
+  useEffect(() => {
+    if (abaAtivaId) {
+      marcarDirty(abaAtivaId, temAlteracoes);
+    }
+  }, [temAlteracoes, abaAtivaId, marcarDirty]);
 
   // Salvar alterações em lote
   const handleSave = () => {

@@ -20,6 +20,7 @@ import {
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEnumOptions } from '../../../hooks/useEnums';
+import { useTabs } from '../../../context/TabsContext';
 
 import { CadastroBasePage } from '../../../components/crud/CadastroBasePage';
 import { EntidadeCadastroConfig } from './EntidadeCadastroConfig';
@@ -90,6 +91,8 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
 
   const isBrowse = mode === 'delete' || mode === 'view';
 
+  const { abaAtivaId, marcarDirty } = useTabs();
+
   // Configuração do React Hook Form
   const methods = useForm<IEntidadeForm>({
     resolver: zodResolver(entidadeSchema) as any,
@@ -97,12 +100,19 @@ export const EntidadeFormView: React.FC<IEntidadeFormViewProps> = ({
     mode: 'onChange',
   });
 
-  const { handleSubmit, reset, control, formState: { errors }, watch } = methods;
+  const { handleSubmit, reset, control, formState: { errors, isDirty }, watch } = methods;
 
   // Sincronizar record do CRUD com o Form State
   useEffect(() => {
     reset(record);
   }, [record, reset]);
+
+  // Sincronizar estado de formulário alterado (dirty) com a aba ativa
+  useEffect(() => {
+    if (abaAtivaId && mode !== 'view' && mode !== 'delete') {
+      marcarDirty(abaAtivaId, isDirty);
+    }
+  }, [isDirty, abaAtivaId, mode, marcarDirty]);
 
   // Observar mudanças em tempo real para campos que controlam abas e seções condicionais
   const watchedValues = watch([

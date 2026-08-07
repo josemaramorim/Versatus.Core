@@ -13,8 +13,8 @@ interface TabsContextState {
    * Se a mesma rota já existir, ainda assim cria outra aba independente.
    */
   abrirAba: (item: Omit<TabItem, 'id'>) => void;
-  /** Remove uma aba pelo ID. Se era a ativa, ativa a aba mais próxima. */
-  fecharAba: (id: string) => void;
+  /** Remove uma aba pelo ID. Se possuir alterações não salvas, pede confirmação. */
+  fecharAba: (id: string, force?: boolean) => void;
   /** Torna uma aba a ativa sem criar nem fechar nenhuma. */
   ativarAba: (id: string) => void;
   /** Marca ou desmarca a aba como "suja" (alterações não salvas) */
@@ -37,8 +37,16 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAbaAtivaId(novaAba.id);
   }, []);
 
-  const fecharAba = useCallback((id: string) => {
+  const fecharAba = useCallback((id: string, force = false) => {
     setAbas(prev => {
+      const abaParaFechar = prev.find(a => a.id === id);
+      if (abaParaFechar?.isDirty && !force) {
+        const confirmou = window.confirm(
+          `A aba "${abaParaFechar.titulo}" possui alterações não salvas. Deseja realmente fechar e descartar as alterações?`
+        );
+        if (!confirmou) return prev;
+      }
+
       const index = prev.findIndex(a => a.id === id);
       const novaLista = prev.filter(a => a.id !== id);
 
