@@ -52,7 +52,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
     : null;
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 4 }, minHeight: '100%', bgcolor: 'background.default' }}>
+    <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5, pb: 3, minHeight: '100%', bgcolor: 'background.default' }}>
 
       {/* 1. Breadcrumbs */}
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>

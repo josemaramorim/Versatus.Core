@@ -149,7 +149,7 @@ export function CadastroBasePage<T>({
   // MODO LISTAGEM (GRID / BROWSE)
   // ---------------------------------------------------------------------------
   return (
-    <Box sx={{ p: 0, bgcolor: 'background.default' }}>
+    <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5, pb: 3, bgcolor: 'background.default' }}>
       
       {/* 1. Breadcrumbs */}
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 0.5 }}>
