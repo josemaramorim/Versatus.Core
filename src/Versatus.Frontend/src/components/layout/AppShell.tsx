@@ -10,7 +10,7 @@ import { useTabs, TabScopeContext } from '../../context/TabsContext';
 import { FEntidade } from '../../pages/AcessoGlobal/FEntidade';
 import { FParametro } from '../../pages/AcessoGlobal/FParametro';
 import { FCondicaoPagamento } from '../../pages/AcessoGlobal/FCondicaoPagamento';
-import { WelcomeScreen } from './WelcomeScreen';
+import { DashboardScreen } from './DashboardScreen';
 
 /** Mapa de rota → componente correspondente */
 const PAGINA_MAP: Record<string, React.ComponentType> = {
@@ -48,19 +48,22 @@ export const AppShell: React.FC = () => {
   const { abas, abaAtivaId, abrirAba } = useTabs();
   const location = useLocation();
   const initializedRef = useRef(false);
+  const lastPathRef = useRef<string | null>(null);
 
-  // Sincronização da URL inicial (ex: acessar direto /acesso-global/entidade ou via Favoritos)
+  // Sincronização da URL inicial / mudança de URL no navegador
   useEffect(() => {
     const currentPath = location.pathname;
     const titulo = ROTA_TITULO_MAP[currentPath];
 
     if (titulo) {
-      if (!initializedRef.current || abas.length === 0) {
+      const pathMudou = lastPathRef.current !== null && lastPathRef.current !== currentPath;
+      if (!initializedRef.current || pathMudou) {
         initializedRef.current = true;
         abrirAba({ titulo, rota: currentPath });
       }
     }
-  }, [location.pathname, abrirAba, abas.length]);
+    lastPathRef.current = currentPath;
+  }, [location.pathname, abrirAba]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -87,8 +90,8 @@ export const AppShell: React.FC = () => {
               position: 'relative',
             }}
           >
-            {/* Tela de boas-vindas quando não há abas abertas */}
-            {abas.length === 0 && <WelcomeScreen />}
+            {/* Dashboard institucional quando não há abas de rotinas abertas */}
+            {abas.length === 0 && <DashboardScreen />}
 
             {/* Keep-Alive Memoizado: cada aba fica montada em memória e isolada com seu próprio ID no TabScopeContext */}
             {abas.map(aba => {
