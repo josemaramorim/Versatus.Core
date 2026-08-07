@@ -70,10 +70,16 @@ export const TabOverflowMenu: React.FC<Props> = ({ abasOcultas }) => {
             onClick={() => handleSelecionar(aba.id)}
             sx={{ fontSize: '0.85rem', py: 0.75 }}
           >
-            <Box sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Box sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 0.75 }}>
               {aba.titulo}
               {aba.isDirty && (
-                <Box component="span" sx={{ ml: 0.75, color: 'warning.main', fontSize: '0.7rem' }}>● não salvo</Box>
+                <Box component="span" sx={{ color: 'warning.main', fontSize: '0.7rem', fontWeight: 600, flexShrink: 0 }}>● não salvo</Box>
+              )}
+              {!aba.isDirty && aba.formMode === 'insert' && (
+                <Box component="span" sx={{ color: 'success.main', fontSize: '0.7rem', fontWeight: 600, flexShrink: 0 }}>● novo</Box>
+              )}
+              {!aba.isDirty && aba.formMode === 'edit' && (
+                <Box component="span" sx={{ color: 'info.main', fontSize: '0.7rem', fontWeight: 600, flexShrink: 0 }}>● editando</Box>
               )}
             </Box>
           </MenuItem>

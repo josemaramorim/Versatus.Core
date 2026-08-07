@@ -141,11 +141,53 @@ export const TabBar: React.FC = () => {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
                 }}
               >
-                {aba.titulo}
-                {aba.isDirty && (
-                  <Box component="span" sx={{ ml: 0.5, color: 'warning.main' }}>●</Box>
+                <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 1 }}>
+                  {aba.titulo}
+                </Box>
+                {/* Indicador de modo: laranja=não salvo | verde=Novo | azul=Editar */}
+                {(aba.isDirty || aba.formMode === 'insert' || aba.formMode === 'edit') && (
+                  <Tooltip
+                    title={
+                      aba.isDirty
+                        ? 'Alterações não salvas'
+                        : aba.formMode === 'insert'
+                        ? 'Novo registro em andamento'
+                        : 'Editando registro'
+                    }
+                    placement="top"
+                    arrow
+                  >
+                    <Box
+                      component="span"
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                        display: 'inline-block',
+                        bgcolor: aba.isDirty
+                          ? 'warning.main'
+                          : aba.formMode === 'insert'
+                          ? 'success.main'
+                          : 'info.main',
+                        boxShadow: aba.isDirty
+                          ? '0 0 0 2px rgba(255,167,38,0.3)'
+                          : aba.formMode === 'insert'
+                          ? '0 0 0 2px rgba(76,175,80,0.3)'
+                          : '0 0 0 2px rgba(41,182,246,0.3)',
+                        animation: 'pulse-dot 2s ease-in-out infinite',
+                        '@keyframes pulse-dot': {
+                          '0%, 100%': { opacity: 1 },
+                          '50%': { opacity: 0.55 },
+                        },
+                      }}
+                    />
+                  </Tooltip>
                 )}
               </Box>
 

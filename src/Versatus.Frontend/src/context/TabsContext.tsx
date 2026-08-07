@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import type { TabItem } from '../types/tabs';
+import type { TabItem, TabFormMode } from '../types/tabs';
 
 // ── Contrato do Contexto ────────────────────────────────────────────────────
 
@@ -26,6 +26,8 @@ interface TabsContextState {
   ativarAba: (id: string) => void;
   /** Marca ou desmarca a aba como "suja" (alterações não salvas) */
   marcarDirty: (id: string, dirty: boolean) => void;
+  /** Define o modo do formulário ativo na aba (browse / insert / edit) */
+  marcarModo: (id: string, mode: TabFormMode) => void;
 }
 
 // ── Criação do Contexto ─────────────────────────────────────────────────────
@@ -86,6 +88,10 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAbas(prev => prev.map(a => a.id === id ? { ...a, isDirty: dirty } : a));
   }, []);
 
+  const marcarModo = useCallback((id: string, mode: TabFormMode) => {
+    setAbas(prev => prev.map(a => a.id === id ? { ...a, formMode: mode } : a));
+  }, []);
+
   return (
     <TabsContext.Provider value={{
       abas,
@@ -95,7 +101,8 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
       fecharAba,
       cancelarFechamento,
       ativarAba,
-      marcarDirty
+      marcarDirty,
+      marcarModo
     }}>
       {children}
     </TabsContext.Provider>

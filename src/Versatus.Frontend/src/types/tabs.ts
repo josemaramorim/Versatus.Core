@@ -1,5 +1,7 @@
 // Tipos da infraestrutura de abas estilo browser do Versatus ERP
 
+export type TabFormMode = 'browse' | 'insert' | 'edit';
+
 export interface TabItem {
   /** UUID único por aba — permite múltiplas abas da mesma rota */
   id: string;
@@ -9,6 +11,8 @@ export interface TabItem {
   rota: string;
   /** Ícone opcional (nome do ícone Lucide ou MUI) */
   icone?: string;
-  /** Indica se há alterações não salvas (para alerta ao fechar no futuro) */
+  /** Indica se há alterações não salvas (para alerta ao fechar) */
   isDirty?: boolean;
+  /** Modo atual do formulário dentro da aba */
+  formMode?: TabFormMode;
 }

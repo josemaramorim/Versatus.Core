@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -42,7 +42,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
   onSair,
   children
 }) => {
-  const { abas, abaAtivaId, idAbaParaFechar, fecharAba, cancelarFechamento, marcarDirty } = useTabs();
+  const { abas, abaAtivaId, idAbaParaFechar, fecharAba, cancelarFechamento, marcarDirty, marcarModo } = useTabs();
   const [confirmarCancelamento, setConfirmarCancelamento] = useState(false);
 
   const abaAtiva = abas.find(a => a.id === abaAtivaId);
@@ -50,6 +50,18 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
 
   // Confirmação de fechamento via [X] da aba — usa o mesmo banner inline
   const querFecharAba = idAbaParaFechar === abaAtivaId;
+
+  // Sinaliza o modo do formulário na aba (bolinha indicadora no TabBar)
+  useEffect(() => {
+    if (!abaAtivaId) return;
+    const modo = state === 'insert' ? 'insert' : state === 'edit' ? 'edit' : 'browse';
+    marcarModo(abaAtivaId, modo);
+    return () => {
+      // Ao desmontar (voltar para listagem), limpa o modo
+      marcarModo(abaAtivaId, 'browse');
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [abaAtivaId, state]);
 
   const isBrowse = state === 'browse';
   const viewMode = isBrowse ? 'list' : 'form';
