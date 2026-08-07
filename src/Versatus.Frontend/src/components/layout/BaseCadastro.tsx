@@ -42,11 +42,14 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
   onSair,
   children
 }) => {
-  const { abas, abaAtivaId, marcarDirty } = useTabs();
+  const { abas, abaAtivaId, idAbaParaFechar, fecharAba, cancelarFechamento, marcarDirty } = useTabs();
   const [confirmarCancelamento, setConfirmarCancelamento] = useState(false);
 
   const abaAtiva = abas.find(a => a.id === abaAtivaId);
   const isDirty = abaAtiva?.isDirty ?? false;
+
+  // Confirmação de fechamento via [X] da aba — usa o mesmo banner inline
+  const querFecharAba = idAbaParaFechar === abaAtivaId;
 
   const isBrowse = state === 'browse';
   const viewMode = isBrowse ? 'list' : 'form';
@@ -71,6 +74,17 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
       marcarDirty(abaAtivaId, false);
     }
     if (onSair) onSair();
+  };
+
+  const handleConfirmarFechamento = () => {
+    if (abaAtivaId) {
+      marcarDirty(abaAtivaId, false);
+      fecharAba(abaAtivaId, true);
+    }
+  };
+
+  const handleCancelarFechamento = () => {
+    cancelarFechamento();
   };
 
   return (
@@ -206,8 +220,8 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
         </Box>
       </Box>
 
-      {/* 3. Banner Inline de Confirmação de Cancelamento (quando há alterações não salvas) */}
-      {confirmarCancelamento && (
+      {/* 3. Banner Inline de Confirmação — Cancelar botão OU fechar aba [X] */}
+      {(confirmarCancelamento || querFecharAba) && (
         <Alert
           severity="warning"
           variant="outlined"
@@ -217,7 +231,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
                 color="warning"
                 variant="contained"
                 size="small"
-                onClick={handleConfirmarDescarte}
+                onClick={querFecharAba ? handleConfirmarFechamento : handleConfirmarDescarte}
               >
                 Descartar e Sair
               </Button>
@@ -225,7 +239,7 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
                 color="inherit"
                 variant="outlined"
                 size="small"
-                onClick={() => setConfirmarCancelamento(false)}
+                onClick={querFecharAba ? handleCancelarFechamento : () => setConfirmarCancelamento(false)}
                 sx={{ borderColor: 'divider' }}
               >
                 Continuar Editando

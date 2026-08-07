@@ -9,12 +9,19 @@ interface TabsContextState {
   /** ID da aba atualmente visível */
   abaAtivaId: string | null;
   /**
+   * ID da aba que solicitou fechamento mas possui alterações não salvas.
+   * Quando preenchido, o formulário ativo exibe o banner de confirmação inline.
+   */
+  idAbaParaFechar: string | null;
+  /**
    * Abre sempre uma NOVA aba (permite duplicatas).
    * Se a mesma rota já existir, ainda assim cria outra aba independente.
    */
   abrirAba: (item: Omit<TabItem, 'id'>) => void;
-  /** Remove uma aba pelo ID. Se possuir alterações não salvas, pede confirmação. */
+  /** Remove uma aba pelo ID. Se possuir alterações não salvas, aciona banner inline em vez de window.confirm(). */
   fecharAba: (id: string, force?: boolean) => void;
+  /** Cancela a solicitação de fechamento da aba (usuário escolheu "Continuar Editando") */
+  cancelarFechamento: () => void;
   /** Torna uma aba a ativa sem criar nem fechar nenhuma. */
   ativarAba: (id: string) => void;
   /** Marca ou desmarca a aba como "suja" (alterações não salvas) */
@@ -30,6 +37,7 @@ const TabsContext = createContext<TabsContextState | undefined>(undefined);
 export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [abas, setAbas] = useState<TabItem[]>([]);
   const [abaAtivaId, setAbaAtivaId] = useState<string | null>(null);
+  const [idAbaParaFechar, setIdAbaParaFechar] = useState<string | null>(null);
 
   const abrirAba = useCallback((item: Omit<TabItem, 'id'>) => {
     const novaAba: TabItem = { ...item, id: crypto.randomUUID() };
@@ -37,29 +45,37 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAbaAtivaId(novaAba.id);
   }, []);
 
+
+
   const fecharAba = useCallback((id: string, force = false) => {
     setAbas(prev => {
       const abaParaFechar = prev.find(a => a.id === id);
+
+      // Se a aba tem alterações e não é forçado: ativar a aba e sinalizar banner inline
       if (abaParaFechar?.isDirty && !force) {
-        const confirmou = window.confirm(
-          `Você possui alterações não salvas na aba "${abaParaFechar.titulo}". Deseja realmente fechar e descartar as alterações?`
-        );
-        if (!confirmou) return prev;
+        setAbaAtivaId(id);
+        setIdAbaParaFechar(id);
+        return prev; // não fecha ainda
       }
 
+      // Fecha imediatamente (sem alterações ou force=true)
       const index = prev.findIndex(a => a.id === id);
       const novaLista = prev.filter(a => a.id !== id);
 
+      setIdAbaParaFechar(null);
       setAbaAtivaId(current => {
         if (current !== id) return current;
         if (novaLista.length === 0) return null;
-        // Ativa a aba anterior ou a próxima disponível
         const novoIndex = Math.max(0, index - 1);
         return novaLista[novoIndex]?.id ?? null;
       });
 
       return novaLista;
     });
+  }, []);
+
+  const cancelarFechamento = useCallback(() => {
+    setIdAbaParaFechar(null);
   }, []);
 
   const ativarAba = useCallback((id: string) => {
@@ -71,7 +87,16 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <TabsContext.Provider value={{ abas, abaAtivaId, abrirAba, fecharAba, ativarAba, marcarDirty }}>
+    <TabsContext.Provider value={{
+      abas,
+      abaAtivaId,
+      idAbaParaFechar,
+      abrirAba,
+      fecharAba,
+      cancelarFechamento,
+      ativarAba,
+      marcarDirty
+    }}>
       {children}
     </TabsContext.Provider>
   );
