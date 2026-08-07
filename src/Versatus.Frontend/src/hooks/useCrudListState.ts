@@ -140,25 +140,42 @@ export function useCrudListState<T>(
     try {
       const id = config.getRecordId(record);
       if (!id) {
-        setSelectedRecord(record);
+        setSelectedRecord(config.mapBackendToForm(record));
         setModalMode('edit');
         return;
       }
 
-      const response = await fetch(`${config.getApiEndpoint()}/completo/${id}`, {
-        headers: getApiHeaders()
-      });
-      if (!response.ok) {
-        throw new Error(`Erro ao buscar detalhes de ${config.getTitulo().toLowerCase()}`);
+      let data: any = null;
+
+      // 1. Tentar primeiro o endpoint de busca completa /completo/{id}
+      try {
+        const resCompleto = await fetch(`${config.getApiEndpoint()}/completo/${id}`, {
+          headers: getApiHeaders()
+        });
+        if (resCompleto.ok) {
+          data = await resCompleto.json();
+        }
+      } catch (err) {
+        console.warn('Endpoint /completo indisponível, buscando por id direto:', err);
       }
 
-      const data = await response.json();
-      const mappedRecord = config.mapBackendToForm(data);
+      // 2. Se /completo/{id} não retornou dados, tentar o endpoint padrão /{id}
+      if (!data) {
+        const resBase = await fetch(`${config.getApiEndpoint()}/${id}`, {
+          headers: getApiHeaders()
+        });
+        if (resBase.ok) {
+          data = await resBase.json();
+        }
+      }
+
+      // 3. Mapear os dados detalhados da API (ou fallback do registro da grid) para a estrutura do formulário
+      const mappedRecord = config.mapBackendToForm(data || record);
       setSelectedRecord(mappedRecord);
       setModalMode('edit');
     } catch (err) {
-      console.error(err);
-      setSelectedRecord(record);
+      console.error('Erro ao buscar detalhes para edição:', err);
+      setSelectedRecord(config.mapBackendToForm(record));
       setModalMode('edit');
     } finally {
       setLoading(false);

@@ -40,24 +40,30 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
 
   /** Transforma a resposta aninhada da API no formato plano do formulário */
   override mapBackendToForm(backend: any): IEntidadeForm {
+    if (!backend) return defaultValues;
+
+    const rawId = backend.idEntidade ?? backend.id ?? backend.codigo;
+    const rawTipoPessoa = backend.tipoPessoa;
+    // No backend C#: 1 = Fisica, 2 = Juridica. No frontend Zod: 2 = Fisica, 3 = Juridica.
+    const mappedTipoPessoa = rawTipoPessoa === 1 ? 2 : rawTipoPessoa === 2 ? 3 : (rawTipoPessoa || 2);
+
     return {
       ...defaultValues,
-      idEntidade: backend.idEntidade,
-      codigo: String(backend.idEntidade),
-      razaoSocial: backend.nome || '',
-      apelido: backend.pessoaJuridica?.razaoSocial || '',
-      tipoPessoa: backend.tipoPessoa, // Nativamente 2 ou 3 do banco
+      codigo: String(rawId || ''),
+      razaoSocial: backend.razaoSocial || backend.nome || '',
+      apelido: backend.apelido || backend.pessoaJuridica?.razaoSocial || '',
+      tipoPessoa: mappedTipoPessoa,
       ativo: backend.ativo ?? true,
-      cpf: backend.pessoaFisica?.cpf || '',
-      cnpj: backend.pessoaJuridica?.cnpj || '',
-      rg: backend.pessoaFisica?.rg || '',
+      cpf: backend.cpf || backend.pessoaFisica?.cpf || '',
+      cnpj: backend.cnpj || backend.pessoaJuridica?.cnpj || '',
+      rg: backend.rg || backend.pessoaFisica?.rg || '',
       isCliente: backend.isCliente || false,
       isFornecedor: backend.isFornecedor || false,
       isFuncionario: backend.isFuncionario || false,
       isTransportadora: backend.isTransportadora || false,
       isComissionado: backend.isComissionado || false,
-      isAgencia: backend.isAgenciaBancaria || false,
-      isFinanceira: backend.isInstituicaoFinanceira || false,
+      isAgencia: backend.isAgencia || backend.isAgenciaBancaria || false,
+      isFinanceira: backend.isFinanceira || backend.isInstituicaoFinanceira || false,
       isFilial: backend.isFilial || false,
       isObra: backend.isObra || false,
       isRepresentante: backend.isRepresentante || false,
@@ -66,28 +72,28 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
       isContador: backend.isContador || false,
       isAluno: backend.isAluno || false,
       isProfessor: backend.isProfessor || false,
-      isIntermediador: backend.isIntermediadorComercial || false,
+      isIntermediador: backend.isIntermediador || backend.isIntermediadorComercial || false,
       inscricaoEstadual: backend.inscricaoEstadual || '',
       inscricaoMunicipal: backend.inscricaoMunicipal || '',
       inscricaoSuframa: backend.inscricaoSuframa || '',
-      emailPrincipal: backend.email || '',
-      emailNfe: backend.emailNFE || '',
+      emailPrincipal: backend.emailPrincipal || backend.email || '',
+      emailNfe: backend.emailNfe || backend.emailNFE || '',
       emailFinanceiro: backend.emailFinanceiro || '',
-      emailVendas: backend.emailVenda || '',
-      emailCompras: backend.emailCompra || '',
+      emailVendas: backend.emailVendas || backend.emailVenda || '',
+      emailCompras: backend.emailCompras || backend.emailCompra || '',
       homePage: backend.homePage || '',
       enderecos: (backend.enderecos || []).map((end: any) => ({
-        id: end.idEntidadeEndereco,
-        tipo: end.tipoEndereco === 1 ? 'ComercialResidencial' :
+        id: end.id || end.idEntidadeEndereco,
+        tipo: end.tipo || (end.tipoEndereco === 1 ? 'ComercialResidencial' :
               end.tipoEndereco === 2 ? 'Comercial' :
               end.tipoEndereco === 3 ? 'Residencial' :
               end.tipoEndereco === 4 ? 'Entrega' :
-              end.tipoEndereco === 5 ? 'Cobranca' : 'Outro',
+              end.tipoEndereco === 5 ? 'Cobranca' : 'Outro'),
         logradouro: end.logradouro || '',
         numero: String(end.numero || ''),
-        bairro: end.bairro?.nome || '',
-        cidade: end.cidade?.nome || '',
-        uf: end.cidade?.estado?.sigla || '',
+        bairro: end.bairro?.nome || end.bairro || '',
+        cidade: end.cidade?.nome || end.cidade || '',
+        uf: end.cidade?.estado?.sigla || end.uf || '',
         cep: end.cep || ''
       })),
     } as IEntidadeForm;
@@ -95,7 +101,12 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
 
   /** Transforma o formulário plano no DTO esperado pela API */
   override mapFormToBackend(form: IEntidadeForm): any {
+    const rawId = Number(form.codigo || 0);
+    // Converte tipoPessoa do frontend (2=Fisica, 3=Juridica) para backend C# (1=Fisica, 2=Juridica)
+    const backendTipoPessoa = form.tipoPessoa === 2 ? 1 : form.tipoPessoa === 3 ? 2 : Number(form.tipoPessoa);
+
     return {
+      idEntidade: rawId,
       nome: form.razaoSocial || '',
       apelido: form.apelido || '',
       email: form.emailPrincipal || '',
@@ -109,7 +120,7 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
       inscricaoMunicipal: form.inscricaoMunicipal || '',
       inscricaoSuframa: form.inscricaoSuframa || '',
       ativo: form.ativo,
-      tipoPessoa: Number(form.tipoPessoa), // Passa nativamente o valor numérico
+      tipoPessoa: backendTipoPessoa,
       cpf: form.cpf || '',
       cnpj: form.cnpj || '',
       rg: form.rg || '',
@@ -118,8 +129,8 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
       isFuncionario: form.isFuncionario || false,
       isTransportadora: form.isTransportadora || false,
       isComissionado: form.isComissionado || false,
-      isAgencia: form.isAgencia || false,
-      isFinanceira: form.isFinanceira || false,
+      isAgenciaBancaria: form.isAgencia || false,
+      isInstituicaoFinanceira: form.isFinanceira || false,
       isFilial: form.isFilial || false,
       isObra: form.isObra || false,
       isRepresentante: form.isRepresentante || false,
@@ -128,10 +139,10 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
       isContador: form.isContador || false,
       isAluno: form.isAluno || false,
       isProfessor: form.isProfessor || false,
-      isIntermediador: form.isIntermediador || false,
+      isIntermediadorComercial: form.isIntermediador || false,
       enderecos: (form.enderecos || []).map((end: any) => ({
-        id: end.id || 0,
-        tipo: end.tipo || 'ComercialResidencial',
+        idEntidadeEndereco: end.id || 0,
+        tipoEndereco: end.tipo === 'ComercialResidencial' ? 1 : end.tipo === 'Comercial' ? 2 : end.tipo === 'Residencial' ? 3 : end.tipo === 'Entrega' ? 4 : 5,
         logradouro: end.logradouro || '',
         numero: end.numero || '',
         cep: end.cep || ''
