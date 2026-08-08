@@ -445,6 +445,43 @@ public class ParametroService : IParametroService
 
     public async Task<List<EnumOpcaoDto>> ObterOpcoesEnumAsync(string enumNome, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(enumNome))
+            return new List<EnumOpcaoDto>();
+
+        // Estratégia definitiva para distinguir os dois tipos de enum:
+        //
+        // TIPO 1 — Enum gravado no banco (ex: FormaPagtoTipo, EntidadeTipoPessoa):
+        //   → O nome do enum (ex: "FormaPagtoTipo") existe como Descricao em GloTipoEnumerado
+        //     com IdTipoEnumeradoPai = null (registro pai/agrupador).
+        //   → Os filhos dessa entrada contêm os labels corretos para cada valor.
+        //   → Devemos buscar pelo IdTipoEnumeradoPai do pai.
+        //
+        // TIPO 2 — Enum puro de C# (ex: TipoValidacaoCampo, com valores 0, 1, 2):
+        //   → O nome NÃO existe em GloTipoEnumerado.
+        //   → Os valores (0, 1, 2...) podem coincidir com IDs de registros de OUTROS grupos na tabela.
+        //   → NÃO devemos consultar o banco — apenas formatar via FormatEnumLabel.
+
+        // Verifica se existe um registro pai na GloTipoEnumerado com este nome
+        var enumPaiNoBanco = await _context.TiposEnumerados
+            .FirstOrDefaultAsync(
+                t => t.IdTipoEnumeradoPai == null && t.Descricao == enumNome,
+                cancellationToken);
+
+        if (enumPaiNoBanco != null)
+        {
+            // TIPO 1: Enum gravado no banco — busca os filhos pelo IdPai
+            var filhos = await _context.TiposEnumerados
+                .Where(t => t.IdTipoEnumeradoPai == enumPaiNoBanco.IdTipoEnumerado)
+                .OrderBy(t => t.IdTipoEnumerado)
+                .ToListAsync(cancellationToken);
+
+            return filhos.Select(f => new EnumOpcaoDto(
+                f.IdTipoEnumerado.ToString(),
+                f.Descricao
+            )).ToList();
+        }
+
+        // Não existe no banco → tenta resolver via enum C# (reflexão)
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
         Type? enumType = null;
         
@@ -458,27 +495,34 @@ public class ParametroService : IParametroService
                 break;
         }
 
-        if (enumType == null || !enumType.IsEnum)
+        if (enumType != null && enumType.IsEnum)
         {
-            return new List<EnumOpcaoDto>();
+            // TIPO 2: Enum puro de C# — NÃO consulta GloTipoEnumerado para evitar colisão de IDs
+            return Enum.GetValues(enumType)
+                .Cast<object>()
+                .Select(val => new EnumOpcaoDto(
+                    val.ToString() ?? "",
+                    FormatEnumLabel(val.ToString() ?? "")
+                ))
+                .ToList();
         }
 
-        var values = Enum.GetValues(enumType);
-        var result = new List<EnumOpcaoDto>();
+        return new List<EnumOpcaoDto>();
+    }
 
-        foreach (var val in values)
+    /// <summary>
+    /// Formata o nome técnico do enum em um label legível para o usuário.
+    /// Usado para enums C# não gravados na GloTipoEnumerado.
+    /// </summary>
+    private static string FormatEnumLabel(string enumName)
+    {
+        return enumName switch
         {
-            var intVal = (int)val;
-            var strVal = val.ToString() ?? "";
-
-            var dbDesc = await _context.TiposEnumerados
-                .Where(t => t.IdTipoEnumerado == intVal)
-                .Select(t => t.Descricao)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            result.Add(new EnumOpcaoDto(strVal, dbDesc ?? strVal));
-        }
-
-        return result;
+            "PermitirSemValidacao" => "Permitir sem validação",
+            "Avisar" => "Avisar e permitir salvar",
+            "BloquearSalvar" => "Avisar e não salvar (Bloquear)",
+            _ => System.Text.RegularExpressions.Regex.Replace(enumName, "([a-z])([A-Z])", "$1 $2")
+        };
     }
 }
+

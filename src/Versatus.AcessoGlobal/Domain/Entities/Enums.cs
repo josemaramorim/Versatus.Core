@@ -170,3 +170,11 @@ public enum DivisaoParcelamentoTipo
     Percentual = 603,
     Quantidade = 604
 }
+
+public enum TipoValidacaoCampo
+{
+    PermitirSemValidacao = 0,
+    Avisar = 1,
+    BloquearSalvar = 2
+}
+
