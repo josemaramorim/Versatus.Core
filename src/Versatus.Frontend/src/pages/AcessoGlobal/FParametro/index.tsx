@@ -606,7 +606,7 @@ export const FParametro: React.FC = () => {
                             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
                               {p.chave}
                             </Typography>
-                            {p.valor && (
+                            {p.valor && p.tipo !== 234 && (
                               <Typography variant="caption" sx={{ color: 'text.disabled', fontStyle: 'italic' }}>
                                 Valor base padrão: {p.valor}
                               </Typography>
