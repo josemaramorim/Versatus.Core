@@ -156,8 +156,8 @@
 - **Constituição:** Artigo IV, Regra 17.
 - **Branch:** `feat/mod-05-e3-controllers` · **Commit:** `feat(mod-05): controllers E3 (E3-T06)` · **Depende de:** E3-T05
 
-### E3-T07 · Frontend Caixa/Banco · tipo: frontend
-- **Objetivo:** `src/pages/Financeiro/FCaixaBanco/` (types, schema, `CaixaBancoCadastroConfig.tsx` estendendo `BaseCadastroConfig<T>`, `index.tsx`) + `schema.test.ts` (Vitest) por regra RTV. Campos obrigatórios com `required` (Lei 10).
+### E3-T07 · Frontend Caixa/Banco (Padrão A) · tipo: frontend
+- **Objetivo:** completar `docs/spec_fcaixabanco.md` (RTV via `legacy-validation-audit` em `FCaixaBanco.cs` + `FBaseCadastro`), depois `src/pages/Financeiro/FCaixaBanco/` (types, schema, `CaixaBancoCadastroConfig.tsx` estendendo `BaseCadastroConfig<T>`, `index.tsx`) + `schema.test.ts` (Vitest) por regra RTV. Campos obrigatórios com `required` (Lei 10). Sem abas/campos de boleto/remessa/retorno (E14).
 - **Cria:** `src/Versatus.Frontend/src/pages/Financeiro/FCaixaBanco/*`.
 - **Cobre:** `VAL-xx#E3` visuais.
 - **Pronto quando:** `npm run build` + `npm test` verdes.
@@ -252,8 +252,8 @@
 ### E4-T08 · Controllers E4 · tipo: contract
 - **Cobre:** `contracts/documento.md`. **Branch:** `feat/mod-05-e4-controllers` · **Commit:** `feat(mod-05): controllers E4 (E4-T08)` · **Depende de:** E4-T07
 
-### E4-T09 · Frontend Documento/Parcela · tipo: frontend
-- **Objetivo:** `src/pages/Financeiro/FDocumento/` + `FConsultaParcelaFinanceiro/` (consulta, inclusão, manutenção) + `schema.test.ts`. `required` nos obrigatórios.
+### E4-T09 · Frontend Documento/Parcela (Padrão C + consulta) · tipo: frontend
+- **Objetivo:** `docs/spec_fdocumento.md` (Padrão C — inclusão/alteração/cancelamento são operações) e `docs/spec_fconsultaparcelafinanceiro.md` (consulta), depois `src/pages/Financeiro/FDocumento/` + `FConsultaParcelaFinanceiro/` + `schema.test.ts`. Segue os templates `spec_fcaixabanco.md` (A) / `spec_fliquidacaodocumento.md` (C). `required` nos obrigatórios.
 - **Cobre:** `VAL-xx#E4` visuais.
 - **Pronto quando:** `npm run build` + `npm test` verdes.
 - **Branch:** `feat/mod-05-e4-frontend` · **Commit:** `feat(mod-05): telas de Documento/Parcela React (E4-T09)` · **Depende de:** E4-T08
@@ -336,10 +336,11 @@
 ### E6-T07 · Controller E6 · tipo: contract
 - **Cobre:** `contracts/liquidacao.md`. **Branch:** `feat/mod-05-e6-controller` · **Commit:** `feat(mod-05): controller de liquidação (E6-T07)` · **Depende de:** E6-T06
 
-### E6-T08 · Frontend Liquidação · tipo: frontend
-- **Objetivo:** `src/pages/Financeiro/FLiquidacaoDocumento/` (seleção de parcelas, formas múltiplas, simulação, confirmação) + `schema.test.ts`.
-- **Cobre:** `VAL-xx#E6` visuais.
-- **Branch:** `feat/mod-05-e6-frontend` · **Commit:** `feat(mod-05): tela de Liquidação React (E6-T08)` · **Depende de:** E6-T07
+### E6-T08 · Frontend Liquidação (Padrão C — 1ª tela de operação do projeto) · tipo: frontend
+- **Objetivo:** (1) criar a base de frontend de operação `src/components/operacao/BaseOperacaoConfig.tsx` + `src/hooks/useOperacaoState.ts` conforme `.agents/skills/migrate-crud/references/padrao-c-operacao.md §4`; (2) completar `docs/spec_fliquidacaodocumento.md` (RTV de composição via `legacy-validation-audit`; efeitos já em `matriz-rot.md#E6`); (3) `src/pages/Financeiro/FLiquidacaoDocumento/` (seleção de parcelas, formas múltiplas com modal por tipo, rateio, troco, barra de resumo com `Diferença`, `simular` antes de `executar`) + `schema.test.ts`. Sem Novo/Excluir.
+- **Cobre:** `VAL-xx#E6` de composição (efeitos ficam na ROT/backend — E6-T06).
+- **Constituição:** Lei 4 (sem hardcode no hook), Lei 10.
+- **Branch:** `feat/mod-05-e6-frontend` · **Commit:** `feat(mod-05): base de operação + tela de Liquidação React (E6-T08)` · **Depende de:** E6-T07
 
 ---
 
@@ -414,7 +415,7 @@
 - **Branch:** `feat/mod-05-e9-contrato` · **Commit:** `feat(mod-05): contrato, controllers e migration E9 (E9-T05)` · **Depende de:** E9-T04
 
 ### E9-T06 · Frontend Cheques (recebido/emitido/movimento/consulta) · tipo: frontend
-- **Objetivo:** `src/pages/Financeiro/FChequeRecebido/`, `FChequeEmitido/`, `FMovimentoChequeRecebido/`, `FMovimentoChequeEmitido/`, `FChequeConsulta*/` + `schema.test.ts`. **Escopo CLR-07** (talão/suprimento/impressão fora).
+- **Objetivo:** specs de tela (`FChequeRecebido`/`FChequeEmitido` = Padrão A cadastro; `FMovimentoChequeRecebido`/`FMovimentoChequeEmitido` = **Padrão C** operação de movimento; `FChequeConsulta*` = consulta), depois `src/pages/Financeiro/F{ChequeRecebido,ChequeEmitido,MovimentoChequeRecebido,MovimentoChequeEmitido,ChequeConsulta*}/` + `schema.test.ts`. Reusa `BaseOperacaoConfig` criada em E6-T08. **Escopo CLR-07** (talão/suprimento/impressão fora).
 - **Cobre:** `VAL-xx#E9` visuais.
 - **Branch:** `feat/mod-05-e9-frontend` · **Commit:** `feat(mod-05): telas de Cheques React (E9-T06)` · **Depende de:** E9-T05
 

@@ -82,6 +82,15 @@ continua chamando a API do AcessoGlobal como está.
 > **Impressão (CLR-08):** DRE, cheque e recibo de liquidação — o endpoint devolve o
 > **modelo de dados**; renderização/impressão é do frontend. Sem geração de PDF no backend.
 
+> **Padrões de tela e specs de referência:** telas de cadastro = **Padrão A**
+> (`BaseCadastroConfig<T>`); telas de operação (Liquidar/Estornar/Reverter/Acertar/Fechar,
+> a maioria do MOD-05) = **Padrão C — Operação/Assistente**
+> (`.agents/skills/migrate-crud/references/padrao-c-operacao.md`, `BaseOperacaoConfig`).
+> Templates criados: [`docs/spec_fcaixabanco.md`](../../../docs/spec_fcaixabanco.md) (A) e
+> [`docs/spec_fliquidacaodocumento.md`](../../../docs/spec_fliquidacaodocumento.md) (C).
+> As demais `docs/spec_f*.md` são geradas na tarefa `frontend` do épico, seguindo esses
+> templates. `BaseOperacaoConfig` é criada na tarefa `E6-T08` (1ª tela de operação).
+
 ---
 
 ## 2. Inventário de Classes
@@ -625,3 +634,4 @@ entidade (`data-model.md`), decisão POCO-abstrata vs. serviço por base individ
 | 2026-09-03 | SDD etapa 2 (`sdd-clarify`) | 13 clarificações resolvidas (`clarify.md`, CLR-01..13): SharedKernel mínimo, pré-tarefa de rateio no MOD-02, `ContaBancaria` E3/E14, regra das bases legadas (POCO abstrata + serviço), interfaces transversais no SharedKernel, `SelecaoDocumento` como serviço, escopo React de cheques, impressão no frontend. §1.3–1.5, §2.1, §2.3, §3.3 (nova), §4.1–4.2, §6 (E0/E3/E5/E9/E10/E11), §8–9 atualizados. Sem pendência bloqueante. |
 | 2026-09-03 | SDD etapa 3 (`sdd-plan`) | `plan.md` (estrutura de projeto, E0 SharedKernel, 15 passos de execução, 11 operações com ordem de persistência, 10 riscos), `research.md` (BoletoNet/OFX, enums, GeradorSequencial, Lookup, golden com banco vazio, tipos `text`/`datetime`), `data-model.md` (extract real de `localhost\SQLEXPRESS2008` — PKs compostas por filial, `numeric(23,8)`, nulidade não-uniforme, detalhamento de E-Caixa/E-Domínio/E-Documento núcleo), `contracts/` (README + caixa-banco/documento/liquidacao), `legacy-schema/` (fin_columns.txt + fin_meta.txt). Achado: banco de dev não tem 100% do schema (falta `FINPROJECAOFLUXOCAIXA*`, `FINLOGDOMINIOPERIODO`) e `FINDOMINIO`→`FINCAIXABANCO` inverte a ordem E2/E3. |
 | 2026-09-03 | SDD etapa 4 (`sdd-tasks`) | `tasks.md`: fase Setup (S-T01..04) + E0..E14 + fecho (Z-T01..03), ~90 tarefas atômicas (1 tarefa = 1 branch `feat/mod-05-*` = 1 commit), cada uma com objetivo, refs legados, arquivos, `Cobre:` (RN/VAL/OP/CALC), Artigos da constituição, `Pronto quando:` e `Depende de:`. `analyze-report.md` parcial (V1/V2/V6/V7). Data-model: nota reforçando que Fluent API vai no Mapping, não na entidade (igual `acesso.global`). |
+| 2026-09-03 | Frontend — Padrão C + templates | Criado **Padrão C — Operação/Assistente** (`.agents/skills/migrate-crud/references/padrao-c-operacao.md`; classificação adicionada em `spec-generator` e `migrate-crud`; `MANUAL-SKILLS.md` atualizado — Lei 12). Templates de spec de tela: `docs/spec_fcaixabanco.md` (Padrão A) e `docs/spec_fliquidacaodocumento.md` (Padrão C). Tarefas `frontend` (E3-T07, E4-T09, E6-T08, E9-T06) atualizadas: E6-T08 cria `BaseOperacaoConfig`. Demais `spec_f*.md` geradas por épico no `/implement`. |

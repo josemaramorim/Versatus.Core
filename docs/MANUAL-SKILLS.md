@@ -79,8 +79,9 @@ Auditorias de apoio, disparadas dentro das etapas 1–3: `legacy-validation-audi
 
 **Fronteira:**
 - **Escopo de módulo** → fluxo SDD (`sdd-*`).
-- **Uma tela CRUD isolada** dentro de um módulo já planejado → `spec-generator` + `migrate-crud` como sempre (essas skills são acionadas por `/implement` ou diretamente).
+- **Uma tela isolada** dentro de um módulo já planejado → `spec-generator` + `migrate-crud` (acionadas por `/implement` ou diretamente). Classificam em **Padrão A** (CRUD), **B** (Configuração em Lote) ou **C** (Operação/Assistente — `references/padrao-c-operacao.md`).
 - Não rode `sdd-specify` para uma única tela, nem `spec-generator` para um módulo inteiro.
+- Telas de operação (Liquidar/Estornar/Reverter/Acertar/Fechar) → **Padrão C**; a Matriz RTV cobre a *composição*, a **Matriz ROT** cobre os *efeitos* (testes de backend).
 
 ---
 
@@ -123,7 +124,7 @@ Leia os seguintes arquivos nesta ordem antes de escrever qualquer código ou spe
 ```
 
 #### O que a IA fará automaticamente:
-1. Classificará a tela como Padrão A (CRUD Padrão) ou Padrão B (Lote).
+1. Classificará a tela como **Padrão A** (CRUD), **Padrão B** (Configuração em Lote) ou **Padrão C** (Operação/Assistente — telas transacionais que herdam `FBaseProcesso`/`FDocumentoSelecaoBase`, com botão "Confirmar/Executar", sem Novo/Excluir; ver `.agents/skills/migrate-crud/references/padrao-c-operacao.md`).
 2. Gerará a Spec Funcional em `docs/spec_fcondicaopagamento.md`.
 3. Aguardará sua aprovação da Spec.
 4. Após aprovação, gerará DTOs, Entidade POCO, Fluent API Mappings, Service (com CQRS Read/Write) e Controller C#.
@@ -152,7 +153,7 @@ Usar a skill spec-generator para analisar a entidade FProduto no módulo Estoque
 
 #### O que a IA fará automaticamente:
 1. Mapeará **todas** as propriedades e suas nulidades (colunas que aceitam NULL no banco viram `int?`, `string?`).
-2. Classificará a tela (Padrão A ou B).
+2. Classificará a tela (Padrão A — CRUD, B — Lote, ou C — Operação/Assistente).
 3. Elaborará o documento em `docs/spec_fproduto.md` contendo as 8 seções padrão (Requisitos Clean Arch, Endpoints, Mapeamento MUI `required`, Critérios de Aceite).
 4. Apresentará a spec e aguardará sua aprovação.
 

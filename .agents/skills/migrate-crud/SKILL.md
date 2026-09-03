@@ -11,15 +11,16 @@ Este skill guia o agente através do pipeline de migração de formulários do E
 
 ## 0. Classificação Obrigatória do Formulário (ANTES de tudo)
 
-Antes de qualquer geração de spec ou código, classifique o formulário em um dos dois padrões abaixo.
+Antes de qualquer geração de spec ou código, classifique o formulário em um dos **três** padrões abaixo.
 Analise o arquivo .cs legado e responda às perguntas:
 
 | Pergunta | Sim | Não |
 |---|---|---|
-| O formulário possui botão Novo/Inserir? | → CRUD Padrão | |
-| O formulário possui botão Excluir/Deletar? | → CRUD Padrão | |
-| O formulário edita valores de itens já existentes em lote? | → Configuração em Lote | |
-| A tela principal usa TreeList, Accordion ou agrupamento expansível? | → Configuração em Lote | |
+| O formulário possui botão Novo/Inserir e Excluir/Deletar (de cadastro)? | → CRUD Padrão (A) | |
+| O formulário edita valores de itens já existentes em lote (Accordion/TreeList)? | → Configuração em Lote (B) | |
+| Herda `FBaseProcesso` / `FDocumentoSelecaoBase` / `FDocumentoOperacaoBase` / `FEstornoDocumento` / `FSuprimentoBase`? | → Operação/Assistente (C) | |
+| O botão principal é "Confirmar/Executar/Liquidar/Estornar/Reverter/Processar/Gerar/Fechar/Acertar" e NÃO há Novo/Excluir de cadastro? | → Operação/Assistente (C) | |
+| A tela **seleciona** registros existentes e **compõe** uma ação sobre eles (formas de pagamento, rateio, distribuição), com totais de conferência? | → Operação/Assistente (C) | |
 
 ### Padrão A: CRUD Padrão
 Exemplos: FEntidade, FCondicaoPagamento, FProduto
@@ -35,8 +36,19 @@ Exemplos: FParametro, FPermissao
 - Botões Novo e Excluir são **completamente ocultados** na UI
 - **Siga as Fases 1→4 com as variações marcadas como [LOTE]**
 
+### Padrão C: Operação / Assistente
+Exemplos: FLiquidacaoDocumento, FEstornoDocumento, FMovimentoChequeRecebido, FAcertoAdiantamento, FArquivoRemessa
+- Seleciona registros existentes e executa uma **operação transacional** sobre eles (não é cadastro)
+- Endpoints: GET /{itens-elegiveis} + POST /simular (quando há cálculo) + POST /executar (Handler, 1 transação) + POST /{id}/estornar (quando existe inverso)
+- Botões Novo/Excluir de cadastro **ausentes**; botão principal = "Confirmar/Executar"
+- Frontend herda `BaseOperacaoConfig<TCmd, TResult>` (seleção + composição + barra de resumo com `Diferença`)
+- As regras de **efeito** vão para a **Matriz ROT** (testes de backend), não para a RTV/`schema.test.ts`
+- **Siga as Fases 1→4 com as variações marcadas como [OPERACAO]** — ver
+  `references/padrao-c-operacao.md` para estrutura de endpoints, tela e base de frontend
+
 > [!IMPORTANT]
 > Documente o padrão identificado no cabeçalho da Spec Funcional antes de qualquer outra coisa.
+> Para Padrão C, **leia `references/padrao-c-operacao.md` na íntegra** antes de gerar a spec.
 
 ---
 
