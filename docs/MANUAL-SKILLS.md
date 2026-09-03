@@ -39,7 +39,15 @@
    - [Propósito](#propósito-project-analyzer)
    - [Quando Usar](#quando-usar-project-analyzer)
    - [Exemplo de Uso Prático](#exemplo-de-uso-prático-project-analyzer)
-10. [Boas Práticas de Manutenção do Manual](#10-boas-práticas-de-manutenção-do-manual)
+10. [Skill 9: `sdd-constitution`](#10-skill-9-sdd-constitution)
+11. [Skill 10: `sdd-specify`](#11-skill-10-sdd-specify)
+12. [Skill 11: `sdd-clarify`](#12-skill-11-sdd-clarify)
+13. [Skill 12: `sdd-plan`](#13-skill-12-sdd-plan)
+14. [Skill 13: `sdd-tasks`](#14-skill-13-sdd-tasks)
+15. [Skill 14: `sdd-analyze`](#15-skill-14-sdd-analyze)
+16. [Skill 15: `legacy-operation-audit`](#16-skill-15-legacy-operation-audit)
+17. [Skill 16: `legacy-calc-parity`](#17-skill-16-legacy-calc-parity)
+18. [Boas Práticas de Manutenção do Manual](#18-boas-práticas-de-manutenção-do-manual)
 
 ---
 
@@ -52,6 +60,28 @@ As **Skills** são capacidades especializadas e sequências de instruções padr
 - **`.agents/skills/<nome>/SKILL.md`** — conteúdo completo e autoritativo de cada skill (o que este manual descreve). Usado por qualquer IA a quem o conteúdo for colado ou indicado manualmente (ex.: Gemini CLI).
 - **`.claude/skills/<nome>/SKILL.md`** — apenas um *stub* de descoberta: mesmo frontmatter (`name`/`description`) da skill original, e um corpo curto instruindo a ler o arquivo completo em `.agents/skills/`. É essa pasta que o Claude Code varre automaticamente para decidir quando disparar uma skill sozinho, sem precisar que o conteúdo seja colado no chat.
 - **Regra de manutenção (Lei 12 do `AGENTS.md`):** toda skill criada, alterada ou removida em `.agents/skills/` precisa: (1) manter este manual atualizado, e (2) ter seu stub em `.claude/skills/` criado/atualizado/removido em conjunto, com o frontmatter idêntico ao da fonte.
+
+### 1.2 Fluxo SDD (Spec-Driven Development) e a fronteira com as skills de tela isolada
+
+O projeto adota o fluxo **SDD** para trabalho em **escopo de módulo** (dezenas/centenas de classes legadas, épicos, ordem de dependência). Ele é a evolução formal do que o repositório já fazia com `specs/modulos/` + `specs/prompts-execucao/` + Matriz RTV.
+
+| Etapa | Comando | Skill | Artefato | Gate |
+|---|---|---|---|---|
+| 0 | `/constitution` | `sdd-constitution` | `specs/memory/constitution.md` | 1x no repo |
+| 1 | `/specify MOD-XX` | `sdd-specify` | `specs/modulos/MOD-XX/spec.md` + `dependency-graph.md` | ⛔ aprovação do usuário |
+| 2 | `/clarify MOD-XX` | `sdd-clarify` | `clarify.md` (+ edições na spec) | ⛔ respostas do usuário |
+| 3 | `/plan MOD-XX` | `sdd-plan` | `plan.md`, `research.md`, `data-model.md`, `contracts/` | ⛔ aprovação do usuário |
+| 4 | `/tasks MOD-XX` | `sdd-tasks` | `tasks.md` (1 tarefa = 1 branch `feat/` = 1 commit) | revisão |
+| 5 | `/analyze MOD-XX` | `sdd-analyze` | `analyze-report.md` — cobertura 100% vs. legado | ⛔ veredito verde |
+| 6 | `/implement MOD-XX <tarefa>` | `migrate-crud` / `create-api-module` / `test-driven-development` | código | — |
+
+Auditorias de apoio, disparadas dentro das etapas 1–3: `legacy-validation-audit` (Matriz RTV — validações), `legacy-operation-audit` (Matriz ROT — operações/transações/máquina de estados), `legacy-calc-parity` (golden tests de cálculo).
+
+**Fronteira:**
+- **Escopo de módulo** → fluxo SDD (`sdd-*`).
+- **Uma tela isolada** dentro de um módulo já planejado → `spec-generator` + `migrate-crud` (acionadas por `/implement` ou diretamente). Classificam em **Padrão A** (CRUD), **B** (Configuração em Lote) ou **C** (Operação/Assistente — `references/padrao-c-operacao.md`).
+- Não rode `sdd-specify` para uma única tela, nem `spec-generator` para um módulo inteiro.
+- Telas de operação (Liquidar/Estornar/Reverter/Acertar/Fechar) → **Padrão C**; a Matriz RTV cobre a *composição*, a **Matriz ROT** cobre os *efeitos* (testes de backend).
 
 ---
 
@@ -94,7 +124,7 @@ Leia os seguintes arquivos nesta ordem antes de escrever qualquer código ou spe
 ```
 
 #### O que a IA fará automaticamente:
-1. Classificará a tela como Padrão A (CRUD Padrão) ou Padrão B (Lote).
+1. Classificará a tela como **Padrão A** (CRUD), **Padrão B** (Configuração em Lote) ou **Padrão C** (Operação/Assistente — telas transacionais que herdam `FBaseProcesso`/`FDocumentoSelecaoBase`, com botão "Confirmar/Executar", sem Novo/Excluir; ver `.agents/skills/migrate-crud/references/padrao-c-operacao.md`).
 2. Gerará a Spec Funcional em `docs/spec_fcondicaopagamento.md`.
 3. Aguardará sua aprovação da Spec.
 4. Após aprovação, gerará DTOs, Entidade POCO, Fluent API Mappings, Service (com CQRS Read/Write) e Controller C#.
@@ -123,7 +153,7 @@ Usar a skill spec-generator para analisar a entidade FProduto no módulo Estoque
 
 #### O que a IA fará automaticamente:
 1. Mapeará **todas** as propriedades e suas nulidades (colunas que aceitam NULL no banco viram `int?`, `string?`).
-2. Classificará a tela (Padrão A ou B).
+2. Classificará a tela (Padrão A — CRUD, B — Lote, ou C — Operação/Assistente).
 3. Elaborará o documento em `docs/spec_fproduto.md` contendo as 8 seções padrão (Requisitos Clean Arch, Endpoints, Mapeamento MUI `required`, Critérios de Aceite).
 4. Apresentará a spec e aguardará sua aprovação.
 
@@ -313,7 +343,145 @@ Skill genérica de **análise profunda e estruturada** de qualquer artefato do p
 
 ---
 
-## 10. Boas Práticas de Manutenção do Manual
+## 10. Skill 9: `sdd-constitution`
+
+<a id="10-skill-9-sdd-constitution"></a>
+### 🎯 Propósito
+Etapa 0 do fluxo SDD. Gera/atualiza `specs/memory/constitution.md` consolidando as 13 Leis do `AGENTS.md`, as 17 Regras Anti-Alucinação e as decisões `DEC-001..006` num **gate executável** (checklist `PASS/FAIL`). Não cria regra nova — consolida.
+
+### 📅 Quando Usar
+Ao iniciar o fluxo SDD num repositório sem `constitution.md`; ou sempre que `AGENTS.md`, `03-REGRAS-ANTI-ALUCINACAO.md` ou algum `DEC-*` mudar; ou ao mudar plataforma (runtime, ORM, convenção de nomes).
+
+### 💡 Exemplo
+```
+/constitution
+```
+A IA relê os documentos ratificados, extrai o estado real da plataforma (`net10.0`, EF Core 10.x) e produz a constituição com Artigos I–XI + Gate de Conformidade (Seção 12) + Glossário. Para e pede aprovação.
+
+---
+
+## 11. Skill 10: `sdd-specify`
+
+<a id="11-skill-10-sdd-specify"></a>
+### 🎯 Propósito
+Etapa 1 do SDD. Gera `specs/modulos/MOD-XX/spec.md` a partir do módulo legado inteiro: inventário de classes, árvore de herança, mapa de dependências cross-módulo, enums, épicos em ordem topológica e regras de negócio macro (`RN-XX-NNN`). **Zero decisão técnica.**
+
+### 📅 Quando Usar
+Ao começar a conversão de um módulo. **Não** usar para uma única tela — nesse caso, `spec-generator`.
+
+### 💡 Exemplo
+```
+/specify MOD-05
+```
+A IA descobre os caminhos legados por convenção, varre `servidor/objeto de negócio/gestao.financeira/` + formulários + kernel, e produz `spec.md` + `dependency-graph.md`. Para e pede aprovação.
+
+---
+
+## 12. Skill 11: `sdd-clarify`
+
+<a id="12-skill-11-sdd-clarify"></a>
+### 🎯 Propósito
+Etapa 2 do SDD. Rodada estruturada de perguntas sobre as `DÚVIDA:` e ambiguidades da spec, registrada em `specs/modulos/MOD-XX/clarify.md` (tabela ID/origem/pergunta/opções/resposta+data/efeito) e reincorporada na spec no mesmo commit.
+
+### 📅 Quando Usar
+Depois de `/specify` aprovado e antes de `/plan`. Materializa a Regra 7 ("em dúvida, PARE e PERGUNTE") como passo formal.
+
+### 💡 Exemplo
+```
+/clarify MOD-05
+```
+A IA pergunta em blocos ≤5 (contexto + opções + impacto no plano), grava as respostas e edita a spec. Não presume respostas.
+
+---
+
+## 13. Skill 12: `sdd-plan`
+
+<a id="13-skill-12-sdd-plan"></a>
+### 🎯 Propósito
+Etapa 3 do SDD. Onde entram as decisões técnicas, todas ancoradas na spec aprovada. Produz `plan.md` (projeto `Versatus.<Modulo>` net10.0, kernel compartilhado, épicos em ordem topológica, reconciliação com `Servidor.Strangler`, padrão de transação por operação), `research.md` (substitutos de libs legadas), `data-model.md` (tabelas/colunas **reais** via `INFORMATION_SCHEMA`) e `contracts/` (endpoints REST).
+
+### 📅 Quando Usar
+Depois de `/clarify` sem pendência bloqueante.
+
+### 💡 Exemplo
+```
+/plan MOD-05
+```
+A IA consulta `localhost\SQLEXPRESS2008 / versatus`, monta o `data-model.md` com nomes e nulidade reais (coluna `NULL` → tipo anulável), define os épicos e contratos. Para e pede aprovação.
+
+---
+
+## 14. Skill 13: `sdd-tasks`
+
+<a id="14-skill-13-sdd-tasks"></a>
+### 🎯 Propósito
+Etapa 4 do SDD. Quebra o plano em `specs/modulos/MOD-XX/tasks.md` — tarefas atômicas (**1 tarefa = 1 branch `feat/` = 1 commit**), cada uma com `Cobre:` (RN/VAL/OP), `Constituição:` (Artigos), `Pronto quando:` (critério objetivo), branch e mensagem de commit. Versão estruturada dos `specs/prompts-execucao/*`.
+
+### 📅 Quando Usar
+Depois de `/plan` aprovado.
+
+### 💡 Exemplo
+```
+/tasks MOD-05
+```
+Ordem: `analysis → domain → dbcontext → service/operation → contract → parity → frontend → migration` por épico. Toda `VAL-xx`/`OP-xx` tem que aparecer em ≥1 tarefa.
+
+---
+
+## 15. Skill 14: `sdd-analyze`
+
+<a id="15-skill-14-sdd-analyze"></a>
+### 🎯 Propósito
+Etapa 5 e **gate duro** do SDD. Cruza `constitution ↔ spec ↔ plan ↔ tasks ↔ código legado ↔ Matriz RTV ↔ Matriz ROT` (verificações V1–V7) e reprova o módulo se qualquer regra, validação, operação ou propriedade legada ficar **órfã**. Produz `analyze-report.md` com veredito.
+
+### 📅 Quando Usar
+Depois de `/tasks` e antes de `/implement`. Rodar de novo após cada correção até ✅.
+Em módulos grandes, as matrizes RTV/ROT nascem por épico dentro do `/implement` — então
+`sdd-analyze` roda em **dois modos**.
+
+### 💡 Exemplo
+```
+/analyze MOD-05 --epico E4   # gate incremental: V1/V3/V4/V5 no escopo do épico E4,
+                             # pré-condição para o código de E4 ir para develop
+/analyze MOD-05              # modo completo: V1–V7 no módulo inteiro + cross-épico (Z-T02)
+```
+A IA varre o legado por palavras-chave de validação/operação e confere que cada ocorrência tem linha nas matrizes e cada linha das matrizes tem tarefa. Não corrige — aponta a ação exigida. `/implement` do épico fica proibido enquanto o veredito incremental for ⛔; o merge final, enquanto o veredito completo for ⛔.
+
+---
+
+## 16. Skill 15: `legacy-operation-audit`
+
+<a id="16-skill-15-legacy-operation-audit"></a>
+### 🎯 Propósito
+Irmã da `legacy-validation-audit` para telas que **não são CRUD** (Liquidar, Estornar, Reverter, Acertar, Fechar caixa, Conciliar). Extrai máquina de estados, pré-condições, **ordem exata de persistência**, efeitos colaterais (saldo, situação, período, sequencial) e condição de rollback, gerando a **Matriz ROT (Rastreabilidade de Operações e Transações)** + a tabela de transições de estado.
+
+### 📅 Quando Usar
+Durante `/specify`–`/plan`, sempre em paralelo com `legacy-validation-audit`, para qualquer classe de `Operação` ou formulário cujo botão principal seja "Executar/Confirmar/Estornar/Reverter/Fechar".
+
+### 💡 Exemplo
+```
+Usar a skill legacy-operation-audit para mapear Liquidacao.cs, LiquidacaoEstorno.cs e a classe pai OperacaoDocumentoBase.cs gerando a Matriz ROT.
+```
+
+---
+
+## 17. Skill 16: `legacy-calc-parity`
+
+<a id="17-skill-16-legacy-calc-parity"></a>
+### 🎯 Propósito
+Isola cada fórmula de cálculo financeiro/fiscal do legado (juros, multa, desconto, conversão por índice, rateio proporcional, arredondamento), documenta parâmetros e regra de arredondamento **sem refatorar** (Regra 5), captura *golden values* do banco/sistema legado e gera esqueletos de teste de paridade numérica com **igualdade exata de `decimal`**.
+
+### 📅 Quando Usar
+Em qualquer épico com cálculo monetário. Alimenta as linhas de cálculo da Matriz ROT e as tarefas `parity` do `tasks.md`.
+
+### 💡 Exemplo
+```
+Usar a skill legacy-calc-parity para extrair CalcularJurosMulta() de Documento.cs e gerar os golden tests de paridade.
+```
+
+---
+
+## 18. Boas Práticas de Manutenção do Manual
 
 1. **Atualização Contínua:** Sempre que uma nova skill for adicionada em `.agents/skills/`, inclua sua entrada no Índice e crie uma seção correspondente neste manual.
 2. **Exemplos Reais:** Mantenha os prompts de exemplo alinhados aos nomes reais de arquivos e módulos do ERP.

@@ -1,6 +1,6 @@
 ---
 name: spec-generator
-description: Use ao mapear formulários legados para elaborar especificações funcionais em docs/spec_f[nome].md antes de escrever código C# ou React.
+description: Use ao mapear UMA tela/formulário legado isolado para elaborar sua especificação funcional em docs/spec_f[nome].md antes de escrever código C# ou React. Para escopo de módulo inteiro use o fluxo SDD (sdd-specify).
 ---
 
 # Skill: spec-generator
@@ -22,7 +22,7 @@ O usuário ou agente deve fornecer:
 
 ## 2. Passo 0 — Classificação Obrigatória da Tela
 
-Antes de elaborar a spec, analise o código do formulário e classifique em:
+Antes de elaborar a spec, analise o código do formulário e classifique em **um dos três**:
 
 ### Padrão A: CRUD Padrão
 - Formulário possui botões de Inserção/Edição/Exclusão e Grid paginado.
@@ -33,6 +33,19 @@ Antes de elaborar a spec, analise o código do formulário e classifique em:
 - Formulário edita valores de itens já existentes em lote (Accordion/TreeList).
 - Endpoints: `GET /escopo` + `PUT /salvar-valores`.
 - Botões Novo e Excluir **totalmente ocultados**.
+
+### Padrão C: Operação / Assistente
+- Herda `FBaseProcesso` / `FDocumentoSelecaoBase` / `FDocumentoOperacaoBase` /
+  `FEstornoDocumento` / `FSuprimentoBase`; botão principal "Confirmar/Executar/Liquidar/
+  Estornar/Reverter/Processar/Gerar/Fechar/Acertar"; sem Novo/Excluir de cadastro.
+- Seleciona registros existentes e **compõe** uma ação transacional sobre eles (formas de
+  pagamento, rateio, distribuição), com totais de conferência.
+- Endpoints: `GET /{itens-elegiveis}` + `POST /simular` (quando há cálculo) +
+  `POST /executar` (Handler, 1 transação) + `POST /{id}/estornar` (quando há inverso).
+- Frontend herda `BaseOperacaoConfig<TCmd, TResult>`.
+- Regras de **efeito** → **Matriz ROT** (testes de backend); a Matriz RTV cobre só as
+  validações de **composição** (soma das formas, período aberto, rateio fechado).
+- **Leia `.agents/skills/migrate-crud/references/padrao-c-operacao.md` antes de gerar a spec.**
 
 ---
 
