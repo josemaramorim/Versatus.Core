@@ -10,6 +10,14 @@
 > `[AutoSequencial("IdAdiantamento")]` → tabela real `FINADIANTAMENTO`, PK real
 > `IDFINADIANTAMENTO`. **Mapear SEMPRE a partir deste documento / do extract, nunca dos
 > atributos `.cs`.** (Regra 1/2 e incidente de 2026-06-06 em `ALUCINACOES-DETECTADAS.md`.)
+>
+> ⚠️ **As entidades de domínio novas NÃO têm atributos** (Artigo III / Lei 2). Toda
+> chamada Fluent API citada abaixo (`HasKey(new {...})`, `.ValueGeneratedNever()`,
+> `.HasColumnName(...)`, `.HasColumnType("text")`, `.HasPrecision(23, 8)`,
+> `HasOne/WithMany`) vai **no arquivo `Infrastructure/Mappings/<Entidade>Mapping.cs`**
+> (`IEntityTypeConfiguration<T>`), nunca na classe da entidade — exatamente como
+> `Versatus.AcessoGlobal` (`SerieDocumentoFilialMapping`). Os `[TableName]`/`[AutoSequencial]`
+> mencionados são apenas os atributos **legados** do Gentle, usados como referência de leitura.
 
 ---
 

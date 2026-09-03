@@ -1,7 +1,9 @@
 # SPEC — MOD-05: Gestão Financeira
 
-> **Versão:** 2.2 (SDD etapa 3 aplicada) | **Data:** 2026-09-03 | **Fase de migração:** 4
-> **Status:** 🔄 Planejada — pronta para `/tasks` (SDD etapa 4) · ver [`plan.md`](./plan.md), [`data-model.md`](./data-model.md), [`research.md`](./research.md), [`contracts/`](./contracts/)
+> **Versão:** 2.3 (SDD etapa 4 aplicada) | **Data:** 2026-09-03 | **Fase de migração:** 4
+> **Status:** 🔄 Tarefas geradas — pronta para `/implement` após `/analyze` verde · ver
+> [`plan.md`](./plan.md), [`tasks.md`](./tasks.md), [`data-model.md`](./data-model.md),
+> [`research.md`](./research.md), [`contracts/`](./contracts/)
 > **Constituição ratificada:** [`specs/memory/constitution.md`](../../memory/constitution.md) v1.0
 > **Substitui:** `specs/modulos/MOD-05-GESTAO-FINANCEIRA.md` (rascunho v1.0 de 2026-04-27,
 > subdimensionado e citando `net8.0`)
@@ -579,11 +581,11 @@ ocorrências no legado). **Valores inteiros a preservar** — extração exata �
 
 - [x] `clarify.md` — 13 clarificações resolvidas (2026-09-03); nenhuma pendência bloqueante
 - [x] `plan.md` + `research.md` + `data-model.md` + `contracts/` (2026-09-03) + `legacy-schema/` (extract real do banco)
-- [ ] `matriz-rtv.md` (por épico — `legacy-validation-audit`)
-- [ ] `matriz-rot.md` + máquina de estados (por épico — `legacy-operation-audit`)
-- [ ] `golden/CALC-*.{md,csv}` (`legacy-calc-parity`)
-- [ ] `tasks.md`
-- [ ] `analyze-report.md` (veredito verde obrigatório antes de `/implement`)
+- [x] `tasks.md` (2026-09-03) — Setup + E0..E14 + fecho; ~90 tarefas atômicas
+- [~] `analyze-report.md` — **parcial** (V1/V2/V6/V7 executáveis agora; V3/V4/V5 aguardam matrizes por épico)
+- [ ] `matriz-rtv.md` (por épico — `legacy-validation-audit`, nas tarefas `E?-T01`)
+- [ ] `matriz-rot.md` + máquina de estados (por épico — `legacy-operation-audit`, nas tarefas `E?-T01`)
+- [ ] `golden/CALC-*.{md,csv}` (`legacy-calc-parity`, nas tarefas `analysis`/`parity`)
 
 ---
 
@@ -622,3 +624,4 @@ entidade (`data-model.md`), decisão POCO-abstrata vs. serviço por base individ
 | 2026-09-03 | SDD etapa 1 (`sdd-specify`) | Reescrita v2.0: inventário completo (180 classes), árvore de herança real, mapa de dependências, 14 épicos em ordem topológica, RN-05-001..020 macro, 13 DÚVIDAS. Fixa `net10.0` / constituição v1.0. |
 | 2026-09-03 | SDD etapa 2 (`sdd-clarify`) | 13 clarificações resolvidas (`clarify.md`, CLR-01..13): SharedKernel mínimo, pré-tarefa de rateio no MOD-02, `ContaBancaria` E3/E14, regra das bases legadas (POCO abstrata + serviço), interfaces transversais no SharedKernel, `SelecaoDocumento` como serviço, escopo React de cheques, impressão no frontend. §1.3–1.5, §2.1, §2.3, §3.3 (nova), §4.1–4.2, §6 (E0/E3/E5/E9/E10/E11), §8–9 atualizados. Sem pendência bloqueante. |
 | 2026-09-03 | SDD etapa 3 (`sdd-plan`) | `plan.md` (estrutura de projeto, E0 SharedKernel, 15 passos de execução, 11 operações com ordem de persistência, 10 riscos), `research.md` (BoletoNet/OFX, enums, GeradorSequencial, Lookup, golden com banco vazio, tipos `text`/`datetime`), `data-model.md` (extract real de `localhost\SQLEXPRESS2008` — PKs compostas por filial, `numeric(23,8)`, nulidade não-uniforme, detalhamento de E-Caixa/E-Domínio/E-Documento núcleo), `contracts/` (README + caixa-banco/documento/liquidacao), `legacy-schema/` (fin_columns.txt + fin_meta.txt). Achado: banco de dev não tem 100% do schema (falta `FINPROJECAOFLUXOCAIXA*`, `FINLOGDOMINIOPERIODO`) e `FINDOMINIO`→`FINCAIXABANCO` inverte a ordem E2/E3. |
+| 2026-09-03 | SDD etapa 4 (`sdd-tasks`) | `tasks.md`: fase Setup (S-T01..04) + E0..E14 + fecho (Z-T01..03), ~90 tarefas atômicas (1 tarefa = 1 branch `feat/mod-05-*` = 1 commit), cada uma com objetivo, refs legados, arquivos, `Cobre:` (RN/VAL/OP/CALC), Artigos da constituição, `Pronto quando:` e `Depende de:`. `analyze-report.md` parcial (V1/V2/V6/V7). Data-model: nota reforçando que Fluent API vai no Mapping, não na entidade (igual `acesso.global`). |
