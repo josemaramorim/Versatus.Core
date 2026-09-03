@@ -12,11 +12,11 @@
 
 | Referência legada | Novo equivalente | Tipo de vínculo |
 | :--- | :--- | :--- |
-| `Geral` | **`Versatus.SharedKernel`** (a criar — E0) | ProjectReference |
+| `Geral` | **`Versatus.SharedKernel`** (a criar — E0, escopo mínimo — CLR-02) | ProjectReference |
 | `Servidor.Framework` (+ `Factory.cs` linkado) | `Versatus.Framework` | ProjectReference |
 | `Servidor.Interface` | contratos redistribuídos por módulo | — |
-| `Acesso.Global` | `Versatus.AcessoGlobal` | ProjectReference (só p/ bases de rateio — DÚVIDA-03) |
-| `Servidor.Strangler` | `Servidor.Strangler` (legado, mantido) | reconciliação `plan.md §4` |
+| `Acesso.Global` | `Versatus.AcessoGlobal` | ProjectReference — bases de rateio (`RateioMovto`/`RateioMovtoItem`/`ManutencaoRateio`) migradas no MOD-02 antes do E5 (CLR-01) |
+| `Servidor.Strangler` | `Servidor.Strangler` (legado, mantido) | só DTOs do AcessoGlobal — nada a reconciliar do lado financeiro (CLR-10) |
 | `Versatus.Eval` | — | fora de escopo |
 | `Versatus.Language` | estratégia de i18n | — |
 | `BarcodeLib`, `Boleto.Net` | substituto .NET 10 (E14 — `research.md`) | ProjectReference futura |

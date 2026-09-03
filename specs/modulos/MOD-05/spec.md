@@ -1,7 +1,7 @@
 # SPEC — MOD-05: Gestão Financeira
 
-> **Versão:** 2.0 (reescrita SDD) | **Data:** 2026-09-03 | **Fase de migração:** 4
-> **Status:** 🔄 Em especificação (SDD etapa 1)
+> **Versão:** 2.1 (SDD etapa 2 aplicada) | **Data:** 2026-09-03 | **Fase de migração:** 4
+> **Status:** 🔄 Clarificada — pronta para `/plan` (SDD etapa 3)
 > **Constituição ratificada:** [`specs/memory/constitution.md`](../../memory/constitution.md) v1.0
 > **Substitui:** `specs/modulos/MOD-05-GESTAO-FINANCEIRA.md` (rascunho v1.0 de 2026-04-27,
 > subdimensionado e citando `net8.0`)
@@ -34,32 +34,51 @@ remessa/retorno CNAB 240/400, boleto, conciliação).
   `Api (Controllers)` das entidades e operações do módulo.
 - Testes: Matriz RTV (validações) + Matriz ROT (operações/transações) + golden tests de
   paridade de cálculo, com 100% de cobertura (Artigo IX da constituição).
-- Kernel compartilhado de `Projeto.Geral` consumido pelo financeiro → **projeto novo
-  `Versatus.SharedKernel`** (decisão do usuário 2026-09-03).
-- Reconciliação com o estrangulamento já existente
-  (`Servidor.Strangler.GestaoFinanceira.DTOs`).
+- **Épico E0 — `Versatus.SharedKernel` (projeto novo, `net10.0`, escopo mínimo — CLR-02):**
+  enums financeiros + `Lookup` + container de rateio + interfaces transversais
+  (`IMovimentoPeriodo`, `IDadosPeriodoFormaPagto`, `IDadosRateioFinanceiro`,
+  `IDadosComissao` — CLR-05). `Result`/`ValidationResult`/`IContextoExecucao` **reusados de
+  `Versatus.Framework`**, não duplicados. Ampliar só sob necessidade comprovada de um épico.
 
 ### 1.4 Fora de escopo (nesta conversão)
 - Reescrever/alterar o legado (o legado continua ligado — Strangler Fig).
 - Classes `*Lista` (eliminadas — Artigo V da constituição).
 - Módulos dependentes (Faturamento, Compra, Contrato, Frota, OS, NFSe, Transporte,
   Contábil): referência apenas por **`int` lógico**, sem navegação EF cross-projeto.
+  Em particular **não há `ProjectReference` para `Versatus.Faturamento`** (que ainda não
+  existe) — ligação por `IdOrigem` + `ProcessoOrigem` (CLR-09).
 - Migração da infraestrutura de rateio genérica (`RateioMovto`, `RateioMovtoItem`,
-  `ManutencaoRateio`) — pertence ao **MOD-02 (AcessoGlobal)**; aqui é dependência.
+  `ManutencaoRateio`) — pertence ao **MOD-02 (AcessoGlobal)**.
 
-### 1.5 Alcance do frontend React nesta rodada — **backend-first, React só no núcleo**
+### 1.4.1 Pré-requisito externo (CLR-01)
+Antes do **épico E5**, o **MOD-02 (AcessoGlobal)** deve expor `RateioMovto`,
+`RateioMovtoItem` e `ManutencaoRateio` migrados (hoje só existem no legado
+`servidor/objeto de negócio/acesso.global/`). `MovtoFinanceiroRateio` e
+`ManutencaoRateioFinanceiro` herdam dessas bases. Essa migração é uma **pré-tarefa no
+MOD-02**, fora do MOD-05, e entra como dependência explícita no `plan.md`.
+
+### 1.4.2 Estrangulamento existente (CLR-10)
+`Servidor.Strangler/Gestao.Financeira/DTOs/` contém apenas `EntidadeDto`, `ClienteDto`,
+`FornecedorDto`, `ParametroDto` — todos **entidades do AcessoGlobal**. O estrangulamento do
+MOD-05 até aqui só trocou *lookups* de AcessoGlobal dentro de `Documento.cs` /
+`DocumentoFinanceiroBase.cs` por chamadas HTTP à API nova do AcessoGlobal. **Nenhum
+contrato financeiro é publicado** — nada a reconciliar do lado financeiro; o legado
+continua chamando a API do AcessoGlobal como está.
+
+### 1.5 Alcance do frontend React nesta rodada — **backend-first, React só no núcleo** (confirmado no /clarify)
 | Recebe tela React agora | Não recebe tela agora (só backend + endpoint) |
 | :--- | :--- |
-| E4 Documento financeiro / parcela | E2 Domínio/Período (telas `FCentralDominio`, `FDominioFinanceiro*`) |
+| E4 Documento financeiro / parcela | E2 Domínio/Período (`FCentralDominio`, `FDominioFinanceiro*`) |
 | E6 Liquidação (`FLiquidacaoDocumento`) | E7 Estorno de liquidação |
 | E3 Caixa e Banco (`FCaixaBanco`, `FConsultaMovtoCaixa/Banco`) | E8 Reversão |
-| E9 Cheques (recebido/emitido, movimento, talão) | E10 Adiantamentos / Acertos |
+| E9 Cheques — **só** recebido, emitido, movimento de cheque e consultas (CLR-07) | E9 talão, suprimento, exclusão/manutenção, impressão de cheque |
+| | E10 Adiantamentos / Acertos |
 | | E11 DRE, Projeção de fluxo de caixa, Seleção de documento |
 | | E12 Programação de cobrança, Transação entre filiais |
-| | E13 Consultas avulsas |
-| | E14 Integração bancária (CNAB / boleto / OFX) |
+| | E13 Consultas avulsas · E14 Integração bancária |
 
-> A confirmação fina de quais telas React entram vem no `/clarify` (ver Seção 9, DÚVIDA-08).
+> **Impressão (CLR-08):** DRE, cheque e recibo de liquidação — o endpoint devolve o
+> **modelo de dados**; renderização/impressão é do frontend. Sem geração de PDF no backend.
 
 ---
 
@@ -75,7 +94,13 @@ Legenda de **Seq.**: `Filial` = `AutoSequencial(..., SequencialTipo.Filial)` ·
 
 ### 2.1 Kernel e bases (E0 / E1)
 
-| Classe | Arq. (linhas) | Herda de | Tabela legada | Tipo | Seq. | Propósito |
+> **Regra das bases legadas (CLR-04):** nenhuma das classes abaixo herda do framework no
+> novo sistema. Cada uma vira **classe abstrata POCO só com os campos compartilhados**; o
+> **comportamento** (validação, sequência de persistência, rateio) migra para
+> **serviço/handler compartilhado do módulo** e é rastreado na Matriz ROT. A coluna
+> "Herda de" registra a cadeia **legada** (contexto de auditoria — Seção 3), não o desenho novo.
+
+| Classe | Arq. (linhas) | Herda de (legado) | Tabela legada | Tipo | Seq. | Propósito |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `DocumentoFinanceiroBase` | 1303 | `ObjectGenerator` | — | Base | — | Campos comuns de conta a pagar/receber (número, histórico, valor, valor convertido, datas, `PagarReceberTipo`, lookups de entidade/operação/tipo doc/condição pagto/índice, rateio) |
 | `OperacaoDocumentoBase` | 1098 | `ObjectGenerated` | — | Base | — | Base de operações sobre documento (`AplicarOperacao`, `GerarRateioItemFinanceiro`, `AtualizarRateio`); pai de `Liquidacao` e `Reversao` |
@@ -108,7 +133,7 @@ Legenda de **Seq.**: `Filial` = `AutoSequencial(..., SequencialTipo.Filial)` ·
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `CaixaBanco` | 869 | `ObjectMaster` | `FinCaixaBanco` | Agregado-raiz | Filial | Caixa ou conta bancária; `ValidarControleCaixaBanco` |
 | `CaixaBancoUsuario` | 350 | `ObjectPersist` | `FinCaixaBancoUsuario` | Filho | — | Usuários do caixa/banco |
-| `ContaBancaria` | 1704 | `ObjectPersist` | `FinContaBancaria` | Agregado-raiz | — | Conta bancária: dados bancários, carteira, cedente, nosso-número, remessa, conciliação OFX |
+| `ContaBancaria` | 1704 | `ObjectPersist` | `FinContaBancaria` | Agregado-raiz | — | **CLR-03:** entidade `ContaBancaria` (dados bancários, carteira, cedente, nosso-número) fica em **E3**; a lógica de **remessa/retorno CNAB e conciliação OFX** vira serviço em **E14** |
 | `SaldoCaixaBanco` | 322 | `ObjectPersist` | `FinSaldoCaixaBanco` | Entidade | — | Saldo por caixa/banco/data |
 | `SaldoRateio` | 382 | `ObjectPersist` | `FinSaldoRateio` | Entidade | — | Saldo de rateio |
 | `Cobrador` | 367 | `ObjectPersist` | `FinCobrador` | Entidade | Filial | Cobrador (cadastro) |
@@ -409,6 +434,28 @@ Bases externas (não no framework, não neste módulo)
 > `legacy-operation-audit`) sobe a cadeia inteira até `ObjectBase`, lendo cada nível por
 > completo (Artigo IX; skill §1).
 
+### 3.3 Como a cadeia legada mapeia para o novo sistema (CLR-04)
+
+A cadeia `ObjectBase → ObjectPersist → ObjectMaster → ObjectGenerated → ObjectGenerator`
+**não existe** no novo sistema (confirmado: `Versatus.AcessoGlobal` e
+`Versatus.GestaoTributo` usam entidade POCO pura, sem classe-base; `Versatus.Framework` não
+tem base de entidade). Cada responsabilidade da cadeia tem destino próprio:
+
+| Responsabilidade na cadeia legada | Destino no novo sistema |
+| :--- | :--- |
+| `MarshalByRefObject` (.NET Remoting) | Removido (DEC-002) |
+| `ObjectPersist.Persist()` / `ExecutarPersistir` / `OnBefore*Persist*` (persistência no objeto) | `DbContext` + Repository; orquestração no **Handler/Service** (DEC-003) — coberto pela Matriz ROT |
+| `ObjectGenerator` + `[AutoSequencial]` (geração de ID) | `GeradorSequencialService` + `.ValueGeneratedNever()` no mapping (RN-05-006) |
+| `ObjectMaster` (tracking de agregado/filhos) | Change tracking do EF Core + agregado `List<T>` privada / `IReadOnlyList<T>` público (Artigo V) |
+| `IAmbiente` carregado pela cadeia (usuário/filial/transação) | `IContextoExecucao` injetado por DI (reusado de `Versatus.Framework`) |
+| `TransacaoBase` passada entre objetos | `IDbContextTransaction` aberta no Handler (DEC-003) |
+
+**Bases do próprio módulo** (`DocumentoFinanceiroBase`, `OperacaoDocumentoBase`,
+`ItemFinanceiroBase`, `ParcelaGeral`/`ParcelaBase`, `FormaMovInfo`, `FechamentoCaixaBase`):
+→ **classe abstrata POCO só com os campos compartilhados** (sem herdar nada) +
+**serviço/handler compartilhado** para o comportamento. A decisão POCO-abstrata vs.
+serviço para cada base é aplicada individualmente no `/plan`, guiada por esta regra.
+
 ---
 
 ## 4. Mapa de Dependências
@@ -418,28 +465,28 @@ Detalhe completo em [`dependency-graph.md`](./dependency-graph.md). Resumo:
 ### 4.1 Cross-módulo (por volume de `using` no legado)
 | Módulo/Namespace legado | Peso | Natureza da dependência | Tratamento nesta conversão |
 | :--- | :--- | :--- | :--- |
-| `Interface.AcessoGlobal` + `ObjetosNegocio.AcessoGlobal` | alto (128 + 72) | Entidade (Entidade/Filial/Operação/CondicaoPagamento/Banco/Portador/CentroCusto/Classe/Usuario), rateio (`RateioMovto`, `RateioMovtoItem`, `ManutencaoRateio`), saldo (`ObjetosNegocio.AcessoGlobal.Saldo`) | `int` lógico para entidades; **`RateioMovtoItem`/`ManutencaoRateio` são classes-base** → depende de o MOD-02 expor equivalente (ver DÚVIDA-03) |
+| `Interface.AcessoGlobal` + `ObjetosNegocio.AcessoGlobal` | alto (128 + 72) | Entidade (Entidade/Filial/Operação/CondicaoPagamento/Banco/Portador/CentroCusto/Classe/Usuario), rateio (`RateioMovto`, `RateioMovtoItem`, `ManutencaoRateio`), saldo (`ObjetosNegocio.AcessoGlobal.Saldo`) | `int` lógico para entidades; **`RateioMovtoItem`/`ManutencaoRateio` são classes-base** → **pré-tarefa no MOD-02** para expô-las antes do E5 (CLR-01, §1.4.1) |
 | `Interface.Ambiente` + `ObjetosNegocio.Ambiente` | alto (125) | `IAmbiente` (usuário, filial, data/hora do sistema, transação) | Substituído por `IContexto` injetado (Glossário da constituição) |
 | `Servidor.Framework` + `Interface.Framework` | alto (173 + 106) | `ObjectBase` e cadeia, `TransacaoBase`, `Factory.Instanciar`, `Lookup`, `AutoSequencial`, `SequencialTipo` | `TransacaoBase`→`DbContext`; `Factory`→DI; `Lookup`→cache/repo; `AutoSequencial`→`GeradorSequencialService` + `ValueGeneratedNever()` |
-| `Projeto.Geral` + `.Enumerado` + `.EnumeradoObjeto` | alto (141 + 128 + 69) | Enums, `ValidationResult`, helpers, `RateioMovto` container | **Vai para `Versatus.SharedKernel`** (Épico E0) |
+| `Projeto.Geral` + `.Enumerado` + `.EnumeradoObjeto` | alto (141 + 128 + 69) | Enums, `ValidationResult`, helpers, `RateioMovto` container | Subconjunto **mínimo** → `Versatus.SharedKernel` (E0, CLR-02): enums + `Lookup` + container de rateio + interfaces transversais. `ValidationResult` reusado de `Versatus.Framework`. |
 | `Interface.BaseDistribuicao` | médio (18) | Base de documento com distribuição por filial | `DocumentoBase` com `IdDistribuicao` (Glossário) — coordenar com MOD-04 |
-| `Interface.Impressao` | baixo (8) | Contratos de impressão (DRE, cheque, recibo) | Fora de escopo do domínio; endpoint retorna dados, impressão é do frontend |
-| `Interface.Faturamento` | baixo (8) | Documento de venda que originou a conta a receber | `int` lógico (`IdOrigem` + `ProcessoOrigem`) |
+| `Interface.Impressao` | baixo (8) | Contratos de impressão (DRE, cheque, recibo) | **CLR-08:** fora do domínio; endpoint retorna o modelo de dados, renderização/impressão é do frontend. Sem PDF no backend. |
+| `Interface.Faturamento` | baixo (8) | Documento de venda que originou a conta a receber | `int` lógico (`IdOrigem` + `ProcessoOrigem`); **sem `ProjectReference`** (CLR-09) |
 | `Interface.NFSe` / `GestaoTransporte` / `GestaoOS` / `GestaoMaterial` / `GestaoFrota` / `GestaoContrato` / `GestaoContabil` / `GestaoEval` | baixo (1–2 cada) | Origem de documento / consumo de dados financeiros | `int` lógico; nenhum `Include` cross-projeto |
 | `BoletoNet` | baixo (6) | Geração remessa / leitura retorno CNAB | Épico **E14**; substituto .NET 10 avaliado em `research.md` |
 | `Versatus.Eval` | baixo (1) | Licenciamento/avaliação | Fora de escopo |
-| `Servidor.Strangler.GestaoFinanceira.DTOs` + `.Common` | baixo (2 + 2) | Estrangulamento já ativo de `Documento`/`DocumentoFinanceiroBase` | **Reconciliar** no `/plan` §4 (Artigo VIII.4) |
+| `Servidor.Strangler.GestaoFinanceira.DTOs` + `.Common` | baixo (2 + 2) | Só `EntidadeDto`/`ClienteDto`/`FornecedorDto`/`ParametroDto` — **entidades do AcessoGlobal** | **CLR-10:** nenhum contrato financeiro publicado; nada a reconciliar do lado financeiro. `plan.md §4` = nota curta. |
 | `Gentle.Framework` | alto (131) | ORM legado | → EF Core 10.x (DEC-001) |
 
-### 4.2 Interfaces implementadas com significado de domínio
-- `IMovimentoPeriodo` — `MovimentoFinanceiro`, `ChequeRecebido`, `AdtoAcerto`: participam do
-  controle de período (abertura/fechamento). Precisa de contrato equivalente no novo domínio.
-- `IDadosComissao` — `Documento`, `LiquidacaoEstorno`, `Reversao`: fornecem base de cálculo
-  de comissão para o Faturamento.
-- `IDadosPeriodoFormaPagto` — `LiquidacaoEstorno`.
-- `IDadosRateioFinanceiro` — `ContraPartidaRateioDoctoFinanceiro`.
-- `IItemList` — várias: item de coleção editável em grade (conceito de UI legada).
-- `ILanguageStrings` — i18n (não é domínio).
+### 4.2 Interfaces implementadas com significado de domínio (destino — CLR-05)
+| Interface | Implementada por | Destino no novo sistema |
+| :--- | :--- | :--- |
+| `IMovimentoPeriodo` | `MovimentoFinanceiro`, `ChequeRecebido`, `AdtoAcerto` | `Versatus.SharedKernel` (transversal: controle de período) |
+| `IDadosPeriodoFormaPagto` | `LiquidacaoEstorno` | `Versatus.SharedKernel` |
+| `IDadosRateioFinanceiro` | `ContraPartidaRateioDoctoFinanceiro` | `Versatus.SharedKernel` |
+| `IDadosComissao` | `Documento`, `LiquidacaoEstorno`, `Reversao` | `Versatus.SharedKernel` (futuro Faturamento consome sem depender do MOD-05) |
+| `IItemList` | várias | Conceito de UI legada — **não migra** (era grade editável) |
+| `ILanguageStrings` | várias | i18n — não é domínio |
 
 ---
 
@@ -474,18 +521,18 @@ ocorrências no legado). **Valores inteiros a preservar** — extração exata �
 
 | Épico | Nome | Classes-núcleo | Depende de | Análise prévia obrigatória (>1.500 l) | Tela React nesta rodada |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **E0** | Kernel compartilhado (`Versatus.SharedKernel`) | subconjunto de `Projeto.Geral`: enums financeiros, `ValidationResult`, `Lookup`, container de rateio, `IContexto` | Framework | — | Não |
+| **E0** | Kernel compartilhado (`Versatus.SharedKernel`) — escopo **mínimo** (CLR-02) | enums financeiros + `Lookup` + container de rateio + interfaces `IMovimentoPeriodo`, `IDadosPeriodoFormaPagto`, `IDadosRateioFinanceiro`, `IDadosComissao` (CLR-05). Reusa `Result`/`ValidationResult`/`IContextoExecucao` de `Versatus.Framework`. | Framework | — | Não |
 | **E1** | Bases do módulo | `DocumentoFinanceiroBase`, `OperacaoDocumentoBase`, `ItemFinanceiroBase`, `ParcelaGeral`, `ParcelaBase`, `FormaMovInfo`, `FechamentoCaixaBase` | E0 | `DocumentoFinanceiroBase` (1303) | Não |
 | **E2** | Domínio e Período | `Dominio`, `DominioPeriodo`, `DominioPeriodoFechamento(+Detalhe)`, `DominioPeriodoFormaPagto`, `DominioPeriodoLacto`, `DominioPeriodoLog`, `DominioResponsavel`, `DominioUsuario`, `PeriodosAbertos` | E1 | `Dominio` (1717), `DominioPeriodo` (1017) | Não |
-| **E3** | Caixa e Banco | `CaixaBanco`, `CaixaBancoUsuario`, `ContaBancaria`, `SaldoCaixaBanco`, `SaldoRateio`, `Cobrador`, `IndiceConversor` | E2 | `ContaBancaria` (1704) | **Sim** |
+| **E3** | Caixa e Banco | `CaixaBanco`, `CaixaBancoUsuario`, `ContaBancaria` (**só a entidade** — CLR-03), `SaldoCaixaBanco`, `SaldoRateio`, `Cobrador`, `IndiceConversor` | E2 | `ContaBancaria` (1704) — análise marca o que é E14 | **Sim** |
 | **E4** | Documento e Parcela | `Documento`, `DocumentoParcela`, `DocumentoMovto`, `DoctoItemFinanceiro`, `DoctoMovtoItemFinanceiro`, `DocumentoTributo`, `DocumentoCartao`, `DocumentoComissionado`, `DoctoCancelado(+Parcela)`, `DocumentoManutencao`, `DocumentoParcelaManutencao`, `DocumentoParcelaImage` | E1, E3 | `Documento` (2803), `DocumentoParcela` (2111) | **Sim** |
-| **E5** | Movimento e Formas de Pagamento | `MovimentoFinanceiro`, `MovimentoFinanceiroUpdate`, `MovtoFinanceiroCheque`, `MovtoFinanceiroRateio`, `formapagamentomov`, `FormaMovInfo*` (11), `TrocoDinheiro`, `ItemFinanceiro`, `ItemFinanceiroOperacao`, `AplicacaoItemFin(+Geral)`, `ContraPartidaRateioDoctoFinanceiro`, `ManutencaoRateioFinanceiro` | E2, E3 | `MovimentoFinanceiro` (2136) | Não |
+| **E5** | Movimento e Formas de Pagamento | `MovimentoFinanceiro`, `MovimentoFinanceiroUpdate`, `MovtoFinanceiroCheque`, `MovtoFinanceiroRateio`, `formapagamentomov`, `FormaMovInfo*` (11), `TrocoDinheiro`, `ItemFinanceiro`, `ItemFinanceiroOperacao`, `AplicacaoItemFin(+Geral)`, `ContraPartidaRateioDoctoFinanceiro`, `ManutencaoRateioFinanceiro` | E2, E3, **+ MOD-02: rateio migrado** (CLR-01, §1.4.1) | `MovimentoFinanceiro` (2136) | Não |
 | **E6** | Liquidação | `Liquidacao`, `LiquidacaoFormaMovimento` | E4, E5 | — | **Sim** |
 | **E7** | Estorno de Liquidação | `LiquidacaoEstorno`, `LiquidacaoEstornoFormaPagto`, `LiquidacaoEstornoItemFin` | E6 | `LiquidacaoEstorno` (2617), `LiquidacaoEstornoFormaPagto` (1074) | Não |
 | **E8** | Reversão | `Reversao`, `ReversaoDoctoParcela`, `ReversaoItemFinanceiro`, `AplicacaoItemFinReversao` | E4, E6 | `Reversao` (1985) | Não |
-| **E9** | Cheques | `Cheque`, `ChequeRecebido`, `ChequeRecebidoMovto`, `ChequeEmitidoMovto`, `ChequeEmitidoMovtoUpdate`, `TalaoCheque`, `SuprimentoCheque`, `MotivoDevolucaoCheque` | E3, E5 | `ChequeRecebidoMovto` (1692), `ChequeEmitidoMovto` (1667), `TalaoCheque` (1103), `ChequeRecebido` (1105) | **Sim** |
-| **E10** | Adiantamentos e Acertos | `Adiantamento`, `AdtoAcerto`, `AdtoAcertoDistribuicao(+Rateio)`, `AdtoAcertoMovto`, `AdtoLanctoEntidade` | E4, E5 | `AdtoAcerto` (1527) | Não |
-| **E11** | DRE, Projeção, Seleção | `DRE`, `DRETitulo(+Classe/+Operacao)`, `ProjecaoFluxoCaixa`, `ProjecaoFluxoCaixaLacto`, `SelecaoDocumento`, `View/{ClasseAvulsaDRE, DREImpressaoView}` | E4, E5 | `SelecaoDocumento` (1226) | Não |
+| **E9** | Cheques | `Cheque`, `ChequeRecebido`, `ChequeRecebidoMovto`, `ChequeEmitidoMovto`, `ChequeEmitidoMovtoUpdate`, `TalaoCheque`, `SuprimentoCheque`, `MotivoDevolucaoCheque` | E3, E5 | `ChequeRecebidoMovto` (1692), `ChequeEmitidoMovto` (1667), `TalaoCheque` (1103), `ChequeRecebido` (1105) | **Sim — só** recebido/emitido/movimento/consulta (CLR-07) |
+| **E10** | Adiantamentos e Acertos | `Adiantamento` (CRUD), `AdtoAcerto` (**operação** — Handler + ROT, CLR-12), `AdtoAcertoDistribuicao(+Rateio)`, `AdtoAcertoMovto`, `AdtoLanctoEntidade` | E4, E5 | `AdtoAcerto` (1527) | Não |
+| **E11** | DRE, Projeção, Seleção | `DRE`, `DRETitulo(+Classe/+Operacao)`, `ProjecaoFluxoCaixa`, `ProjecaoFluxoCaixaLacto`, **`SelecaoDocumento` → serviço de consulta sem entidade** (CLR-06), `View/{ClasseAvulsaDRE, DREImpressaoView}` | E4, E5 | `SelecaoDocumento` (1226) | Não |
 | **E12** | Programação de Cobrança e Transação entre Filiais | `ProgramacaoCobranca(+Parcela)`, `TransacaoFilial/{TransacaoFilial, TransacaoFinanceira, FilialMovimento}`, `View/TransacaoFinanceiraView` | E4 | — | Não |
 | **E13** | Consultas | ~30 classes `Consultas/*` → read-models / query-methods + `contracts/` | épicos correspondentes | `Consultas/DocumentoParcConsulta` (1508) | Não |
 | **E14** | Integração Bancária (fase dedicada final) | `View/ArquivoRemessaView`, `View/ArquivoRetorno{Base, BaseView, 240View, 400View, ViewOutro}`, `View/{AprovacaoDoctoPagarView, LiberacaoDoctoPagarView}`, integração de boleto/OFX | E3, E6, E9 | — | Não |
@@ -525,7 +572,7 @@ ocorrências no legado). **Valores inteiros a preservar** — extração exata �
 
 ## 8. Artefatos SDD subsequentes (checklist)
 
-- [ ] `clarify.md` — resolver as DÚVIDAS da Seção 9
+- [x] `clarify.md` — 13 clarificações resolvidas (2026-09-03); nenhuma pendência bloqueante
 - [ ] `plan.md` + `research.md` + `data-model.md` + `contracts/`
 - [ ] `matriz-rtv.md` (por épico — `legacy-validation-audit`)
 - [ ] `matriz-rot.md` + máquina de estados (por épico — `legacy-operation-audit`)
@@ -537,20 +584,28 @@ ocorrências no legado). **Valores inteiros a preservar** — extração exata �
 
 ## 9. Pendências e DÚVIDAS
 
-| ID | Pendência | Impacto |
+Todas as 13 DÚVIDAS foram resolvidas na rodada de clarificação de 2026-09-03 — ver
+[`clarify.md`](./clarify.md) (linhas CLR-01..CLR-13). **Nenhuma pendência bloqueante para o
+`/plan`.**
+
+| DÚVIDA | Resolução | CLR |
 | :--- | :--- | :--- |
-| **DÚVIDA-01** | `Versatus.SharedKernel`: confirmar o conjunto exato de tipos de `Projeto.Geral` a portar (só enums + `ValidationResult` + `Lookup`? ou também helpers de data/número, `ThreadManager`, `EnumDescriptor`?). E se `IContexto` já existe em `Versatus.Framework` (reusar) ou entra no SharedKernel. | Define E0 e a referência de todos os projetos |
-| **DÚVIDA-02** | `Versatus.GestaoFinanceira` deve referenciar `Versatus.Faturamento`? Ele **não existe** ainda (MOD-04 é rascunho). Confirmar que toda a ligação com Faturamento é `int` lógico (`IdOrigem`/`ProcessoOrigem`) e nenhuma navegação. | Referências do `.csproj` |
-| **DÚVIDA-03** | `MovtoFinanceiroRateio : RateioMovtoItem` e `ManutencaoRateioFinanceiro : ManutencaoRateio` — essas **bases** estão em `acesso.global` (MOD-02) e não parecem migradas para `Versatus.AcessoGlobal`. Opções: (a) migrar `RateioMovtoItem`/`RateioMovto`/`ManutencaoRateio` como parte do MOD-02 antes; (b) portá-las para `Versatus.SharedKernel`; (c) trazê-las para o MOD-05. | Bloqueia E5 |
-| **DÚVIDA-04** | `IMovimentoPeriodo`, `IDadosComissao`, `IDadosPeriodoFormaPagto`, `IDadosRateioFinanceiro` — recriar como interfaces de domínio no MOD-05, no SharedKernel, ou no MOD-02? `IDadosComissao` é consumido pelo Faturamento. | Contratos de domínio |
-| **DÚVIDA-05** | Estrangulamento existente (`Servidor.Strangler.GestaoFinanceira.DTOs`): quais DTOs/campos já estão publicados e consumidos pelo legado? Preciso do inventário para o `plan.md §4` (reconciliação). O `MOD-05-ESTRANGULAMENTO-DOCUMENTO.md` cobre só `Documento`/`DocumentoFinanceiroBase`? | `plan.md §4` |
-| **DÚVIDA-06** | Banco legado `localhost\SQLEXPRESS2008 / versatus`: confirmo acesso liberado para rodar `INFORMATION_SCHEMA` no `/plan` (você respondeu "sim" — confirmando que a instância está no ar nesta máquina). Há dicionário de dados / DER exportado que eu deva usar junto? | `data-model.md` |
-| **DÚVIDA-07** | `ContaBancaria` (1704 l) concentra dados bancários **e** lógica de remessa/retorno/OFX. Separo a **entidade** `ContaBancaria` (E3) da **lógica de integração** (E14), mantendo a entidade com os campos e movendo só os métodos de arquivo para E14? | Fronteira E3/E14 |
-| **DÚVIDA-08** | Confirmar a lista final de telas React desta rodada (Seção 1.5). Em especial: E9 Cheques tem ~15 formulários legados — todos entram, ou só os de movimento (recebido/emitido) + consulta, deixando talão/suprimento/impressão para depois? | Escopo frontend / `tasks.md` |
-| **DÚVIDA-09** | `SelecaoDocumento` (1226 l, `: ObjetoBaseSAO`) é motor de seleção em lote usado por liquidação, cobrança e remessa. Migrar como **serviço de consulta** (sem entidade/tabela) em E11, e as telas de operação (E6/E14) consomem esse serviço? | E11 / contratos |
-| **DÚVIDA-10** | Impressão (`Interface.Impressao`: DRE, cheque, recibo de liquidação): fora do domínio, endpoint devolve o **modelo de dados** e o frontend renderiza/imprime? Ou há geração de PDF no backend a preservar? | Escopo de E6/E9/E11 |
-| **DÚVIDA-11** | `AdtoAcerto` herda `ObjectMaster` mas tem `ExecutarPersistir/ExecutarExcluir` como operação; `FAcertoAdiantamento` herda `FBaseCadastro`. Trato o Acerto como **operação transacional** (Handler + Matriz ROT) e não como CRUD, certo? | E10 / classificação |
-| **DÚVIDA-12** | Nomenclatura de pastas `Domain/` do `Versatus.GestaoFinanceira`: proponho `Bases/`, `Dominio/`, `Bancos/`, `Documentos/`, `Movimentos/`, `Liquidacao/`, `Reversao/`, `Cheques/`, `Adiantamentos/`, `DRE/`, `Cobranca/`, `TransacaoFilial/`, `Consultas/`. Confirmar. | `plan.md §1` |
+| 01 SharedKernel escopo | Mínimo: enums + `Lookup` + container de rateio + interfaces transversais; reusa Framework | CLR-02 |
+| 02 Referência a Faturamento | Não — `int` lógico, sem `ProjectReference` (Artigo VIII) | CLR-09 |
+| 03 Bases de rateio | Pré-tarefa no **MOD-02** migra `RateioMovto`/`RateioMovtoItem`/`ManutencaoRateio` antes do E5 | CLR-01 |
+| 04 Interfaces de domínio | `IMovimentoPeriodo`/`IDadosPeriodoFormaPagto`/`IDadosRateioFinanceiro`/`IDadosComissao` → SharedKernel | CLR-05 |
+| 05 Estrangulamento | Só DTOs do AcessoGlobal; nenhum contrato financeiro; nada a reconciliar | CLR-10 |
+| 06 Acesso ao banco | Confirmado; `INFORMATION_SCHEMA` + materialização do 1º registro | CLR-11 |
+| 07 `ContaBancaria` | Entidade em E3; lógica remessa/retorno/OFX em E14 | CLR-03 |
+| 08 Telas React | Backend-first; E9 só recebido/emitido/movimento/consulta | CLR-07 |
+| 09 `SelecaoDocumento` | Serviço de consulta sem entidade em E11 | CLR-06 |
+| 10 Impressão | Endpoint devolve dados; frontend renderiza; sem PDF no backend | CLR-08 |
+| 11 `AdtoAcerto` | Operação transacional (Handler + Matriz ROT), não CRUD | CLR-12 |
+| 12 Pastas `Domain/` | Proposta aceita; ajuste fino no `/plan §1` | CLR-13 |
+| 13 Bases legadas | Regra fixada: POCO abstrata só de dados + comportamento em serviço/handler | CLR-04 |
+
+**A detalhar dentro do `/plan`** (não bloqueia): enums finos por épico, campos de cada
+entidade (`data-model.md`), decisão POCO-abstrata vs. serviço por base individual.
 
 ---
 
@@ -559,4 +614,5 @@ ocorrências no legado). **Valores inteiros a preservar** — extração exata �
 | Data | Autor | Alteração |
 | :--- | :--- | :--- |
 | 2026-04-27 | Análise inicial | Criação do rascunho v1.0 (`MOD-05-GESTAO-FINANCEIRA.md`) |
-| 2026-09-03 | SDD etapa 1 (`sdd-specify`) | Reescrita v2.0: inventário completo (180 classes), árvore de herança real, mapa de dependências, 14 épicos em ordem topológica, RN-05-001..020 macro, 12 DÚVIDAS. Fixa `net10.0` / constituição v1.0. |
+| 2026-09-03 | SDD etapa 1 (`sdd-specify`) | Reescrita v2.0: inventário completo (180 classes), árvore de herança real, mapa de dependências, 14 épicos em ordem topológica, RN-05-001..020 macro, 13 DÚVIDAS. Fixa `net10.0` / constituição v1.0. |
+| 2026-09-03 | SDD etapa 2 (`sdd-clarify`) | 13 clarificações resolvidas (`clarify.md`, CLR-01..13): SharedKernel mínimo, pré-tarefa de rateio no MOD-02, `ContaBancaria` E3/E14, regra das bases legadas (POCO abstrata + serviço), interfaces transversais no SharedKernel, `SelecaoDocumento` como serviço, escopo React de cheques, impressão no frontend. §1.3–1.5, §2.1, §2.3, §3.3 (nova), §4.1–4.2, §6 (E0/E3/E5/E9/E10/E11), §8–9 atualizados. Sem pendência bloqueante. |
