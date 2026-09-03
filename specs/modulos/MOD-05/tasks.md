@@ -15,6 +15,13 @@
 > criados na tarefa `analysis` do épico e referenciados pelas tarefas seguintes.
 > `sdd-analyze` V2/V4 exige que toda `VAL-xx`/`OP-xx`/`CALC-xx` apareça em ≥1 tarefa.
 >
+> **Gate incremental (todas as tarefas `analysis` de épico):** o "Pronto quando" de toda
+> `E?-T01` (e demais `analysis` do épico) inclui, além de gerar as matrizes: rodar
+> `/analyze MOD-05 --epico E?` e obter veredito ✅ (0 órfã `VAL`/`OP`/`CALC` no escopo
+> `#E?`). **Nenhuma tarefa `domain`/`service`/`operation`/`frontend` do épico entra em
+> `develop` enquanto o gate incremental daquele épico estiver ⛔.** `Z-T02` é a
+> consolidação final (V1–V7 no módulo inteiro + cross-épico), não a primeira passada.
+>
 > **`Pronto quando:`** sempre inclui `dotnet build` 0 erro/0 aviso (Lei 6) — omitido
 > abaixo por brevidade quando é o único critério; matar `dotnet run` antes do build.
 
@@ -559,9 +566,9 @@
 - **Pronto quando:** `dotnet build`/`dotnet test` e `npm run build`/`npm test` **100% verdes** (Lei 13).
 - **Branch:** `feat/mod-05-fecho` · **Commit:** `feat(mod-05): fecho do módulo — migrations, DI e rotas` · **Depende de:** E14-T07
 
-### Z-T02 · `/analyze MOD-05` — gate de cobertura · tipo: analysis
-- **Objetivo:** rodar `sdd-analyze`; veredito verde obrigatório (todas as `VAL-xx`/`OP-xx`/`CALC-xx` cobertas; V1–V7).
-- **Cria/atualiza:** `analyze-report.md`.
+### Z-T02 · `/analyze MOD-05` — gate de cobertura (consolidação) · tipo: analysis
+- **Objetivo:** rodar `sdd-analyze` no **modo completo** — V1–V7 no módulo inteiro; veredito verde obrigatório (todas as `VAL-xx`/`OP-xx`/`CALC-xx` cobertas). Cada épico já passou pelo gate incremental (`/analyze MOD-05 --epico E?` na sua tarefa `analysis`); aqui a checagem é de **cross-épico**: regra que só aparece na junção de dois épicos, propriedade compartilhada, contradição spec↔tasks acumulada.
+- **Cria/atualiza:** `analyze-report.md` (consolida as rodadas incrementais).
 - **Branch:** `docs/mod-05-analyze` · **Commit:** `docs(mod-05): relatório de análise de cobertura` · **Depende de:** Z-T01
 
 ### Z-T03 · `/handoff` — Log de Progresso · tipo: —
@@ -573,8 +580,10 @@
 
 - **RN-05-001..020:** todas referenciadas em ≥1 tarefa (E1, E3–E14).
 - **VAL-xx / OP-xx / CALC-xx:** criados nas tarefas `analysis` de cada épico (E?-T01) e
-  consumidos pelas tarefas `service`/`operation`/`parity`/`frontend` do mesmo épico — o
-  `sdd-analyze` (Z-T02) valida a ligação 1:1.
+  consumidos pelas tarefas `service`/`operation`/`parity`/`frontend` do mesmo épico. O
+  **gate incremental** (`/analyze MOD-05 --epico E?`, na própria `analysis`) valida a
+  ligação 1:1 dentro do épico antes de o código do épico ir para `develop`; o
+  `sdd-analyze` completo (Z-T02) consolida e cobre o cross-épico.
 - **Épicos do `plan.md §3`:** E0, E1, E3, E2, E4, E5, E6, E7, E8, E9, E10, E11, E12, E13,
   E14 — todos com tarefas. Ordem de execução conforme dependências declaradas.
 - **Frontend (CLR-07):** E3, E4, E6, E9 (escopo núcleo) — demais sem tarefa `frontend`.

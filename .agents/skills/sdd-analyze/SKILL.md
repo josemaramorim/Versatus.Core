@@ -13,8 +13,12 @@ tarefa que o cubra. Não gera código; produz um relatório com veredito.
 
 ## 1. Pré-condições
 
-`spec.md`, `clarify.md`, `plan.md` (+ `research.md`, `data-model.md`, `contracts/`),
-`tasks.md`, `matriz-rtv.md`, `matriz-rot.md` existem.
+- **Modo completo** (`/analyze MOD-XX`): `spec.md`, `clarify.md`, `plan.md`
+  (+ `research.md`, `data-model.md`, `contracts/`), `tasks.md` e **todas** as seções de
+  `matriz-rtv.md` / `matriz-rot.md` existem.
+- **Modo incremental** (`/analyze MOD-XX --epico E?`): `spec.md`, `plan.md`, `tasks.md` e
+  as seções `matriz-rtv.md#E?` / `matriz-rot.md#E?` **daquele épico** existem. Roda
+  V1/V3/V4/V5 restritos ao escopo do épico; V2/V6/V7 ficam para o modo completo.
 
 ---
 
@@ -98,7 +102,25 @@ frontend). `clarify.md` sem pendência marcada `bloqueante`.
 
 ---
 
-## 5. Saída
+## 5. Gate incremental por épico
+
+Módulos grandes produzem `matriz-rtv.md#E?` / `matriz-rot.md#E?` **por épico**, dentro do
+`/implement`. Para não deixar a única passada de V3/V4/V5 para o fim (retrabalho tardio):
+
+1. Assim que a tarefa `analysis` de um épico gera as matrizes `#E?`, rode
+   `/analyze MOD-XX --epico E?` **antes** de qualquer código daquele épico entrar em
+   `develop`.
+2. O modo incremental reprova o épico (⛔) se houver `VAL`/`OP`/`CALC` órfã no escopo `#E?`;
+   a implementação do épico não avança enquanto não ficar ✅.
+3. O **modo completo** em `Z-T02` deixa de ser a primeira execução de V3/V4/V5 e passa a
+   ser **consolidação**: re-roda V1–V7 no módulo inteiro e pega o que é cross-épico
+   (regra que só aparece na junção de dois épicos, propriedade compartilhada, etc.).
+
+Registrar cada rodada incremental no `analyze-report.md` (seção "Rodadas incrementais").
+
+---
+
+## 6. Saída
 
 - `specs/modulos/MOD-XX/analyze-report.md`.
 - Commit: `docs(mod-XX): relatório de análise de cobertura (SDD etapa 5)`.

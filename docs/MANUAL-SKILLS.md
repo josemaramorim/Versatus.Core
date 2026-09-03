@@ -436,12 +436,16 @@ Etapa 5 e **gate duro** do SDD. Cruza `constitution ↔ spec ↔ plan ↔ tasks 
 
 ### 📅 Quando Usar
 Depois de `/tasks` e antes de `/implement`. Rodar de novo após cada correção até ✅.
+Em módulos grandes, as matrizes RTV/ROT nascem por épico dentro do `/implement` — então
+`sdd-analyze` roda em **dois modos**.
 
 ### 💡 Exemplo
 ```
-/analyze MOD-05
+/analyze MOD-05 --epico E4   # gate incremental: V1/V3/V4/V5 no escopo do épico E4,
+                             # pré-condição para o código de E4 ir para develop
+/analyze MOD-05              # modo completo: V1–V7 no módulo inteiro + cross-épico (Z-T02)
 ```
-A IA varre o legado por palavras-chave de validação/operação e confere que cada ocorrência tem linha nas matrizes e cada linha das matrizes tem tarefa. Não corrige — aponta a ação exigida. `/implement` fica proibido enquanto o veredito for ⛔.
+A IA varre o legado por palavras-chave de validação/operação e confere que cada ocorrência tem linha nas matrizes e cada linha das matrizes tem tarefa. Não corrige — aponta a ação exigida. `/implement` do épico fica proibido enquanto o veredito incremental for ⛔; o merge final, enquanto o veredito completo for ⛔.
 
 ---
 

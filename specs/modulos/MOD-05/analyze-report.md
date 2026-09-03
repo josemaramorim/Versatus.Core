@@ -6,8 +6,17 @@
 > **Veredito parcial:** 🟡 **APROVADO PARA PLANEJAMENTO** — V1, V2, V6, V7 executados e
 > sem achado CRÍTICO/ALTO. V3, V4, V5 **não executáveis nesta rodada** (dependem das
 > matrizes RTV/ROT e do detalhamento de colunas, que são produzidos por épico nas tarefas
-> `E?-T01` durante `/implement`). O **gate duro completo** roda em `Z-T02` antes de
-> qualquer merge de implementação.
+> `E?-T01` durante `/implement`).
+>
+> **Gate incremental por épico:** V3/V4/V5 **não** ficam represados até o fim. Assim que a
+> tarefa `analysis` de um épico gera `matriz-rtv.md#E?` / `matriz-rot.md#E?`, roda-se
+> `/analyze MOD-05 --epico E?` (modo incremental de `sdd-analyze §5`) e o veredito ✅ do
+> épico é pré-condição para o código daquele épico entrar em `develop`. As rodadas ficam
+> registradas na seção "Rodadas incrementais" abaixo.
+>
+> O **gate duro completo** (`sdd-analyze` modo completo) roda em `Z-T02` como
+> **consolidação** — V1–V7 no módulo inteiro + verificação cross-épico — antes de qualquer
+> merge final.
 
 ---
 
@@ -17,9 +26,9 @@
 | :--- | :--- | :--- | :--- |
 | **V1** Constituição (gate §12) vs. plan/data-model/contracts/tasks | ✅ PASS | §12.1, §12.3, §12.4, §12.6 | 0 |
 | **V2** Rastreabilidade spec → tasks (RN, épicos, contratos, entidades) | ✅ PASS | 20 RN, 15 épicos, 3 contratos, catálogo de 59 tabelas | 0 |
-| **V3** Rastreabilidade legado → matrizes (varredura de palavras-chave) | ⏸️ ADIADA | — | — (matrizes por épico) |
-| **V4** Matrizes → tasks (VAL/OP/CALC em ≥1 tarefa) | ⏸️ ADIADA | estrutura pronta (`Cobre:` em toda tarefa `service`/`operation`/`parity`/`frontend`) | — |
-| **V5** Cobertura de propriedades (toda coluna com destino; NULL→anulável) | 🟡 PARCIAL | E-Caixa/E-Domínio/E-Documento núcleo detalhados; demais por épico | 0 (nos detalhados) |
+| **V3** Rastreabilidade legado → matrizes (varredura de palavras-chave) | ⏸️ ADIADA → gate incremental | — | — (roda em `/analyze --epico E?` por épico; consolida em `Z-T02`) |
+| **V4** Matrizes → tasks (VAL/OP/CALC em ≥1 tarefa) | ⏸️ ADIADA → gate incremental | estrutura pronta (`Cobre:` em toda tarefa `service`/`operation`/`parity`/`frontend`) | — (idem V3) |
+| **V5** Cobertura de propriedades (toda coluna com destino; NULL→anulável) | 🟡 PARCIAL → gate incremental | E-Caixa/E-Domínio/E-Documento núcleo detalhados; demais por épico | 0 (nos detalhados) |
 | **V6** Cross-module e estrangulamento | ✅ PASS | 11 refs `int` lógico classificadas; estrangulamento reconciliado (CLR-10) | 0 |
 | **V7** Coerência spec ↔ plan ↔ tasks; clarify sem pendência bloqueante | ✅ PASS | 15 épicos, escopo frontend, 13 CLR | 0 |
 
@@ -99,9 +108,33 @@
 | A-01 | **MÉDIO** | V5 | Banco de dev não contém `FINPROJECAOFLUXOCAIXA(+LACTO)` nem `FINLOGDOMINIOPERIODO` — `data-model.md` desses fica incompleto. | Tarefas `E2-T01` e `E11-T01` reconfirmam e, se ausente, solicitam dump de schema de produção **antes** do `domain` do épico. Já registrado (`plan.md §7 R-1`, `research.md §8`). |
 | A-02 | **MÉDIO** | V5 | Maioria das tabelas `Fin*` vazia → golden values de cálculo sem amostra real. | Golden via execução do legado / conferência manual (`research.md §5`); DÚVIDA-R3 (base de homologação) aberta ao usuário — não bloqueia. |
 | A-03 | **BAIXO** | V5 | `FINDRETITULOOPERACAO` referencia `IDFINDRETITULOCALCULO` sem tabela `FINDRETITULOCALCULO` no banco. | Classificar (enum vs. FK) na tarefa `E11-T01`. |
-| A-04 | **BAIXO** | V2 | `tasks.md` usa `Cobre:` com `VAL-xx#E?`/`OP-xx#E?` que ainda não existem (criados nas tarefas `analysis`). | Esperado no SDD; `sdd-analyze` V3/V4 completo roda em `Z-T02` após as matrizes existirem. |
+| A-04 | **BAIXO** | V2 | `tasks.md` usa `Cobre:` com `VAL-xx#E?`/`OP-xx#E?` que ainda não existem (criados nas tarefas `analysis`). | Esperado no SDD; `sdd-analyze` V3/V4 rodam por épico no **gate incremental** (`/analyze --epico E?`) e consolidam em `Z-T02`. |
 
 Nenhum achado **CRÍTICO** ou **ALTO**.
+
+---
+
+## Rodadas incrementais (`/analyze MOD-05 --epico E?`)
+
+Preenchida durante o `/implement`, uma linha por épico, à medida que a tarefa `analysis`
+de cada épico gera suas matrizes.
+
+| Épico | Data | Órfãs V3 | V4 OK? | V5 OK? | Veredito | Achados |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| E1 | — | — | — | — | ⏳ pendente | — |
+| E3 | — | — | — | — | ⏳ pendente | — |
+| E2 | — | — | — | — | ⏳ pendente | — |
+| E4 | — | — | — | — | ⏳ pendente | — |
+| E5 | — | — | — | — | ⏳ pendente | — |
+| E6 | — | — | — | — | ⏳ pendente | — |
+| E7 | — | — | — | — | ⏳ pendente | — |
+| E8 | — | — | — | — | ⏳ pendente | — |
+| E9 | — | — | — | — | ⏳ pendente | — |
+| E10 | — | — | — | — | ⏳ pendente | — |
+| E11 | — | — | — | — | ⏳ pendente | — |
+| E12 | — | — | — | — | ⏳ pendente | — |
+| E13 | — | — | — | — | ⏳ pendente | — |
+| E14 | — | — | — | — | ⏳ pendente | — |
 
 ---
 
@@ -111,6 +144,9 @@ Nenhum achado **CRÍTICO** ou **ALTO**.
 spec, clarificação, plano, modelo de dados, pesquisa, contratos, tarefas) está completa,
 consistente e conforme a constituição v1.0. Nenhum bloqueio.
 
-⛔ **O gate duro completo (V3/V4/V5) é obrigatório em `Z-T02`** — antes de mesclar qualquer
-implementação, `sdd-analyze` deve rodar contra as matrizes RTV/ROT já preenchidas e dar
-veredito ✅ verde (Artigo IX; `sdd-analyze` §4.4).
+⛔ **Gate incremental por épico é obrigatório** — nenhum código de um épico entra em
+`develop` sem `/analyze MOD-05 --epico E?` ✅ (V3/V4/V5 no escopo `#E?`).
+
+⛔ **O gate duro completo (modo completo, V1–V7 + cross-épico) é obrigatório em `Z-T02`** —
+antes de mesclar o fecho do módulo, `sdd-analyze` deve dar veredito ✅ verde
+(Artigo IX; `sdd-analyze` §5–§6).
