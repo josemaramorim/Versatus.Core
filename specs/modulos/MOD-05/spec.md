@@ -1,7 +1,7 @@
 # SPEC — MOD-05: Gestão Financeira
 
-> **Versão:** 2.1 (SDD etapa 2 aplicada) | **Data:** 2026-09-03 | **Fase de migração:** 4
-> **Status:** 🔄 Clarificada — pronta para `/plan` (SDD etapa 3)
+> **Versão:** 2.2 (SDD etapa 3 aplicada) | **Data:** 2026-09-03 | **Fase de migração:** 4
+> **Status:** 🔄 Planejada — pronta para `/tasks` (SDD etapa 4) · ver [`plan.md`](./plan.md), [`data-model.md`](./data-model.md), [`research.md`](./research.md), [`contracts/`](./contracts/)
 > **Constituição ratificada:** [`specs/memory/constitution.md`](../../memory/constitution.md) v1.0
 > **Substitui:** `specs/modulos/MOD-05-GESTAO-FINANCEIRA.md` (rascunho v1.0 de 2026-04-27,
 > subdimensionado e citando `net8.0`)
@@ -537,6 +537,11 @@ ocorrências no legado). **Valores inteiros a preservar** — extração exata �
 | **E13** | Consultas | ~30 classes `Consultas/*` → read-models / query-methods + `contracts/` | épicos correspondentes | `Consultas/DocumentoParcConsulta` (1508) | Não |
 | **E14** | Integração Bancária (fase dedicada final) | `View/ArquivoRemessaView`, `View/ArquivoRetorno{Base, BaseView, 240View, 400View, ViewOutro}`, `View/{AprovacaoDoctoPagarView, LiberacaoDoctoPagarView}`, integração de boleto/OFX | E3, E6, E9 | — | Não |
 
+> **Ordem de execução real** (achado do `data-model.md`): `FINDOMINIO.IDFINCAIXABANCO` é
+> `NOT NULL`, então **E3 (Caixa/Banco) executa antes de E2 (Domínio/Período)**. Os números
+> de épico são identificadores, não sequência — a sequência definitiva está em
+> [`plan.md §3`](./plan.md).
+
 ---
 
 ## 7. Regras de Negócio Macro (RN-05-NNN)
@@ -573,7 +578,7 @@ ocorrências no legado). **Valores inteiros a preservar** — extração exata �
 ## 8. Artefatos SDD subsequentes (checklist)
 
 - [x] `clarify.md` — 13 clarificações resolvidas (2026-09-03); nenhuma pendência bloqueante
-- [ ] `plan.md` + `research.md` + `data-model.md` + `contracts/`
+- [x] `plan.md` + `research.md` + `data-model.md` + `contracts/` (2026-09-03) + `legacy-schema/` (extract real do banco)
 - [ ] `matriz-rtv.md` (por épico — `legacy-validation-audit`)
 - [ ] `matriz-rot.md` + máquina de estados (por épico — `legacy-operation-audit`)
 - [ ] `golden/CALC-*.{md,csv}` (`legacy-calc-parity`)
@@ -616,3 +621,4 @@ entidade (`data-model.md`), decisão POCO-abstrata vs. serviço por base individ
 | 2026-04-27 | Análise inicial | Criação do rascunho v1.0 (`MOD-05-GESTAO-FINANCEIRA.md`) |
 | 2026-09-03 | SDD etapa 1 (`sdd-specify`) | Reescrita v2.0: inventário completo (180 classes), árvore de herança real, mapa de dependências, 14 épicos em ordem topológica, RN-05-001..020 macro, 13 DÚVIDAS. Fixa `net10.0` / constituição v1.0. |
 | 2026-09-03 | SDD etapa 2 (`sdd-clarify`) | 13 clarificações resolvidas (`clarify.md`, CLR-01..13): SharedKernel mínimo, pré-tarefa de rateio no MOD-02, `ContaBancaria` E3/E14, regra das bases legadas (POCO abstrata + serviço), interfaces transversais no SharedKernel, `SelecaoDocumento` como serviço, escopo React de cheques, impressão no frontend. §1.3–1.5, §2.1, §2.3, §3.3 (nova), §4.1–4.2, §6 (E0/E3/E5/E9/E10/E11), §8–9 atualizados. Sem pendência bloqueante. |
+| 2026-09-03 | SDD etapa 3 (`sdd-plan`) | `plan.md` (estrutura de projeto, E0 SharedKernel, 15 passos de execução, 11 operações com ordem de persistência, 10 riscos), `research.md` (BoletoNet/OFX, enums, GeradorSequencial, Lookup, golden com banco vazio, tipos `text`/`datetime`), `data-model.md` (extract real de `localhost\SQLEXPRESS2008` — PKs compostas por filial, `numeric(23,8)`, nulidade não-uniforme, detalhamento de E-Caixa/E-Domínio/E-Documento núcleo), `contracts/` (README + caixa-banco/documento/liquidacao), `legacy-schema/` (fin_columns.txt + fin_meta.txt). Achado: banco de dev não tem 100% do schema (falta `FINPROJECAOFLUXOCAIXA*`, `FINLOGDOMINIOPERIODO`) e `FINDOMINIO`→`FINCAIXABANCO` inverte a ordem E2/E3. |
