@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/block-protected-git.js",
+            "timeout": 10,
+            "statusMessage": "Verificando regras de Git do projeto (develop/main)…"
+          }
+        ]
+      }
+    ]
+  }
+}
