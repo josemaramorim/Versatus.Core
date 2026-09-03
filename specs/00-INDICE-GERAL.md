@@ -41,7 +41,8 @@ specs/
 │   ├── MOD-02-ACESSO-GLOBAL.md         ← Entidades, clientes, fornecedores, usuários
 │   ├── MOD-03-GESTAO-MATERIAL.md       ← Produtos, estoques, movimento de estoque
 │   ├── MOD-04-FATURAMENTO.md           ← Documentos de venda, NF-e, pedidos
-│   ├── MOD-05-GESTAO-FINANCEIRA.md     ← Documentos financeiros, liquidação, caixa
+│   ├── MOD-05-GESTAO-FINANCEIRA.md     ← Documentos financeiros, liquidação, caixa (rascunho v1 — ver MOD-05/)
+│   ├── MOD-05/                          ← SDD: spec.md, dependency-graph.md, plan.md, tasks.md, matrizes
 │   ├── MOD-06-GESTAO-COMPRA.md         ← Cotações, recebimento, requisições
 │   ├── MOD-07-GESTAO-TRIBUTO.md        ← Tributação, CFOP, NCM, SPED
 │   ├── MOD-08-NFe.md                   ← Nota Fiscal Eletrônica
@@ -111,7 +112,7 @@ Módulos mais isolados, podem ser atacados em paralelo após Fase 1.
 | MOD-02 | Acesso Global | 1 | ✔️ Concluído | Fases 1-10 completas, 32 testes passando |
 | MOD-03 | Gestão Material | 2 | 🔄 Em progresso | Fases 1-3 prontas — ver `prompts-execucao/` |
 | MOD-04 | Faturamento | 3 | 📝 Rascunho | Aguarda MOD-03 |
-| MOD-05 | Gestão Financeira | 4 | 📝 Rascunho | |
+| MOD-05 | Gestão Financeira | 4 | 🔄 Em especificação (SDD) | `specs/modulos/MOD-05/spec.md` v2.0 — 180 classes, 14 épicos, 12 DÚVIDAS |
 | MOD-06 | Gestão Compra | 2 | 📝 Rascunho | |
 | MOD-07 | Gestão Tributo | 1 | 🔄 Em progresso | Fases 1-4 OK; Fase 5 SPED — ver `prompts-execucao/` |
 | MOD-08 | NFe | 3 | 📝 Rascunho | |
