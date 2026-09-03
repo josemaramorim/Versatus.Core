@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Versatus.Framework/Versatus.Framework.csproj" />
+    <Project Path="src/Versatus.GestaoFinanceira/Versatus.GestaoFinanceira.csproj" />
     <Project Path="src/Versatus.GestaoTributo/Versatus.GestaoTributo.csproj" />
     <Project Path="src/Versatus.Infra.Data/Versatus.Infra.Data.csproj" />
     <Project Path="src/Versatus.NFe/Versatus.NFe.csproj" />
