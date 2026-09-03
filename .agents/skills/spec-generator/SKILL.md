@@ -1,6 +1,6 @@
 ---
 name: spec-generator
-description: Use ao mapear formulários legados para elaborar especificações funcionais em docs/spec_f[nome].md antes de escrever código C# ou React.
+description: Use ao mapear UMA tela/formulário legado isolado para elaborar sua especificação funcional em docs/spec_f[nome].md antes de escrever código C# ou React. Para escopo de módulo inteiro use o fluxo SDD (sdd-specify).
 ---
 
 # Skill: spec-generator

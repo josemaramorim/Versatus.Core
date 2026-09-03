@@ -1,6 +1,6 @@
 ---
 name: migrate-crud
-description: Pipeline de migração automatizada de formulários legados (C#) para a arquitetura .NET 10 + React OOP seguindo SOLID, Clean Architecture e Clean Code.
+description: Pipeline de migração automatizada de UM formulário/tela legado (C#) para a arquitetura .NET 10 + React OOP seguindo SOLID, Clean Architecture e Clean Code. É a skill de implementação de tela isolada, acionada dentro da etapa /implement do fluxo SDD ou diretamente.
 ---
 
 # Skill: migrate-crud
