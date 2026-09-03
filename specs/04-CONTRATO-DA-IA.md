@@ -106,7 +106,7 @@ Qualquer código utilitário de rede, integração ou DTO criado no projeto lega
 
 ---
 
-## 5. Log de Progresso e Handoff (Atualizado: 2026-06-12)
+## 5. Log de Progresso e Handoff (Atualizado: 2026-09-03)
 
 Este log serve para que a próxima instância da IA saiba exatamente onde o trabalho parou. **Ao finalizar sua sessão, atualize esta tabela.**
 
@@ -114,13 +114,15 @@ Este log serve para que a próxima instância da IA saiba exatamente onde o trab
 | :--- | :--- | :--- | :--- | :--- |
 | **MOD-01** | ✅ Concluído | 9.2 (Final) | `develop` | Framework Base e Infra base finalizados. |
 | **MOD-02** | ✅ Concluído | 11.0 (Validação)| `develop` | Implementadas validações estritas de CPF/CNPJ (Módulo 11), Obrigatoriedade, Razão Social e bypass de estrangeiros baseados em parâmetros do banco. |
-| **MOD-05** | ✅ Concluído | Estrangulamento (MOD-05) | `develop` | Substituídas consultas locais por chamadas HTTP no legado usando `Servidor.Strangler`. |
+| **MOD-05** | 🔄 SDD completo — pré-implementação | `tasks.md` gerado (SDD etapas 1-5) | `docs/mod-05-sdd` | Estrangulamento já concluído (`develop`). Migração real (.NET 10 + EF Core) **planejada mas não iniciada**: `specs/modulos/MOD-05/` com spec v2.3, clarify (13 CLR), plan, data-model (extract real do banco), research, contracts, tasks (~90), analyze parcial. Próximo: aprovar merge de `docs/mod-05-sdd` e iniciar `S-T01`. |
+| **SDD (Governança)** | 🔄 Fundação criada | Fluxo spec-kit + 8 skills | `docs/mod-05-sdd` | `specs/memory/constitution.md` v1.0 + skills `sdd-constitution/specify/clarify/plan/tasks/analyze` + `legacy-operation-audit` + `legacy-calc-parity` + comandos `/constitution /specify /clarify /plan /tasks /analyze`. `MANUAL-SKILLS.md` atualizado (Lei 12). |
 | **MOD-08** | 🔄 Em progresso | Segurança (MOD-08) | `feat/seguranca-integracao-strangler` | Implementada autenticação via API Key com bypass de localhost na API e no legado. |
 | **MOD-07** | 🔄 Em progresso | 4.3 (Fase 4) | `feat/mod-02-demo` | Concluída Fase 4 (ICMS, Substituição Tributária, Mapeamentos, Regimes e Vigências). Fase 5 (SPED) aguarda análise — ver `specs/prompts-execucao/MOD-07-FASE5-ANALISE-SPED.md`. |
 | **MOD-03** | 🔄 Em progresso | Fases 1-3 prontas | `develop` | Prompts de execução criados em `specs/prompts-execucao/`. Iniciar por `MOD-03-FASES1-3-EXECUTION-PROMPT.md`. |
 | **MOD-02 (Parametro)** | ✅ Concluído | Migração e Reorganização | `feat/migrate-parametro` | Migrado formulário Parametro (C# e React) e reorganizadas as páginas do frontend por módulo correspondente ao backend. |
 
 ### Histórico Recente de Decisões:
+- **2026-09-03 (MOD-05 / SDD):** Executadas as etapas 1-5 do fluxo SDD para o MOD-05 Gestão Financeira, sem código (branch `docs/mod-05-sdd`). Criada a **Constituição de Engenharia** (`specs/memory/constitution.md` v1.0 — consolida AGENTS.md + 17 Regras + DEC-001..006 num gate executável, fixa `net10.0`/C# 14). Criadas 8 skills SDD (`sdd-constitution`, `sdd-specify`, `sdd-clarify`, `sdd-plan`, `sdd-tasks`, `sdd-analyze`, `legacy-operation-audit` — Matriz ROT, `legacy-calc-parity` — golden tests) + 6 slash commands + `MANUAL-SKILLS.md` atualizado. Fronteira: SDD = módulo; `spec-generator`/`migrate-crud` = tela CRUD isolada. Para o MOD-05: `specs/modulos/MOD-05/` com `spec.md` v2.3 (inventário de 180 classes, árvore de herança, 14 épicos, RN-05-001..020), `clarify.md` (13 CLR — SharedKernel mínimo, rateio como pré-tarefa do MOD-02, `ContaBancaria` E3/E14, bases legadas → POCO abstrata + serviço, `SelecaoDocumento` como serviço, React só núcleo E3/E4/E6/E9, impressão no frontend), `plan.md` (projeto `Versatus.GestaoFinanceira` + `Versatus.SharedKernel` `net10.0`, 15 passos, 11 operações com ordem de persistência, 10 riscos), `data-model.md` + `legacy-schema/` (inspeção real de `localhost\SQLEXPRESS2008` — PK composta por filial com ordem variável, `numeric(23,8)`, `text`, nulidade de auditoria não-uniforme; achado: banco de dev não tem 100% do schema), `research.md`, `contracts/`, `tasks.md` (~90 tarefas atômicas), `analyze-report.md` (V1/V2/V6/V7 PASS; V3/V4/V5 no gate `Z-T02`). **Nenhuma linha de C#/React.**
 - **2026-07-20 (AcessoGlobal):** Migrado o formulário legado `Parametro` e valores `ParametroValor` para a arquitetura .NET Core + React. Implementada a regra de organização de pastas por módulo no frontend (`src/pages/[Modulo]/F[Nome]/`), movendo `FEntidade` e `FParametro` para `AcessoGlobal/` e ajustando importações. Commits adicionados na branch `feat/migrate-parametro`.
 - **2026-06-12 (Seguranca):** Implementada a segurança via API Key no helper legado e middleware de validação com loopback bypass no .NET 8, conforme especificado em DEC-006 e MOD-08. Commits adicionados na branch `feat/seguranca-integracao-strangler`.
 - **2026-06-12 (GestaoFinanceira):** Concluído o estrangulamento de validações e parâmetros das entidades `Documento` e `DocumentoFinanceiroBase` no projeto legado. Criado o projeto `Servidor.Strangler` sob a estrutura de pastas recomendada. Alterações mescladas na branch `develop`.
@@ -136,5 +138,8 @@ Este log serve para que a próxima instância da IA saiba exatamente onde o trab
 - **2026-04-28 (Global):** Padronização total de nomenclatura para **Inglês** em todas as pastas físicas e namespaces (`Repositories`, `Context`, `Exceptions`). O `Versatus.Framework` foi totalmente refatorado.
 
 ### Próxima Ação Pendente:
+- **MOD-05:** revisar/aprovar a camada SDD em `specs/modulos/MOD-05/` e o merge de `docs/mod-05-sdd` para `develop`. Depois, iniciar a implementação por `S-T01` (`tasks.md`) — criar `Versatus.SharedKernel`. Pré-requisito antes do épico E5: migrar `RateioMovto`/`RateioMovtoItem`/`ManutencaoRateio` no MOD-02 (CLR-01). Antes de E2/E11: obter dump de schema de produção das tabelas ausentes no banco de dev (`FINPROJECAOFLUXOCAIXA*`, `FINLOGDOMINIOPERIODO`).
 - Executar **MOD-03 Fases 1-3** usando o prompt em `specs/prompts-execucao/MOD-03-FASES1-3-EXECUTION-PROMPT.md`.
 - Executar **Fase 5 SPED (análise)** usando `specs/prompts-execucao/MOD-07-FASE5-ANALISE-SPED.md`.
+
+> **Para retomar o MOD-05 com o fluxo SDD:** os comandos são `/specify /clarify /plan /tasks /analyze /implement MOD-XX`. O MOD-05 já está em `/tasks` concluído — o próximo passo real é `/analyze` completo (gate `Z-T02`) durante/antes de mesclar implementação, e `/implement MOD-05 S-T01`.
