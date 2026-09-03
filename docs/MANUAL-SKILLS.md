@@ -47,6 +47,12 @@
 
 As **Skills** são capacidades especializadas e sequências de instruções padronizadas armazenadas na pasta `.agents/skills/`. Elas garantem que a migração de formulários, auditorias de código e criação de novos módulos no **Versatus ERP** sigam rigorosamente as premissas de **SOLID, Clean Architecture, Clean Code, Result Pattern, CQRS DB Split e .NET 10**.
 
+### 1.1 Duas pastas, uma fonte da verdade
+
+- **`.agents/skills/<nome>/SKILL.md`** — conteúdo completo e autoritativo de cada skill (o que este manual descreve). Usado por qualquer IA a quem o conteúdo for colado ou indicado manualmente (ex.: Gemini CLI).
+- **`.claude/skills/<nome>/SKILL.md`** — apenas um *stub* de descoberta: mesmo frontmatter (`name`/`description`) da skill original, e um corpo curto instruindo a ler o arquivo completo em `.agents/skills/`. É essa pasta que o Claude Code varre automaticamente para decidir quando disparar uma skill sozinho, sem precisar que o conteúdo seja colado no chat.
+- **Regra de manutenção (Lei 12 do `AGENTS.md`):** toda skill criada, alterada ou removida em `.agents/skills/` precisa: (1) manter este manual atualizado, e (2) ter seu stub em `.claude/skills/` criado/atualizado/removido em conjunto, com o frontmatter idêntico ao da fonte.
+
 ---
 
 ## 2. Skill 1: `migrate-crud`

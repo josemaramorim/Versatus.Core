@@ -113,9 +113,10 @@ Todo formulário migrado deve ser classificado em um dos dois padrões antes de 
 - Os repositórios herdados de `AcessoGlobalRepositorioBase<TEntity>` utilizam automaticamente `ReadContext` / `ReadDbSet` para leitura e `Context` / `DbSet` para escrita.
 - Configuração de conexão via variáveis `WriteConnection` e `ReadConnection` no `appsettings.json` / ICP.
 
-## 12. Manutenção do Manual de Skills (`docs/MANUAL-SKILLS.md`)
+## 12. Manutenção do Manual de Skills (`docs/MANUAL-SKILLS.md`) e do Stub de Descoberta (`.claude/skills/`)
 - **Obrigatorio:** Toda criação, alteração ou exclusão de qualquer skill no diretório `.agents/skills/` DEVE obrigatoriamente ser refletida e atualizada no manual `docs/MANUAL-SKILLS.md`.
 - O manual deve manter seu Índice Geral atualizado, explicando o propósito da skill, quando utilizá-la e fornecendo um exemplo de uso prático.
+- **Obrigatorio:** `.agents/skills/<nome>/SKILL.md` é a fonte única do conteúdo de cada skill. Toda criação, alteração de frontmatter (`name`/`description`) ou exclusão de skill DEVE ser espelhada em `.claude/skills/<nome>/SKILL.md` — um stub curto com o mesmo frontmatter, cujo corpo apenas instrui a ler o arquivo completo em `.agents/skills/`. Essa pasta é o que permite ao Claude Code descobrir e disparar a skill automaticamente; nunca duplicar o conteúdo integral nela.
 
 ## 13. Cobertura Obrigatória de Testes Unitários (Dupla Trava: Backend + Frontend)
 - **Obrigatorio Backend C#:** Nenhum serviço backend C# (`Domain/Services/[Nome]Service.cs`) pode ser entregue sem sua respectiva classe de testes unitários em `tests/[Modulo].Tests/[Nome]ServiceTests.cs` cobrindo 100% dos itens da **Matriz RTV**.
