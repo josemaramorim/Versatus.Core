@@ -10,6 +10,7 @@ using Versatus.AcessoGlobal.Domain.Services;
 using Versatus.AcessoGlobal.Infrastructure;
 using Versatus.Framework.Context;
 using Versatus.Framework.Sequences;
+using Versatus.SharedKernel.Enums;
 using Xunit;
 
 namespace Versatus.AcessoGlobal.Tests;

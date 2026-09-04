@@ -138,7 +138,7 @@ export interface IEntidadeForm {
   razaoSocial: string;
   apelido: string;
   tipoEspecificoEntidade: string;
-  tipoPessoa: number; // 1 = Fisica, 2 = Juridica
+  tipoPessoa: number; // 2 = Fisica, 3 = Juridica (igual ao legado GloTipoEnumerado idPai=1)
   isCliente: boolean;
   isFornecedor: boolean;
   isFuncionario: boolean;

@@ -1,9 +1,19 @@
 namespace Versatus.AcessoGlobal.Domain.Entities;
 
+// DEC-007: FormaPagtoTipo, CondicaoPagtoTipo, ParcelamentoArredondamento, Disponibilidade,
+// VencimentoTipo e ParcelamentoTipo foram movidos para Versatus.SharedKernel.Enums (também
+// usados pelo MOD-05 GestaoFinanceira). Os enums abaixo continuam aqui por serem exclusivos
+// do Acesso Global.
+
+/// <summary>
+/// Origem: Projeto.Geral.Enumerado.EntidadeFisicaJuridica (legado, [TipoEnumerado(1)]) —
+/// persistido em GLOENTIDADE.IDFISICAJURIDICA. Corrigido em DEC-007: valores eram 1/2
+/// (divergentes do legado, que grava 2/3) — renumerado para bater com o legado.
+/// </summary>
 public enum EntidadeTipoPessoa
 {
-    Fisica = 1,
-    Juridica = 2
+    Fisica = 2,
+    Juridica = 3
 }
 
 public enum IndicadorContribuinteICMS
@@ -80,24 +90,6 @@ public enum TipoTransportador
     Nenhum = 1655
 }
 
-public enum FormaPagtoTipo
-{
-    Dinheiro = 122,
-    ChequeEmpresa = 123,
-    ChequeCliente = 124,
-    CartaoCredito = 125,
-    CartaoDebito = 126,
-    ParcelamentoProprio = 127,
-    ParcelamentoFinanceira = 128,
-    Credito = 236,
-    CreditoPortador = 237,
-    Deposito = 256,
-    Outros = 293,
-    Abatimento = 483,
-    PixEstatico = 1962,
-    PixDinamico = 1963
-}
-
 public enum ParametroValorTipo
 {
     Int = 153,
@@ -118,40 +110,6 @@ public enum ParametroTipo
     Perfil = 161,
     Grupo = 350,
     Empresa = 351
-}
-
-public enum CondicaoPagtoTipo
-{
-    Parcelada = 36,
-    FaixaDias = 37,
-    Semanal = 38
-}
-
-public enum ParcelamentoArredondamento
-{
-    Primeira = 46,
-    Ultima = 47
-}
-
-public enum Disponibilidade
-{
-    Pagamento = 56,
-    Recebimento = 57,
-    Ambas = 101
-}
-
-public enum VencimentoTipo
-{
-    Normal = 59,
-    AntecipaDiaUtil = 60,
-    ProrrogaDiaUtil = 61
-}
-
-public enum ParcelamentoTipo
-{
-    DiaFixo = 119,
-    DiasEntreParcela = 120,
-    DiasUteis = 693
 }
 
 public enum DiaSemana

@@ -1,4 +1,5 @@
 using Versatus.AcessoGlobal.Domain.Entities;
+using Versatus.SharedKernel.Enums;
 
 namespace Versatus.AcessoGlobal.Domain.Finance;
 

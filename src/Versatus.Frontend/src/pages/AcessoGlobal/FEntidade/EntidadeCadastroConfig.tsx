@@ -52,9 +52,8 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
     if (!backend) return defaultValues;
 
     const rawId = backend.idEntidade ?? backend.id ?? backend.codigo;
-    const rawTipoPessoa = backend.tipoPessoa;
-    // No backend C#: 1 = Fisica, 2 = Juridica. No frontend Zod: 2 = Fisica, 3 = Juridica.
-    const mappedTipoPessoa = rawTipoPessoa === 1 ? 2 : rawTipoPessoa === 2 ? 3 : (rawTipoPessoa || 2);
+    // Backend C# (DEC-007) e frontend Zod usam a mesma convenção do legado: 2 = Fisica, 3 = Juridica.
+    const mappedTipoPessoa = backend.tipoPessoa || 2;
 
     return {
       ...defaultValues,
@@ -112,8 +111,8 @@ export class EntidadeCadastroConfig extends BaseCadastroConfig<IEntidadeForm> {
   /** Transforma o formulário plano no DTO esperado pela API */
   override mapFormToBackend(form: IEntidadeForm): any {
     const rawId = Number(form.codigo || 0);
-    // Converte tipoPessoa do frontend (2=Fisica, 3=Juridica) para backend C# (1=Fisica, 2=Juridica)
-    const backendTipoPessoa = form.tipoPessoa === 2 ? 1 : form.tipoPessoa === 3 ? 2 : Number(form.tipoPessoa);
+    // Backend C# (DEC-007) usa a mesma convenção do frontend Zod: 2 = Fisica, 3 = Juridica.
+    const backendTipoPessoa = Number(form.tipoPessoa);
 
     return {
       idEntidade: rawId,

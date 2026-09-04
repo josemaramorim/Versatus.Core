@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Versatus.Framework\Versatus.Framework.csproj" />
+    <ProjectReference Include="..\Versatus.SharedKernel\Versatus.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

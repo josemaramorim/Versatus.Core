@@ -480,7 +480,7 @@ public class EntidadeService : IEntidadeService
         using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
-            var tipoEnum = dto.TipoPessoa == 2 ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
+            var tipoEnum = dto.TipoPessoa == (int)EntidadeTipoPessoa.Juridica ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
             var entidade = new Entidade
             {
                 Nome = (tipoEnum == EntidadeTipoPessoa.Juridica && !string.IsNullOrWhiteSpace(dto.Apelido)) 
@@ -582,7 +582,7 @@ public class EntidadeService : IEntidadeService
                 return Result<Entidade>.Fail(new ValidationError("IdEntidade", $"Entidade com ID {id} não encontrada para atualização."));
             }
 
-            var tipoEnum = dto.TipoPessoa == 2 ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
+            var tipoEnum = dto.TipoPessoa == (int)EntidadeTipoPessoa.Juridica ? EntidadeTipoPessoa.Juridica : EntidadeTipoPessoa.Fisica;
 
             entidade.Nome = (tipoEnum == EntidadeTipoPessoa.Juridica && !string.IsNullOrWhiteSpace(dto.Apelido)) 
                 ? dto.Apelido 
