@@ -1,7 +1,7 @@
 # Constituição de Engenharia — Versatus.Net8
 
 > **Versão:** 1.0 | **Criada:** 2026-09-03 | **Ratifica:** `.agents/AGENTS.md`,
-> `specs/03-REGRAS-ANTI-ALUCINACAO.md`, `specs/decisoes/DEC-001..DEC-006`
+> `specs/03-REGRAS-ANTI-ALUCINACAO.md`, `specs/decisoes/DEC-001..DEC-007`
 >
 > Este documento é a **fonte única de verificação** ("constitution gate") do fluxo SDD.
 > Ele **não cria regra nova** — consolida as regras já ratificadas em um checklist
@@ -242,4 +242,4 @@ Marque cada item **PASS/FAIL** contra o artefato. Qualquer `FAIL` reprova.
 ---
 
 *Ratificada com base no estado do repositório em 2026-09-03. Corrigir esta versão sempre
-que AGENTS.md, 03-REGRAS-ANTI-ALUCINACAO.md ou DEC-001..006 mudarem.*
+que AGENTS.md, 03-REGRAS-ANTI-ALUCINACAO.md ou DEC-001..007 mudarem.*

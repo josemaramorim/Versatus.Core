@@ -65,7 +65,10 @@ specs/
     ├── DEC-001-ORM.md                  ← Substituição do Gentle.NET
     ├── DEC-002-REMOTING.md             ← Substituição do .NET Remoting
     ├── DEC-003-TRANSACAO.md            ← Padrão de transações no novo sistema
-    └── DEC-004-ORDEM-MIGRACAO.md       ← Ordem de prioridade dos módulos
+    ├── DEC-004-ORDEM-MIGRACAO.md       ← Ordem de prioridade dos módulos
+    ├── DEC-005-COLECOES-E-BOAS-PRATICAS.md ← Coleções nativas .NET, sem ListBase
+    ├── DEC-006-INTEGRACAO-SEGURA.md    ← API Key + bypass localhost (legado ↔ API nova)
+    └── DEC-007-SHAREDKERNEL-ESCOPO.md  ← Versatus.SharedKernel vira kernel do ERP
 ```
 
 ---

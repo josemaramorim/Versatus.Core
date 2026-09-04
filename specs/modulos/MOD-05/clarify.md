@@ -19,6 +19,13 @@
 | **CLR-12** | spec §9 DÚVIDA-11 | `AdtoAcerto` é operação transacional ou CRUD? | — | **Operação** (2026-09-03) | §2.10 / §6 E10: `AdtoAcerto` tratado como **operação transacional** (Handler + Matriz ROT + golden tests), não CRUD, apesar de `FAcertoAdiantamento : FBaseCadastro` no legado. `Adiantamento` (o cadastro em si) permanece CRUD. |
 | **CLR-13** | spec §9 DÚVIDA-12 | Nomenclatura das pastas `Domain/` de `Versatus.GestaoFinanceira`. | proposta da spec | **Proposta aceita** (2026-09-03) | `Bases/`, `Dominio/`, `Bancos/`, `Documentos/`, `Movimentos/`, `Liquidacao/`, `Reversao/`, `Cheques/`, `Adiantamentos/`, `DRE/`, `Cobranca/`, `TransacaoFilial/`, `Consultas/`. Ajuste fino permitido no `/plan §1`. |
 
+> **Atualização pós-`/tasks` (2026-09-04):** durante `E0-T01` foi constatado que 6 enums que
+> o MOD-05 precisa já existiam em `Versatus.AcessoGlobal` (MOD-02). O escopo "mínimo" da
+> CLR-02 acima **não é revogado**, mas **[DEC-007](../../decisoes/DEC-007-SHAREDKERNEL-ESCOPO.md)**
+> amplia o critério: `Versatus.SharedKernel` passa a ser o kernel do **ERP inteiro**, não só
+> do MOD-05 — um enum usado por 2+ módulos mora lá, não é duplicado por módulo. Ver DEC-007
+> para o racional e o impacto no MOD-02.
+
 ## Pendências remanescentes (bloqueantes: nenhuma)
 
 Nenhuma pendência bloqueante para o `/plan`. Itens que continuarão sendo detalhados **dentro
