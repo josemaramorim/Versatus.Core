@@ -1,0 +1,77 @@
+namespace Versatus.SharedKernel.Enums;
+
+/// <summary>
+/// Origem lógica de um lançamento financeiro/movimento — o enum mais transversal do módulo
+/// (usado por 43 classes do legado). Liga o financeiro a outros módulos (venda, compra,
+/// estoque, produção, contrato...) por int lógico, sem ProjectReference cross-módulo
+/// (Artigo VIII).
+/// Origem: Projeto.Geral.Enumerado.ProcessoOrigem (legado, [TipoEnumerado(129)]) —
+/// persistido em FINMOVIMENTO.IDPROCESSOORIGEM, FINDOCUMENTO.IDPROCESSOORIGEM (anulável),
+/// FINDOCTOMOVTO, FINCHEQUERECEBIDOMOVTO, FINPROJECAOFLUXOCAIXALACTO.
+/// Nota: "ProjecaoFluxoCaixa = 723" está comentado no código legado — não portado.
+/// </summary>
+public enum ProcessoOrigem
+{
+    Venda = 130,
+    Compra = 131,
+    Liquidacao = 132,
+    Documento = 133,
+    ChequeRecebido = 134,
+    MovimentoChequeRecebido = 135,
+    CaixaBanco = 196,
+    DominioPeriodoLancto = 292,
+    Estorno = 296,
+    EntidadeMovimento = 295,
+    Reversao = 294,
+    MovimentoEstoque = 335,
+    LancamentoComissao = 420,
+    FechamentoComissao = 421,
+    MovimentoRateio = 440,
+    CancelamentoVendaCompra = 469,
+    Faturamento = 476,
+    ImplantacaoEstoque = 478,
+    DevolucaoVendaCompra = 479,
+    EstornoDevolucao = 489,
+    MovimentoChequeEmitido = 500,
+    AtendimentoRequisicao = 581,
+    DevolucaoRequisicao = 582,
+    FechamentoFolha = 583,
+    MovimentoConsignacao = 627,
+    CancelamentoDocumentoFinanceiro = 644,
+    OrdemServico = 662,
+    Adiantamento = 691,
+    AcertoAdiantamento = 692,
+    OrdemExpedicao = 694,
+    MovimentoVeiculo = 695,
+    Abastecimento = 696,
+    DistribuicaoAcerto = 700,
+    FechamentoOsFrota = 716,
+    CancelamentoOsFrota = 717,
+    RomaneioArmazem = 718,
+    AtendimentoRequisicaoObra = 720,
+    AtendimentoDevolucaoObra = 721,
+    DespesaVeiculoFrota = 878,
+    MovimentoEstoqueFiscal = 882,
+    DespesaVeiculoGaragem = 1438,
+    CancelamentoMovtoFinanceiroFrota = 905,
+    CancelamentoMovtoFinanceiroGaragem = 906,
+    ClienteFilial = 1106,
+    LiquidacaoContraPartida = 1195,
+    TransacaoFilial = 1237,
+    TicketPesagem = 1297,
+    Contrato = 1382,
+    Matricula = 1406,
+    CancelamentoContrato = 1422,
+    Transporte = 1491,
+    MovimentoProducao = 1519,
+    MovimentoItemProducao = 1520,
+    CancelamentoMovimentoProducao = 1521,
+    CancelamentoMovimentoItemProducao = 1522,
+    MDFeDocumento = 1576,
+    CancelamentoTransporte = 1776,
+    MovimentoContrato = 1812,
+    NotaFiscalServico = 1850,
+    AjusteMovimentoContratoQuantidade = 1854,
+    AjusteMovimentoContratoFinanceiro = 1855,
+    ICMSSubstituicaoEstoque = 1906
+}
