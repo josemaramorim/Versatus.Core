@@ -487,9 +487,10 @@ public class ParametroService : IParametroService
         
         foreach (var assembly in assemblies)
         {
-            enumType = assembly.GetType($"Versatus.AcessoGlobal.Domain.Entities.{enumNome}") 
+            enumType = assembly.GetType($"Versatus.AcessoGlobal.Domain.Entities.{enumNome}")
                        ?? assembly.GetType($"Versatus.AcessoGlobal.Domain.Configuration.{enumNome}")
-                       ?? assembly.GetType($"Versatus.GestaoTributo.Domain.Rules.{enumNome}");
+                       ?? assembly.GetType($"Versatus.GestaoTributo.Domain.Rules.{enumNome}")
+                       ?? assembly.GetType($"Versatus.SharedKernel.Enums.{enumNome}");
             
             if (enumType != null && enumType.IsEnum)
                 break;

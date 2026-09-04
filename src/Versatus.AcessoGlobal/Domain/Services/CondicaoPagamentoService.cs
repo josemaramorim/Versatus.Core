@@ -12,6 +12,7 @@ using Versatus.Framework.Context;
 using Versatus.Framework.Pagination;
 using Versatus.Framework.Sequences;
 using Versatus.Framework.Validation;
+using Versatus.SharedKernel.Enums;
 
 namespace Versatus.AcessoGlobal.Domain.Services;
 

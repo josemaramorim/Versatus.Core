@@ -5,6 +5,7 @@ using Versatus.AcessoGlobal.Domain.Security;
 using Versatus.AcessoGlobal.Domain.Finance;
 using Versatus.AcessoGlobal.Domain.Configuration;
 using Versatus.AcessoGlobal.Infrastructure;
+using Versatus.SharedKernel.Enums;
 using Xunit;
 using FluentAssertions;
 

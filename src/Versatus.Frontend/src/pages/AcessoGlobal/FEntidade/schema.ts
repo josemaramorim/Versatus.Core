@@ -205,7 +205,7 @@ export const entidadeSchema = z.object({
   razaoSocial: z.string().min(3, 'Nome / Razão Social deve ter no mínimo 3 caracteres'),
   apelido: z.string().optional().default(''),
   tipoEspecificoEntidade: z.string(),
-  tipoPessoa: z.number(), // 1 = Fisica, 2 = Juridica
+  tipoPessoa: z.number(), // 2 = Fisica, 3 = Juridica (igual ao legado GloTipoEnumerado idPai=1)
   isCliente: z.boolean(),
   isFornecedor: z.boolean(),
   isFuncionario: z.boolean(),

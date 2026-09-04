@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Versatus.AcessoGlobal.Domain.Entities;
+using Versatus.SharedKernel.Enums;
 
 namespace Versatus.AcessoGlobal.Domain.DTOs;
 

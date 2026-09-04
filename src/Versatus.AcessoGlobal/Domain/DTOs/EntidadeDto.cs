@@ -18,7 +18,7 @@ public record SalvarEntidadeDto
     public string? InscricaoMunicipal { get; init; }
     public string? InscricaoSuframa { get; init; }
     public bool Ativo { get; init; } = true;
-    public int TipoPessoa { get; init; } = 1; // 1 = Fisica, 2 = Juridica
+    public int TipoPessoa { get; init; } = 2; // 2 = Fisica, 3 = Juridica (DEC-007 — igual ao legado)
     public string? Cpf { get; init; }
     public string? Cnpj { get; init; }
     public string? Rg { get; init; }
