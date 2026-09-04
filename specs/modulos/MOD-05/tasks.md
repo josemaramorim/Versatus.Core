@@ -59,14 +59,14 @@
 ## Épico E0 — `Versatus.SharedKernel` (escopo mínimo — CLR-02)
 
 ### E0-T01 · Inventário de enums financeiros · tipo: analysis
-- **Objetivo:** listar todos os enums de `Projeto.Geral.Enumerado`/`.EnumeradoObjeto` usados pelo MOD-05 com **valores inteiros** e `[TipoEnumerado(idPai)]`; classificar as colunas `ID*` do `data-model.md` como enum vs. FK.
-- **Refs legados:** `projeto_tag_1906/Geral/{tipoenumerado.cs, TipoEnumeradoObjeto.cs, EnumDescriptor.cs}`, `Projeto.Geral.Enumerado*`; `research.md §2`.
-- **Cria:** `specs/modulos/MOD-05/enums.md`.
+- **Objetivo:** listar todos os enums de `Projeto.Geral.Enumerado`/`.EnumeradoObjeto` usados pelo MOD-05. Para cada um: nome, membros com **valor inteiro**, e **classificação de persistência** (`research.md §2`) — `persistido` (`[TipoEnumerado(idPai)]`, valor gravado em coluna `ID*` — anotar `idPai` e a(s) coluna(s)), `não-persistido` (`EnumeradoObjeto`, sem atributo, comportamento/UI/retorno — anotar se é `[Flags]`), ou `misto`. Classificar as colunas `ID*` do `data-model.md` como enum-persistido vs. FK vs. não-enum.
+- **Refs legados:** `projeto_tag_1906/Geral/{tipoenumerado.cs (persistidos), TipoEnumeradoObjeto.cs (não-persistidos), EnumDescriptor.cs}`, `Projeto.Geral.Enumerado*`; `research.md §2`.
+- **Cria:** `specs/modulos/MOD-05/enums.md` — tabela com colunas: Enum · Origem legada · Membros (`nome=valor`) · Persistência (`persistido`/`não-persistido`/`misto`) · `idPai` · Coluna(s) `ID*` alvo · `[Flags]`? · Observação.
 - **Cobre:** RN-05 (enums de situação/tipo), suporte a `data-model.md`.
 - **Branch:** `feat/mod-05-e0-analise-enums` · **Commit:** `docs(mod-05): inventário de enums (E0-T01)` · **Depende de:** S-T01
 
 ### E0-T02 · Enums no SharedKernel · tipo: domain
-- **Objetivo:** criar os enums de `enums.md` em `Versatus.SharedKernel/Enums/`, valores inteiros preservados, comentário de origem.
+- **Objetivo:** criar os enums de `enums.md` em `Versatus.SharedKernel/Enums/`, valores inteiros preservados, `[Flags]` mantido onde havia, comentário de origem (`Enumerado`/`EnumeradoObjeto` + `idPai` quando persistido). O `HasConversion<int>()` dos enums persistidos é feito no mapping da entidade que usa a coluna, no épico dono — **não** aqui.
 - **Cria:** `src/Versatus.SharedKernel/Enums/*.cs`.
 - **Cobre:** E0-T01.
 - **Constituição:** Artigo V.5, Artigo II.6.
@@ -80,7 +80,7 @@
 - **Branch:** `feat/mod-05-e0-abstracoes` · **Commit:** `feat(mod-05): interfaces transversais e container de rateio (E0-T03)` · **Depende de:** E0-T02
 
 ### E0-T04 · Testes do SharedKernel + `AddSharedKernel()` · tipo: service
-- **Objetivo:** testes de valor de enum (paridade com o legado) e registro DI `AddSharedKernel()`.
+- **Objetivo:** testes de valor de enum (paridade 1:1 com o legado, com ênfase nos **persistidos** — divergência corrompe dado histórico gravado) e registro DI `AddSharedKernel()`.
 - **Cria:** `tests/.../SharedKernel/EnumValoresTests.cs`, `src/Versatus.SharedKernel/DependencyInjection/ServiceCollectionExtensions.cs`.
 - **Cobre:** E0-T02.
 - **Pronto quando:** `dotnet test` verde.

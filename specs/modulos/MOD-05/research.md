@@ -32,15 +32,28 @@
 
 ---
 
-## 2. Enums — inventário e valores inteiros
+## 2. Enums — inventário, valores inteiros e persistência
 
-- **Mecanismo legado:** enum decorado com `[TipoEnumerado(idPai)]`; labels vêm de
-  `GloTipoEnumerado` em runtime (ver `docs/analise_integracao_enumerados.md`).
+- **Duas famílias no legado — classificar cada enum:**
+  - **Persistido** — `Projeto.Geral.Enumerado`, decorado com `[TipoEnumerado(idPai)]`. O
+    **valor inteiro é gravado** numa coluna `ID*` do banco (ex.: `IDSITUACAO`,
+    `IDRECEBERPAGAR`, `IDPROCESSOORIGEM`). Valores **imutáveis** — dado histórico depende
+    deles. Label dinâmico via `GloTipoEnumerado` em runtime
+    (ver `docs/analise_integracao_enumerados.md`).
+  - **Não-persistido** — `Projeto.Geral.EnumeradoObjeto`, **sem** `[TipoEnumerado]`.
+    Comportamento / UI / código de retorno (ex.: `MascaraPredefinida`, `MensagemTipo`,
+    `AcessoTipo` `[Flags]`). **Nunca** vira coluna; pode não ter valor explícito; label
+    estático.
+  - **Misto** — está em `EnumeradoObjeto` mas tem valores explícitos que aparecem em
+    dados/config (ex.: `SequencialTipo` = 230/231/232). Sinalizar caso a caso.
 - **Decisão:** os enums do MOD-05 entram em `Versatus.SharedKernel` com os **valores
-  inteiros preservados** do `Projeto.Geral.Enumerado` / `.EnumeradoObjeto`. Labels seguem a
-  estratégia dinâmica já definida no doc de enumerados (não hardcode no React).
+  inteiros preservados**. No mapeamento das entidades, **só os persistidos** ganham
+  `HasConversion<int>()` na coluna `ID*` correspondente (feito no épico dono da entidade);
+  os não-persistidos ficam apenas no código. Labels seguem a estratégia dinâmica do doc de
+  enumerados (não hardcode no React).
 - **Extração fina por épico** (na tarefa `analysis`), a partir de:
-  - `projeto_tag_1906/Geral/tipoenumerado.cs`, `TipoEnumeradoObjeto.cs`, `EnumDescriptor.cs`
+  - `projeto_tag_1906/Geral/tipoenumerado.cs` (persistidos), `TipoEnumeradoObjeto.cs`
+    (não-persistidos), `EnumDescriptor.cs`
   - os arquivos de enum em `Projeto.Geral.Enumerado*`
   - colunas `ID<Algo>` do `data-model.md` que são enum (não FK): `IDSITUACAO`
     (`SituacaoDocumento`/`SituacaoParcela`), `IDRECEBERPAGAR` (`PagarReceberTipo`),
