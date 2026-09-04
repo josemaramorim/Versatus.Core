@@ -9,6 +9,9 @@ using Versatus.Framework.Context;
 using Versatus.Framework.Sequences;
 using Versatus.GestaoTributo.DependencyInjection;
 using Versatus.GestaoTributo.Infrastructure;
+using Versatus.SharedKernel.DependencyInjection;
+using Versatus.GestaoFinanceira.DependencyInjection;
+using Versatus.GestaoFinanceira.Infrastructure;
 using Versatus.WebAPI.Context;
 using Versatus.WebAPI.Services;
 using Versatus.WebAPI.Middleware;
@@ -31,6 +34,9 @@ builder.Services.AddDbContext<AcessoGlobalDbContext>(options =>
 builder.Services.AddDbContext<TributoDbContext>(options =>
     options.UseSqlServer(writeConnectionString));
 
+builder.Services.AddDbContext<GestaoFinanceiraDbContext>(options =>
+    options.UseSqlServer(writeConnectionString));
+
 // DbContexts para LEITURA (Read Replica DB desativado de tracking para alta performance)
 builder.Services.AddDbContext<AcessoGlobalReadDbContext>(options =>
     options.UseSqlServer(readConnectionString)
@@ -40,9 +46,15 @@ builder.Services.AddDbContext<TributoReadDbContext>(options =>
     options.UseSqlServer(readConnectionString)
            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
+builder.Services.AddDbContext<GestaoFinanceiraReadDbContext>(options =>
+    options.UseSqlServer(readConnectionString)
+           .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
 // Registrar dependências de negócio
 builder.Services.AddAcessoGlobal();
 builder.Services.AddGestaoTributo();
+builder.Services.AddSharedKernel();
+builder.Services.AddGestaoFinanceira();
 
 // Suporte a HttpContext e Contexto de Execução com Claims
 builder.Services.AddHttpContextAccessor();
@@ -93,7 +105,8 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     })
     .AddApplicationPart(typeof(Versatus.AcessoGlobal.Api.Controllers.AuthController).Assembly)
-    .AddApplicationPart(typeof(Versatus.GestaoTributo.Api.Controllers.TributacaoController).Assembly);
+    .AddApplicationPart(typeof(Versatus.GestaoTributo.Api.Controllers.TributacaoController).Assembly)
+    .AddApplicationPart(typeof(Versatus.GestaoFinanceira.DependencyInjection.ServiceCollectionExtensions).Assembly);
 
 // Swagger e OpenAPI com suporte a Segurança (JWT Bearer)
 builder.Services.AddEndpointsApiExplorer();

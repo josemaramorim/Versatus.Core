@@ -15,6 +15,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Versatus.AcessoGlobal\Versatus.AcessoGlobal.csproj" />
     <ProjectReference Include="..\Versatus.GestaoTributo\Versatus.GestaoTributo.csproj" />
+    <ProjectReference Include="..\Versatus.SharedKernel\Versatus.SharedKernel.csproj" />
+    <ProjectReference Include="..\Versatus.GestaoFinanceira\Versatus.GestaoFinanceira.csproj" />
     <ProjectReference Include="..\Versatus.Infra.Data\Versatus.Infra.Data.csproj" />
   </ItemGroup>
 
