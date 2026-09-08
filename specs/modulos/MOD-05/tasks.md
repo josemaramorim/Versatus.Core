@@ -72,10 +72,10 @@
 - **Constituição:** Artigo V.5, Artigo II.6.
 - **Branch:** `feat/mod-05-e0-enums` · **Commit:** `feat(mod-05): enums financeiros no SharedKernel (E0-T02)` · **Depende de:** E0-T01
 
-### E0-T03 · Interfaces transversais + container de rateio · tipo: domain
-- **Objetivo:** `IMovimentoPeriodo`, `IDadosPeriodoFormaPagto`, `IDadosRateioFinanceiro`, `IDadosComissao` (CLR-05) e o container de acumulação de rateio (`RateioContainer`) em `Versatus.SharedKernel`.
-- **Refs legados:** `Interface.GestaoFinanceira`, `Projeto.Geral` `RateioMovto`/`ValidationRateioContainer`.
-- **Cria:** `src/Versatus.SharedKernel/Abstractions/*.cs`, `.../Rateio/RateioContainer.cs`.
+### E0-T03 · Interface transversal + container de rateio · tipo: domain
+- **Objetivo (escopo corrigido — CLR-05):** só `IDadosComissao` vai para `Versatus.SharedKernel` (para o futuro Faturamento consumir cálculo de comissão sem depender do MOD-05) + o container de acumulação de rateio (`RateioContainer`) e o agregador de validação (`ValidationRateioContainer`). **`IMovimentoPeriodo`, `IDadosPeriodoFormaPagto`, `IDadosRateioFinanceiro` NÃO entram aqui** — CLR-05 as coloca em `Versatus.GestaoFinanceira.Domain`; são criadas no épico dono (E2 período / E3 forma de pagto / E5 rateio), junto das entidades que as implementam. (O texto do CLR-02 que as listava no SharedKernel estava impreciso — ver nota pós-`/tasks` no `clarify.md`.)
+- **Refs legados:** `Projeto.Servidor.Interface.AcessoGlobal.IDadosComissao`; `Projeto.Geral.ValidationRateioContainer`; região "Métodos para acumular rateio" de `Projeto.Servidor.ObjetosNegocio.AcessoGlobal.RateioMovto` (só o acumulador — o **motor** de rateio é do MOD-02, CLR-01).
+- **Cria:** `src/Versatus.SharedKernel/Abstractions/IDadosComissao.cs`, `.../Rateio/RateioContainer.cs`, `.../Rateio/ValidationRateioContainer.cs`.
 - **Cobre:** RN-05-004, RN-05-002.
 - **Branch:** `feat/mod-05-e0-abstracoes` · **Commit:** `feat(mod-05): interfaces transversais e container de rateio (E0-T03)` · **Depende de:** E0-T02
 
