@@ -121,7 +121,7 @@ de cada épico gera suas matrizes.
 
 | Épico | Data | Órfãs V3 | V4 OK? | V5 OK? | Veredito | Achados |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| E1 | — | — | — | — | ⏳ pendente | — |
+| E1 | 2026-09-08 | 0 (após correção) | ✅ | ✅ (bases abstratas — coluna por E3/E4) | ✅ **APROVADO** | 3 MÉDIO de completude de matriz, **corrigidos na rodada** (ver E1 abaixo) |
 | E3 | — | — | — | — | ⏳ pendente | — |
 | E2 | — | — | — | — | ⏳ pendente | — |
 | E4 | — | — | — | — | ⏳ pendente | — |
@@ -135,6 +135,45 @@ de cada épico gera suas matrizes.
 | E12 | — | — | — | — | ⏳ pendente | — |
 | E13 | — | — | — | — | ⏳ pendente | — |
 | E14 | — | — | — | — | ⏳ pendente | — |
+
+---
+
+## Rodada incremental E1 — `/analyze MOD-05 --epico E1` (2026-09-08)
+
+**Escopo:** `matriz-rtv.md#E1` (31 `VAL-E1`), `matriz-rot.md#E1` (13 `OP-E1` + 10 `CALC-E1`),
+`analysis/E1-bases.md`. Classes: `DocumentoFinanceiroBase`, `OperacaoDocumentoBase`,
+`ItemFinanceiroBase`, `ParcelaGeral`, `ParcelaBase`, `FormaMovInfo`, `FechamentoCaixaBase`
++ herança até `servidor.framework/ObjetoNegocio.cs`.
+
+| Verif. | Resultado | Nota |
+| :--- | :--- | :--- |
+| **V1** Constituição (escopo E1) | ✅ PASS | `E1-bases.md` fixa: POCO só de dados (Art. III), Fluent API, `decimal` p/ dinheiro, `bool` simples, auditoria anulável, `IReadOnlyList<T>`, sem herança de framework (spec §3.3), comportamento em serviço (CLR-04), 1 transação/handler (Art. VII), cross-módulo por `int` (Art. VIII). Nenhum `.csproj`/código ainda — gate real de código nas tarefas E1-T02/T03. |
+| **V3** legado → matrizes | ✅ PASS (após correção) | Varredura de `Validar*`/`throw`/`Executar*`/`Persistir*`/`Calcular*`/`Aplicar*`/`Atualizar*`/`Recalcular*`/`OnBefore*`/`OnAfter*` nos 7 arquivos + pai: **todas as ocorrências relevantes têm linha**. 3 lacunas de completude encontradas e corrigidas nesta rodada (ver abaixo). `throw new NotImplementedException()` em `OperacaoDocumentoBase.GetIdOrigemRateio` = stub legado, não é regra (N/A). |
+| **V4** matrizes → tasks | ✅ PASS | `E1-T04` (`tipo: parity`) cobre "todas as `VAL-xx#E1`, `CALC-xx#E1`"; `E1-T03` cobre "`OP-xx` de base"; `E1-T02` cobre as `VAL` de forma/atributo. Toda `CALC-E1` está em tarefa `parity` (E1-T04). |
+| **V5** cobertura de propriedades | ✅ PASS (no escopo E1) | Bases são **abstratas, sem tabela própria** — o mapa coluna↔propriedade das entidades concretas é das tarefas `E3-T01`/`E4-T01`/`E4-T02` (`data-model.md §223`). `E1-bases.md §2` lista todos os campos compartilhados por classe; nenhum descarte silencioso — colunas de boleto/remessa marcadas `[E14]` (Regra 4, justificado). |
+
+### Achados (3 · todos MÉDIO · corrigidos nesta rodada)
+
+| # | Sev. | Verif. | Descrição | Ação (aplicada) |
+| :--- | :--- | :--- | :--- | :--- |
+| E1-A01 | MÉDIO | V3 | Ganchos `virtual` vazios de `DocumentoFinanceiroBase` (`RecalcularTributoRateio`, `SetParcelasCondicaoPagto`, `CarregarComissionadoPadrao`, `CarregaItemFinanceiroOperacao`) sem linha `OP`. | Adicionada **OP-E1-12** (ganchos de extensão → E4). |
+| E1-A02 | MÉDIO | V3 | `OperacaoDocumentoBase.AplicarOperacao()` / `CarregarDefault` / `CarregarPortadorDefault` / `CarregarOperacoesDefault` sem linha `OP`. | Adicionada **OP-E1-13** (carga de defaults da operação → E6/E8). |
+| E1-A03 | MÉDIO | V3 | `ItemFinanceiroBase.CalcularItem` / `AplicarItemFinanceiro` / `GetValorItemFinanceiroBoleto` (entradas públicas que compõem as fórmulas) sem linha `CALC`. | Adicionada **CALC-E1-10**. |
+
+Nenhum achado **CRÍTICO** ou **ALTO**.
+
+### Dependências cross-épico registradas (não bloqueiam E1)
+
+- **VAL-E1-27** (`ValidarCaixaBanco`) precisa de `CaixaBanco`/`ContaBancaria` — **E3**; teste de E1-T04 mocka a porta.
+- **OP-E1-05** (`AtualizarRateio`) precisa do motor de rateio do **MOD-02** (CLR-01) → integração no **E5**.
+- `Situacao` de `FechamentoCaixaBase` + `PersistirPeriodoFormaPagto` → enum/máquina de estados no **E2**.
+- **VAL-E1-28** (setter linha 609 de `ParcelaBase`) — detalhe do texto a extrair no `E1-T02`.
+
+### Veredito E1
+
+✅ **APROVADO** — `domain`/`service`/`operation` do épico E1 (E1-T02, E1-T03, E1-T04)
+liberados para entrar em `develop`. As correções (OP-E1-12/13, CALC-E1-10) já estão em
+`matriz-rot.md#E1` neste mesmo commit.
 
 ---
 
