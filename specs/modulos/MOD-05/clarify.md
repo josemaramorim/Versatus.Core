@@ -26,6 +26,15 @@
 > do MOD-05 — um enum usado por 2+ módulos mora lá, não é duplicado por módulo. Ver DEC-007
 > para o racional e o impacto no MOD-02.
 
+> **Correção de imprecisão em CLR-02 (2026-09-08):** a coluna "Efeito na spec" do CLR-02
+> lista `IMovimentoPeriodo`/`IDadosPeriodoFormaPagto`/`IDadosRateioFinanceiro` como conteúdo
+> do `Versatus.SharedKernel`, mas isso contradiz a resolução do **CLR-05**, que é a decisão
+> específica sobre onde cada interface fica: **só `IDadosComissao` vai para o SharedKernel**;
+> as outras três vão para `Versatus.GestaoFinanceira.Domain`, criadas no épico dono (E2/E3/E5).
+> Vale o CLR-05. `tasks.md` E0-T03 foi ajustado. O container de rateio (`RateioContainer` +
+> `ValidationRateioContainer`) continua no SharedKernel; o **motor** de rateio é do MOD-02
+> (CLR-01).
+
 ## Pendências remanescentes (bloqueantes: nenhuma)
 
 Nenhuma pendência bloqueante para o `/plan`. Itens que continuarão sendo detalhados **dentro
