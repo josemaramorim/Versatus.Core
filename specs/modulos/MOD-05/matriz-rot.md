@@ -1,0 +1,48 @@
+# Matriz ROT — Rastreabilidade de Operações e Transações · MOD-05 Gestão Financeira
+
+> Gerada pela skill `legacy-operation-audit` dentro do `/implement` (tarefa `analysis` de
+> cada épico). Uma linha `OP-<épico>-<nn>` por operação/transação de negócio legada
+> (persistência orquestrada, máquina de estados, efeitos colaterais, ordem de gravação,
+> rollback). `CALC-<épico>-<nn>` para as fórmulas que precisam de golden test de paridade
+> (`legacy-calc-parity`).
+>
+> `sdd-analyze` V3 exige que toda operação legada tenha linha aqui; V4 exige que toda
+> `OP-xx`/`CALC-xx` apareça em ≥1 tarefa de `tasks.md` (e `CALC-xx` numa tarefa `parity`).
+
+---
+
+## `#E1` — Bases do módulo (E1-T01)
+
+### Operações / persistência orquestrada
+
+| ID | Origem legada | Tipo | Ordem de persistência / efeitos | Rollback | Destino no novo sistema | Cobre |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **OP-E1-01** | `ObjetoNegocio.cs:ObjectPersist.ExecutarPersistir` (herdado por todas as bases) | Persistência-base (1 transação) | `Validate()` → `OnBeforeExecutarPersistir` (em `DocumentoFinanceiroBase`: seta `dataInclusao`/`horaInclusao` se novo) → **gerar sequencial** se novo (`GeradorSequencialService` — RN-05-006) → `OnAfterGeneratedId` → gravar o registro → `OnAfterExecutarPersistir` → `PersistirRateio` (se `IDadosRateio`) → `PersistirCampoEspecifico` → `PersistirPeriodoFormaPagto` (se `IDadosPeriodoFormaPagto`) → registro de sincronização → invalidar cache. | Transação legada única (`TransacaoBase`); erro → rollback total. | `PersistenciaDocumentoBase` / `OperacaoDocumentoBaseHandler` abstratos em `Application/Bases/` — 1 `IDbContextTransaction` por Handler (Artigo VII). Sincronização e cache **fora de escopo**. | RN-05-001, RN-05-004, RN-05-006, RN-05-008 |
+| **OP-E1-02** | `ObjetoNegocio.cs:ExecutarExcluir` | Exclusão-base (1 transação) | `ExcluirRateio` (se `IDadosRateio`) → `ExcluirCampoEspecifico` → registro de sincronização (Exclusão) → remover o registro → invalidar cache. | Transação única; erro → rollback. | `PersistenciaDocumentoBase.ExcluirAsync` abstrato; ordem preservada. | RN-05-001, RN-05-004 |
+| **OP-E1-03** | `ObjetoNegocio.cs:ValidarRateio` + `RateioMovto.Validar` | Validação de rateio (pré-persistência) | Se `IDadosRateio`: soma do rateio por dimensão (classe / centro de custo / projeto) deve igualar o valor rateável — resultado agregado em `ValidationRateioContainer`. | — (falha impede o commit) | `RateioServiceBase.ValidarAsync` → `ValidationRateioContainer` (E0-T03). | RN-05-002, RN-05-004 |
+| **OP-E1-04** | `ObjetoNegocio.cs:ObjectGenerated.ValidarOrigemGerador` | Validação de origem (pré-persistência/exclusão) | Objetos gerados por processo externo (Documento por Faturamento/Compra/Contrato/OS/…) validam a origem (`IdOrigem` + `IdProcessoOrigem`) antes de persistir/excluir. | — | `OperacaoDocumentoBaseHandler` chama `ValidarOrigemGeradorAsync` (virtual); implementação concreta por épico. | RN-05-007 |
+| **OP-E1-05** | `OperacaoDocumentoBase.cs:AtualizarRateio` | Recálculo de rateio (in-memory) | `RateioMovto.Limpar()` → se `usaClasse\|usaCentroCusto\|usaProjeto`: `GeraRateioSelecionado` (rateio por documento selecionado via `FinanceiroUtil.GeraRateioLiquidacao` + rateio de transferência entre filiais quando `IdFilialOrigem != IdFilial`) → `AposGeraRateioSelecionado` → para cada `ItemFinanceiroRateio` acumulado: `AcumuladorAdd(Classe, …)` (+ centro de custo/projeto via `UpdateCentroCustoProjetoItemFinanceiro`) → `AcumuladorAplicar()`. Natureza devedora inverte o sinal. | — (recálculo total; sem persistência) | `RateioServiceBase.AtualizarRateio(RateioContainer)` — usa `RateioContainer` (E0-T03) + porta para o motor de rateio do MOD-02 (CLR-01, consumido em E5). | RN-05-002, RN-05-004 |
+| **OP-E1-06** | `OperacaoDocumentoBase.cs:GerarRateioItemFinanceiro` (virtual) | Gancho (subclasse decide) | Retorna se o rateio deve ser gerado a partir dos itens financeiros da seleção — implementado por `Liquidacao`/`Reversao` (E6/E8). | — | método abstrato em `OperacaoDocumentoBaseHandler`. | RN-05-004 |
+| **OP-E1-07** | `DocumentoFinanceiroBase.cs:AplicarOperacao` | Aplicação de operação ao documento | Seta histórico padrão (`or.HistoricoPadrao.TextoPadrao`), `IdFormaCobranca` (parâmetro `FormaCobrancaGeracaoDoctoMovCartao` se `MovimentoCartao`), `IdTipoDocumento` da operação; `RateioMovto.Limpar()`. | **Rollback local:** em erro zera `IdOperacao`/`Historico`/`IdTipoDocumento` e re-lança. | `PersistenciaDocumentoBase.AplicarOperacaoAsync` — mesma ordem; o "rollback local" vira `Result.Fail` sem mutação parcial. | RN-05-001, RN-05-007 |
+| **OP-E1-08** | `DocumentoFinanceiroBase.cs:AplicarCondicaoPagamento` | Geração de parcelas pela condição | `recalcularValorConvertido = true` → `CalcularValorConvertido()` (CALC-E1-09 — conversão por índice) → se `DataEmissao > MinValue`: `SetParcelasCondicaoPagto(refazer)` (gera/refaz as parcelas conforme a condição de pagamento — `CondicaoPagtoTipo` Parcelada/FaixaDias/Semanal). | — (em memória; commit só no persist) | `GeracaoParcelasService` (`Application/Bases/`) — consome `CondicaoPagamento` do AcessoGlobal por `int`. | RN-05-001, RN-05-008, RN-05-020 |
+| **OP-E1-09** | `DocumentoFinanceiroBase.cs:CalcularValorConvertido` | Conversão de valor por índice | Se `recalcularValorConvertido` e `IdIndiceEconomico != 0`: `IndiceConversor.ConverterIndice(IndiceEconomico, IndiceConversao, Valor, DataEmissao)` → `valorConvertido`; limpa a flag. | erro → propaga. | `ConversorIndiceService` (base) — golden test em CALC-E1-09. | RN-05-008 |
+| **OP-E1-10** | `ParcelaBase.cs:RecalcularParcelas / RecalcularParcelasRestante / CorrigirDiferenca` | Rebalanceamento de parcelas | Ao alterar valor/vencimento de uma parcela: recalcula as demais; a diferença de arredondamento vai para a **1ª ou a última** parcela conforme `cp.IdParcelaArredondamento` (`ParcelamentoArredondamento`). | — (em memória) | `GeracaoParcelasService.Rebalancear` — determinístico; golden em CALC-E1-07/08. | RN-05-001, RN-05-020 |
+| **OP-E1-11** | `FechamentoCaixaBase.cs:CalcularQtdeValorEditado / SetQtdeValor` | Contagem/edição de fechamento de caixa | Acumula quantidade × valor por forma de pagamento no fechamento (contagem de dinheiro por moeda, cheques recebidos); respeita `PermiteDigitarQtde`/`PermiteDigitarValor`/`PermiteEditarColuna`. | — (em memória) | `FechamentoCaixaService` (`Application/Bases/`) — a máquina de estados do período fica no E2. | RN-05-013 |
+
+### Fórmulas — golden tests de paridade (`CALC-xx#E1`, tarefa `E1-T04` / `legacy-calc-parity`)
+
+| ID | Origem legada | Fórmula (transcrever **sem refatorar** — Regra 5) | Cobre |
+| :--- | :--- | :--- | :--- |
+| **CALC-E1-01** | `ItemFinanceiroBase.cs:ExecutarCalculo` | Por `CalculoItemFinanceiro`: `Somar`/`Subtrair` → `Arredondar((valorBase * Valor) / 100, 2)`; `MultiplicarSomar`/`MultiplicarDiminuir` → `valorBase * Abs(Valor)`; `DividirSomar`/`DividirSubtrair` → `valorBase / Abs(Valor)`; `PercentualSomar`/`PercentualSubtrair` → `valorBase * (Abs(Valor) / 100)`; default `0`. | RN-05-020 |
+| **CALC-E1-02** | `ItemFinanceiroBase.cs:CalcularComposto` | Blocos de 30 dias: `while d>30 { vc = ExecutarCalculo(vb); total += vc; vb += vc; d -= 30 }`; resto `d>0`: `total += (ExecutarCalculo(vb) / 30) * d`. | RN-05-020 |
+| **CALC-E1-03** | `ItemFinanceiroBase.cs:CalcularDias` | Por `ItemFinanceiroAplicar`: `AntesVencimento` → `(dataInicial - dataFinal).Days`; `DepoisVencimento` → `(dataFinal - dataInicial).Days`; `NaoAplicar` → `0`. | RN-05-020 |
+| **CALC-E1-04** | `ItemFinanceiroBase.cs:ConsiderarDiasParaCalculo` (2 sobrecargas) | Se `!item.Composto && item.ConsideraDiasCalculo`: `valorCalculo / 30` (sem dias) ou `valorCalculo / 30 * dias`. | RN-05-020 |
+| **CALC-E1-05** | `ItemFinanceiroBase.cs:RetornarIndiceConvertido` | Não converte se cálculo percentual ou `IdIndiceEconomico` nulo/igual ao default; senão `IndiceConversor.ConverterIndice(item.IndiceEconomico, default, valor, dataIndice)`. `DataSemIndiceEconomico` → `valor = 0`. | RN-05-008, RN-05-020 |
+| **CALC-E1-06** | `ItemFinanceiroBase.cs:DefinirValor` | `if item.Desconto: valorCalculo = -valorCalculo` → `if item.Composto && dias>0: CalcularComposto` → `ConsiderarDiasParaCalculo(…, dias)` → `RetornarIndiceConvertido`. | RN-05-020 |
+| **CALC-E1-07** | `ParcelaBase.cs:CalcularValorMinimo` | `valorParcela = valorParcelamento * PercentualDivisao / 100`; retorno `Arredondar(valorParcela * PercentualValorMinimo / 100, 2)`. | RN-05-020 |
+| **CALC-E1-08** | `ParcelaBase.cs:CalcularPercentualNovo` | `total = GetValorParcelamento()`; `total == 0 → 0`; senão `Arredondar(valorParcela * 100 / total, 2)`. | RN-05-020 |
+| **CALC-E1-09** | `DocumentoFinanceiroBase.cs:CalcularValorConvertido` | `valor` × índice via `IndiceConversor.ConverterIndice(IndiceEconomico, IndiceConversao, Valor, DataEmissao)` → `valorConvertido`. | RN-05-008 |
+
+> **OP-xx#E1 = 11 · CALC-xx#E1 = 9.** `OP` cobertas por `E1-T03` (serviços/handlers de base) e
+> `E1-T04` (testes de integração + rollback). `CALC` cobertas por `E1-T04` (`parity`, igualdade
+> exata de `decimal`, origem conforme `research.md §5`). Gate: `/analyze MOD-05 --epico E1`.
