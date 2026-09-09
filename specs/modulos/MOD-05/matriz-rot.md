@@ -49,3 +49,38 @@
 > **OP-xx#E1 = 13 · CALC-xx#E1 = 10.** `OP` cobertas por `E1-T03` (serviços/handlers de base) e
 > `E1-T04` (testes de integração + rollback). `CALC` cobertas por `E1-T04` (`parity`, igualdade
 > exata de `decimal`, origem conforme `research.md §5`). Gate: `/analyze MOD-05 --epico E1`.
+
+---
+
+## `#E3` — Caixa e Banco (E3-T01)
+
+### Operações / persistência orquestrada
+
+| ID | Origem legada | Tipo | Ordem de persistência / efeitos | Rollback | Destino no novo sistema | Cobre |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **OP-E3-01** | `CaixaBanco.cs:ExecutarPersistir` | Persistência (1 transação) | `base.ExecutarPersistir` (Validate → sequencial se novo → gravar `FINCAIXABANCO`) → `PersistirContaBancaria`: se `TipoConta == Caixa` **remove** a `ContaBancaria`; se `Banco` **persiste** a `ContaBancaria` com `IdCaixaBanco`/`IdFilial` do caixa. Auditoria em `OnBeforeExecutarPersistir` (OP-E3-03). Lista de `Usuarios` (`FINCAIXABANCOUSUARIO`) gravada como agregado. | 1 transação; erro → rollback total. | `CaixaBancoService` + `GestaoFinanceiraRepositorioBase`; 1 `IDbContextTransaction` (Artigo VII). PK composta `(IdCaixaBanco, IdFilial)` — `.ValueGeneratedNever()`. | RN-05-006, RN-05-019 |
+| **OP-E3-02** | `CaixaBanco.cs:ExecutarExcluir` | Exclusão (1 transação) | Remove `ContaBancaria` (se existir) → `base.ExecutarExcluir` (remove `FINCAIXABANCO` + usuários). | 1 transação; erro → rollback. | `CaixaBancoService.ExcluirAsync`. | RN-05-006, RN-05-019 |
+| **OP-E3-03** | `CaixaBanco.cs:OnBeforeExecutarPersistir` | Gancho pré-persistência | `ValidarPeriodoCaixa` (VAL-E3-08) → seta usuário/data/hora de inclusão (novo) ou alteração. | — | ganchos do `CaixaBancoService`; auditoria via `IContextoExecucao`. | RN-05-019 |
+| **OP-E3-04** | `CaixaBanco.cs:PersistirContaBancaria` / `RemoverContaBancaria` | Máquina de estados (tipo de conta) | Alterar `TipoConta` de `Banco` → `Caixa` **remove** a `FINCONTABANCARIA` associada; `Caixa` → `Banco` cria/persiste a `FINCONTABANCARIA`. | dentro da transação do persist. | lógica no `CaixaBancoService` — 1:1 `FINCAIXABANCO`↔`FINCONTABANCARIA` (`HasOne...WithOne`). | RN-05-006 |
+| **OP-E3-05** | `ContaBancaria.cs:ExecutarPersistir` | Persistência da conta bancária | `base.ExecutarPersistir` (grava `FINCONTABANCARIA` núcleo) → `UpdateDadosContaVinculada` (propaga dados para contas que a referenciam) → `AdicionarSequencial(remessa=false)` + `AdicionarSequencial(remessa=true)` **`[E14]`** (sequenciais de arquivo). | 1 transação. | `ContaBancariaService` (núcleo E3). Sequenciais de arquivo → **E14**. | RN-05-006 |
+| **OP-E3-06** | `ContaBancaria.cs:ExecutarExcluir` | Exclusão da conta bancária | `RemoverSequencial(false)` + `RemoverSequencial(true)` **`[E14]`** → `base.ExecutarExcluir`. | 1 transação. | idem; remoção dos sequenciais → **E14**. | RN-05-006 |
+| **OP-E3-07** | `CaixaBanco.cs:Usuarios` (agregado) / `CaixaBancoUsuario` | Persistência em lote | Ao salvar o caixa, a coleção de usuários é sincronizada (inserir novos, remover ausentes) — respeitando VAL-E3-11 (unicidade) e VAL-E3-12 (não altera usuário salvo). | dentro da transação do caixa. | `CaixaBancoService` — `List<CaixaBancoUsuario>` privada + `IReadOnlyList<>` (Artigo V). PK `(IdCaixaBanco, IdFilial, IdUsuario)`. | RN-05-019 |
+| **OP-E3-08** | `SaldoCaixaBanco.cs:RetornarSaldoCaixaBanco` / `RetornarCaixaBanco` (static) | Consulta de saldo por data/tipo | Busca 1 registro de `FINSALDOCAIXABANCO` por `(IdFilial, IdCaixaBanco)` filtrando `DataSaldo`: `Inicial` → `< dataSaldo`; `Atual`/`Final` → `<= dataSaldo`; ordena `DataSaldo` desc, top 1. Retorna 0 se não achar ou (`Inicial` + data vazia). | — (leitura) | `SaldoCaixaBancoService` no `ReadContext`; paginação/top-1 materializados (Artigo VII.5). | RN-05-005 |
+
+### Fórmulas — golden tests de paridade (`CALC-xx#E3`, tarefa `E3-T05` / `legacy-calc-parity`)
+
+| ID | Origem legada | Fórmula (transcrever sem refatorar — Regra 5) | Cobre |
+| :--- | :--- | :--- | :--- |
+| **CALC-E3-01** | `SaldoCaixaBanco.cs:Saldo` | `Arredondar( saldoAnterior + (totalCredito − totalDebito) , 2)`. | RN-05-005 |
+| **CALC-E3-02** | `SaldoCaixaBanco.cs:SaldoConciliado` | `Arredondar( saldoAnteriorConciliado + (totalCreditoConciliado − totalDebitoConciliado) , 2)`. | RN-05-005 |
+| **CALC-E3-03** | `SaldoCaixaBanco.cs:RetornarSaldoCaixaBanco` | Seleciona o saldo por `(dataSaldo, TipoSaldo)` (ver OP-E3-08) e devolve `Arredondar(Saldo, 2)` ou `Arredondar(SaldoConciliado, 2)` conforme `saldoConciliado`; `0` quando `Inicial` + `dataSaldo == MinValue` ou sem registro. | RN-05-005 |
+| **CALC-E3-04** | `SaldoRateio.cs:SaldoEconomico` / `SaldoFinanceiro` | `Arredondar( SaldoAnterior{Economico\|Financeiro} + (TotalCredito{...} − TotalDebito{...}) , 8)` — **8 casas** (`numeric(23,8)`). | RN-05-004, RN-05-005 |
+| **CALC-E3-05** | `IndiceConversor.cs:CalcularConversao` | Mesmo índice → valor inalterado. Ambos ≠ padrão → `v1 = Arredondar(valor / valorIndiceOrigem, dec)`; `Arredondar(v1 * valorIndiceDestino, dec)`. Só destino ≠ padrão → `Arredondar(valor / valorIndiceDestino, dec)`. Senão → `Arredondar(valor * valorIndiceOrigem, dec)`. `dec` = 2 por padrão. | RN-05-008 |
+| **CALC-E3-06** | `IndiceConversor.cs:RetornarDataIndiceValida` | Se `d` é dia útil → `d`; senão avança (`+1`) ou retrocede (`-1` quando `IndiceModoCorrecao == UsarDataAnterior`) até achar dia útil (`Feriado.DiaUtil`). | RN-05-008 |
+| **CALC-E3-07** | `IndiceConversor.cs:RetornarIndice` | Índice padrão → `1.00`. Senão carrega a lista de valores do índice para o ano; posição = `mês − 1` (`Mensal`) ou `dia − 1` (`Diário`); se lista vazia ou valor `0` → `ObjetoNegocioException(DataSemIndiceEconomico)`. | RN-05-008 |
+
+> **OP-xx#E3 = 8 · CALC-xx#E3 = 7.** `OP` cobertas por `E3-T04` (DbSets/mapeamento) e `E3-T05`
+> (serviços + testes de integração). `CALC` cobertas por **`E3-T09`** (`parity` — saldos +
+> conversão por índice; o `IndiceConversor` vira `ConversorIndiceService` e realiza o gancho
+> `ConverterIndice` deixado em `CalculadoraItemFinanceiroBase` no E1-T03). Gate:
+> `/analyze MOD-05 --epico E3`.
