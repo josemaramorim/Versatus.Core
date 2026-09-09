@@ -22,6 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="E1\golden\*.csv" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Versatus.GestaoFinanceira\Versatus.GestaoFinanceira.csproj" />
     <ProjectReference Include="..\..\src\Versatus.SharedKernel\Versatus.SharedKernel.csproj" />
     <ProjectReference Include="..\..\src\Versatus.Framework\Versatus.Framework.csproj" />

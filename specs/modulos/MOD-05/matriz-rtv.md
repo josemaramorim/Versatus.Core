@@ -51,6 +51,19 @@
 | **VAL-E1-30** | `FechamentoCaixaBase.cs:ValorInformado.set` | Domínio / Base (fechamento) | Só permite digitar **valor** se `PermiteDigitarValor()` — não edita coluna **e** forma ≠ `ChequeEmpresa`. | *(LanguageManager item 1 — `DominioValidar`)* | `Result.Fail` | célula somente-leitura conforme regra | RN-05-013 |
 | **VAL-E1-31** | `FormaMovInfo.cs:DefinirValor` | Domínio / Base (forma de movimento) | Se `LimitarValorDisponivel`: o valor informado é **limitado** a `ValorDisponivel` (retorna 0 se `ValorDisponivel ≤ 0`). Ajuste, não erro. | *(sem mensagem — ajusta o valor)* | `FormaMovInfoBase` (serviço) aplica o teto | `zod`+aviso de teto | RN-05-003, RN-05-005 |
 
-> **VAL-xx#E1 = 31.** As `VAL-xx` são consumidas pelas tarefas `E1-T02` (POCOs — validações
-> de forma/atributo), `E1-T03` (serviços de comportamento — validações de estado/consulta) e
-> `E1-T04` (1 `[Fact]` por linha). O gate `/analyze MOD-05 --epico E1` verifica cobertura.
+> **VAL-xx#E1 = 31.** Cobertura por `[Fact]`:
+> - **VAL-E1-29, -30, -31** — regras puras já concretas (`FechamentoCaixaService.PermiteDigitar*`,
+>   `FormaMovInfoServiceBase.AplicarTetoValorDisponivel`): testadas em **`E1-T04`**
+>   (`tests/.../E1/FechamentoCaixaRegrasTests.cs`, `FormaMovInfoTetoTests.cs`).
+> - **VAL-E1-01..28** — regras em métodos `abstract` de `Application/Bases/`
+>   (`PersistenciaDocumentoBase`, `GeracaoParcelasService`, `OperacaoDocumentoBaseHandler`,
+>   `RateioServiceBase`). O `[Fact]` de cada uma acompanha a **implementação concreta**, na
+>   tarefa `service` do épico dono: **E4-T05** (documento/parcela — VAL-E1-01..07, 12..26),
+>   **E3-T05** (`ValidarCaixaBanco` — VAL-E1-27, depende de `CaixaBanco`/`ContaBancaria`),
+>   **E5/E6** (operação e rateio — VAL-E1-08..11), **E1-T02** (setter de `ParcelaBase` — VAL-E1-28).
+>   `E1-T04` deixa a assinatura/mensagem esperada de cada uma documentada na matriz; o gate
+>   completo (`Z-T02`) confere que nenhuma ficou sem `[Fact]`.
+>
+> **CALC-xx#E1** (ver `matriz-rot.md#E1`): golden tests em **`E1-T04`**
+> (`tests/.../E1/CalculoItemFinanceiroParityTests.cs`, `GeracaoParcelasCalcTests.cs`,
+> `ArredondamentoFinanceiroTests.cs` + `golden/CALC-E1-*.csv`).

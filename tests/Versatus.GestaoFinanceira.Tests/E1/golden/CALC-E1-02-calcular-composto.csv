@@ -1,0 +1,5 @@
+caso;valorBase;valor;dias;calculo;esperado
+90_dias_1pct_somar;1000.00;1;90;Somar;30.30
+30_dias_1pct_somar;1000.00;1;30;Somar;10.00
+45_dias_1pct_somar;1000.00;1;45;Somar;15.05
+0_dias;1000.00;1;0;Somar;0.00

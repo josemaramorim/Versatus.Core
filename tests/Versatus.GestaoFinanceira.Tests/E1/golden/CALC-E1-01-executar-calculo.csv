@@ -1,0 +1,11 @@
+caso;valorBase;valor;calculo;esperado
+somar_2pct;1000.00;2;Somar;20.00
+subtrair_2pct;1000.00;2;Subtrair;20.00
+somar_2_5pct;1000.00;2.5;Somar;25.00
+somar_arredonda;333.33;1.5;Somar;5.00
+multiplicar;100.00;3;MultiplicarSomar;300.00
+multiplicar_valor_negativo;100.00;-3;MultiplicarDiminuir;300.00
+dividir;100.00;4;DividirSomar;25.00
+dividir_valor_negativo;100.00;-4;DividirSubtrair;25.00
+percentual_10pct;1000.00;10;PercentualSomar;100.00
+percentual_subtrair_7_5pct;200.00;7.5;PercentualSubtrair;15.00
