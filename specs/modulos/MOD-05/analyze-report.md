@@ -122,6 +122,7 @@ de cada épico gera suas matrizes.
 | Épico | Data | Órfãs V3 | V4 OK? | V5 OK? | Veredito | Achados |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | E1 | 2026-09-08 | 0 (após correção) | ✅ | ✅ (bases abstratas — coluna por E3/E4) | ✅ **APROVADO** | 3 MÉDIO de completude de matriz, **corrigidos na rodada** (ver E1 abaixo) |
+| E3 | 2026-09-09 | 0 (após correção) | ✅ (E3-T09 `parity` adicionada) | ✅ (colunas confirmadas vs. `fin_columns.txt`) | ✅ **APROVADO** | 2 MÉDIO (VAL órfã) + 1 MÉDIO (V4: faltava tarefa `parity`), **corrigidos na rodada** (ver E3 abaixo) |
 | E3 | — | — | — | — | ⏳ pendente | — |
 | E2 | — | — | — | — | ⏳ pendente | — |
 | E4 | — | — | — | — | ⏳ pendente | — |
@@ -174,6 +175,43 @@ Nenhum achado **CRÍTICO** ou **ALTO**.
 ✅ **APROVADO** — `domain`/`service`/`operation` do épico E1 (E1-T02, E1-T03, E1-T04)
 liberados para entrar em `develop`. As correções (OP-E1-12/13, CALC-E1-10) já estão em
 `matriz-rot.md#E1` neste mesmo commit.
+
+---
+
+## Rodada incremental E3 — `/analyze MOD-05 --epico E3` (2026-09-09)
+
+**Escopo:** `matriz-rtv.md#E3` (21 `VAL-E3`, 6 `[E14]`), `matriz-rot.md#E3` (8 `OP-E3` + 7 `CALC-E3`),
+`analysis/E3-caixa-banco.md`. Classes: `CaixaBanco`, `ContaBancaria`, `CaixaBancoUsuario`,
+`SaldoCaixaBanco`, `SaldoRateio`, `Cobrador`, `IndiceConversor`.
+
+| Verif. | Resultado | Nota |
+| :--- | :--- | :--- |
+| **V1** Constituição (escopo E3) | ✅ PASS | `E3-caixa-banco.md §2` fixa PKs compostas reais (`.ValueGeneratedNever()`), `numeric(23,8)`→`decimal` `HasPrecision(23,8)`, `smallint`→`bool`, enums E0 com `HasConversion<int>()`, cross-módulo por `int`, 1 transação/serviço. Nenhum `.csproj`/código ainda. |
+| **V3** legado → matrizes | ✅ PASS (após correção) | Varredura de `Validar*`/`throw`/`Executar*`/`Persistir*`/`Calcular*` nos 7 arquivos. 2 lacunas encontradas e corrigidas: guardas do `IndiceConversor` (`ValorNulo`/`DataSemIndiceEconomico`) → **VAL-E3-20**; agência obrigatória nos setters `GeraBoleto`/`GeraRemessa`/`ProcessaRetorno` → **VAL-E3-21** `[E14]`. `IndiceConversor.GetIdOrigemRateio` inexistente (era stub em `OperacaoDocumentoBase`). |
+| **V4** matrizes → tasks | ✅ PASS (após correção) | `E3-T05` cobre "todas as `VAL-xx#E3`". **Faltava tarefa `parity` para as `CALC-E3`** (V4: "toda OP de cálculo tem tarefa `parity`") → adicionada **`E3-T09 · Paridade de saldo e conversão por índice · tipo: parity`** em `tasks.md` (IDs estáveis — não renumera). VAL `[E14]` → `E14-T0x`. |
+| **V5** cobertura de propriedades | ✅ PASS | Todas as colunas das 7 tabelas mapeadas em `E3-caixa-banco.md §2` (contra `legacy-schema/fin_columns.txt`). `NULL`→anulável respeitado. ~40 colunas `[E14]` de `FINCONTABANCARIA` **listadas** e delegadas ao E14 (Regra 4 — escrito e justificado). `FININDICECONVERSOR` não existe → `IndiceConversor` é serviço (confirmado). |
+
+### Achados (3 · todos MÉDIO · corrigidos nesta rodada)
+
+| # | Sev. | Verif. | Descrição | Ação (aplicada) |
+| :--- | :--- | :--- | :--- | :--- |
+| E3-A01 | MÉDIO | V3 | Guardas de `IndiceConversor.ConverterIndice`/`RetornarIndice` (`ValorNulo`, `DataSemIndiceEconomico`) sem linha `VAL`. | Adicionada **VAL-E3-20**. |
+| E3-A02 | MÉDIO | V3 | Setters `GeraBoleto`/`GeraRemessa`/`ProcessaRetorno` de `ContaBancaria` exigem agência — sem linha `VAL`. | Adicionada **VAL-E3-21** `[E14]`. |
+| E3-A03 | MÉDIO | V4 | Épico E3 sem tarefa `parity` para `CALC-E3-01..07` (saldos + conversão por índice). | Adicionada **`E3-T09`** (`tipo: parity`) em `tasks.md`. |
+
+Nenhum achado **CRÍTICO** ou **ALTO**.
+
+### Dependências cross-épico registradas (não bloqueiam E3)
+
+- **VAL-E1-27** (`ValidarCaixaBanco` da parcela — E1) **fecha aqui** — o `[Fact]` vai para `E3-T05`.
+- **VAL-E3-08 / -10** dependem da máquina de estados do período (**E2**) — teste de `E3-T05` mocka a porta.
+- **`FINSALDORATEIO`** tem colunas de PK anuláveis (`IDFINCLASSE`/`IDGLOCENTROCUSTO`/`IDGLOPROJETOS`) — `DÚVIDA-E3-1`, confirmar no `E3-T03`.
+- ~40 colunas `[E14]` de `FINCONTABANCARIA` + `VAL-E3-13..16, 18, 19, 21` + sequenciais de arquivo (`OP-E3-05/06`) → épico **E14**.
+
+### Veredito E3
+
+✅ **APROVADO** — `domain`/`dbcontext`/`service`/`parity` do épico E3 (E3-T02..E3-T09)
+liberados para entrar em `develop`. As correções (VAL-E3-20/21, `E3-T09`) estão neste commit.
 
 ---
 

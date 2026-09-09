@@ -80,7 +80,7 @@
 | **CALC-E3-07** | `IndiceConversor.cs:RetornarIndice` | Índice padrão → `1.00`. Senão carrega a lista de valores do índice para o ano; posição = `mês − 1` (`Mensal`) ou `dia − 1` (`Diário`); se lista vazia ou valor `0` → `ObjetoNegocioException(DataSemIndiceEconomico)`. | RN-05-008 |
 
 > **OP-xx#E3 = 8 · CALC-xx#E3 = 7.** `OP` cobertas por `E3-T04` (DbSets/mapeamento) e `E3-T05`
-> (serviços + testes de integração). `CALC` cobertas por `E3-T05` (`parity` — saldos + conversão
-> por índice; o `IndiceConversor` vira `ConversorIndiceService` e realiza o gancho
+> (serviços + testes de integração). `CALC` cobertas por **`E3-T09`** (`parity` — saldos +
+> conversão por índice; o `IndiceConversor` vira `ConversorIndiceService` e realiza o gancho
 > `ConverterIndice` deixado em `CalculadoraItemFinanceiroBase` no E1-T03). Gate:
 > `/analyze MOD-05 --epico E3`.

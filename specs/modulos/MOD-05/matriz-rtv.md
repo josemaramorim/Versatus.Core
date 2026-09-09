@@ -98,6 +98,9 @@
 | **VAL-E3-17** | `ContaBancaria.cs:Validate` | Domínio | `ContaTerceiro` → `Titular` **e** `CpfCnpj` obrigatórios. | *(LanguageManager item 4)* | `Result.Fail` (núcleo — `ContaTerceiro`/`Titular` são E3; `CpfCnpj` da conta fica no bloco E14, mas a regra é núcleo) | `required` condicional | RN-05-006 |
 | **VAL-E3-18** `[E14]` | `ContaBancaria.cs:ValidaDiasProtesto` | Domínio | `DiasParaProtesto` entre 5 e 55 (quando `> 0`; máx. 55 só se banco usa negativação). | *"...deve ser informado no MÍNIMO 5 (cinco) dias." / "...no MÁXIMO 55 (cinquenta e cinco) dias."* | **E14** | **E14** | RN-05-016 |
 | **VAL-E3-19** `[E14]` | `ContaBancaria.cs:CpfCnpj.set` (linha 877) | Domínio | Dígito verificador de CPF/CNPJ da conta bancária. | *(`ValorInvalidoException.CnpjCpfInvalido`)* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-20** | `IndiceConversor.cs:ConverterIndice` (198/201) + `RetornarIndice` (94) | Serviço | Índice de origem/destino não nulos; e deve existir valor do índice para a data (lista não vazia e valor ≠ 0). | *"IndiceOrigem/IndiceDestino" (`ValorNulo`)* · *(`DataSemIndiceEconomico`, sigla + data)* | `ConversorIndiceService` — guardas + `Result.Fail` (`DataSemIndiceEconomico`); ver CALC-E3-05..07 | N/A | RN-05-008 |
+| **VAL-E3-21** `[E14]` | `ContaBancaria.cs:GeraBoleto.set` / `GeraRemessa.set` / `ProcessaRetorno.set` (1058/1080/1102) | Domínio | Ao ligar boleto / remessa / retorno, a **agência** deve estar informada. | *"Para gerar boleto/remessa / processar arquivo de retorno, deve ser informado a agência."* | **E14** | **E14** | RN-05-016 |
 
-> **VAL-xx#E3 = 19** (5 marcadas `[E14]`, tratadas no épico E14 — CLR-03). Cobertura por
-> `[Fact]`: **E3-T05** (`service`) — 1 por `VAL-E3-01..12, 17`; **E14-T0x** — `VAL-E3-13..16, 18, 19`.
+> **VAL-xx#E3 = 21** (6 marcadas `[E14]`, tratadas no épico E14 — CLR-03). Cobertura por
+> `[Fact]`: **E3-T05** (`service`) — 1 por `VAL-E3-01..12, 17, 20`; **E14-T0x** —
+> `VAL-E3-13..16, 18, 19, 21`.
