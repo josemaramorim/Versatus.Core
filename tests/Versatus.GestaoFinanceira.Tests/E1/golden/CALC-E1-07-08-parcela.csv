@@ -1,0 +1,7 @@
+calc;caso;p1;p2;p3;esperado
+CALC-E1-07;metade_com_20pct_minimo;1000.00;50;20;100.00
+CALC-E1-07;terco_com_10pct_minimo;900.00;33.333;10;30.00
+CALC-E1-07;sem_percentual_minimo;1000.00;50;0;0.00
+CALC-E1-08;250_de_1000;250.00;1000.00;;25.00
+CALC-E1-08;333_33_de_1000;333.33;1000.00;;33.33
+CALC-E1-08;total_zero;250.00;0.00;;0.00
