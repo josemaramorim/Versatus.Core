@@ -129,15 +129,15 @@
 - **Branch:** `feat/mod-05-e3-analise` · **Commit:** `docs(mod-05): auditoria E3 Caixa/Banco (E3-T01)` · **Depende de:** E1-T04
 
 ### E3-T02 · Entidades de domínio E3 · tipo: domain
-- **Objetivo:** `CaixaBanco`, `CaixaBancoUsuario`, `ContaBancaria` (55 props — todas, Regra 4), `SaldoCaixaBanco`, `SaldoRateio`, `Cobrador`, `IndiceConversor` como POCOs puras em `Domain/Bancos/`. Coleções de agregado = `List<T>` privada + `IReadOnlyList<T>`.
+- **Objetivo:** `CaixaBanco`, `CaixaBancoUsuario`, `ContaBancaria` (**só o núcleo** — 12 col + auditoria; as colunas `[E14]` entram no E14 — decisão do usuário 2026-09-24), `SaldoCaixaBanco`, `SaldoRateio`, `Cobrador` como POCOs puras em `Domain/Bancos/`. Coleções de agregado = `List<T>` privada + `IReadOnlyList<T>`. `IndiceConversor` **não** vira POCO (sem tabela — `analysis/E3-caixa-banco.md §2.7`): é `ConversorIndiceService` (E3-T05/E3-T09, CALC-E3-05..07).
 - **Cria:** `src/Versatus.GestaoFinanceira/Domain/Bancos/*.cs`.
 - **Cobre:** E3-T01; RN-05-006.
 - **Constituição:** Artigo III, Artigo V.1.
 - **Branch:** `feat/mod-05-e3-entidades` · **Commit:** `feat(mod-05): entidades de Caixa/Banco (E3-T02)` · **Depende de:** E3-T01
 
 ### E3-T03 · Mappings Fluent API E3 · tipo: domain
-- **Objetivo:** 1 arquivo por entidade em `Infrastructure/Mappings/`: `ToTable` (nome MAIÚSCULO real), `HasKey(new {...})` na ordem física, `HasColumnName`, `HasColumnType("text")`, `HasPrecision(23,8)`/`(17,2)`, nulidade coluna a coluna do extract, `.ValueGeneratedNever()` nas PKs. `ContaBancaria`: `HasOne<CaixaBanco>().WithOne().HasForeignKey<ContaBancaria>(x => new {x.IdCaixaBanco, x.IdFilial})`.
-- **Cria:** `Infrastructure/Mappings/{CaixaBanco,CaixaBancoUsuario,ContaBancaria,SaldoCaixaBanco,SaldoRateio,Cobrador,IndiceConversor}Mapping.cs`.
+- **Objetivo:** 1 arquivo por entidade em `Infrastructure/Mappings/`: `ToTable` (nome MAIÚSCULO real), `HasKey(new {...})` na ordem física, `HasColumnName`, `HasColumnType("text")`, `HasPrecision(23,8)`/`(17,2)`, nulidade coluna a coluna do extract, `.ValueGeneratedNever()` nas PKs. `ContaBancaria`: `HasOne<CaixaBanco>().WithOne().HasForeignKey<ContaBancaria>(x => new {x.IdCaixaBanco, x.IdFilial})`. **Atenção (núcleo E3):** 6 colunas `[E14]` NOT NULL fora da entidade (`GERABOLETO`, `GERAREMESSA`, `PROCESSARETORNO`, `BOLETOBENEFICIARIODIFERENTE`, `BOLETOSACADOAVALISTA`, `ENVIARSPED`) — garantir valor no INSERT (shadow property com default, ou equivalente) sem inventar regra; resolver `DÚVIDA-E3-1` (PK anulável de `FINSALDORATEIO`).
+- **Cria:** `Infrastructure/Mappings/{CaixaBanco,CaixaBancoUsuario,ContaBancaria,SaldoCaixaBanco,SaldoRateio,Cobrador}Mapping.cs`.
 - **Cobre:** E3-T01; RN-05-006.
 - **Constituição:** Artigo II.1/II.5, Artigo III.2.
 - **Branch:** `feat/mod-05-e3-mappings` · **Commit:** `feat(mod-05): mappings Fluent API E3 (E3-T03)` · **Depende de:** E3-T02
