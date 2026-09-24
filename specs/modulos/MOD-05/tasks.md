@@ -175,6 +175,13 @@
 - **Cria:** `Infrastructure/Migrations/*`.
 - **Branch:** `feat/mod-05-e3-migration` · **Commit:** `setup(mod-05): migration inicial E3 (E3-T08)` · **Depende de:** E3-T04
 
+### E3-T09 · Paridade de saldo e conversão por índice · tipo: parity
+- **Objetivo:** `SaldoCalculadora` (Saldo/SaldoConciliado — `CALC-E3-01/02/03`), `SaldoRateio` (`CALC-E3-04`, **8 casas**) e `ConversorIndiceService` (`CALC-E3-05/06/07` — realiza o gancho `ConverterIndice` deixado em `CalculadoraItemFinanceiroBase` no E1-T03). Transcrever **sem refatorar** (Regra 5); golden tests com igualdade exata de `decimal`.
+- **Cria:** `Application/Bases/ConversorIndiceService.cs`, `Domain/Services/SaldoCalculadora.cs`, `tests/.../E3/*ParityTests.cs`, `golden/CALC-E3-*.csv` (origem conforme `research.md §5`).
+- **Cobre:** todas as `CALC-xx#E3`; RN-05-005, RN-05-008.
+- **Constituição:** Artigo IX.3.
+- **Branch:** `feat/mod-05-e3-paridade` · **Commit:** `test(mod-05): paridade de saldo e conversão por índice (E3-T09)` · **Depende de:** E3-T05
+
 ---
 
 ## Épico E2 — Domínio e Período

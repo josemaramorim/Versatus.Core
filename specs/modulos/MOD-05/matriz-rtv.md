@@ -67,3 +67,40 @@
 > **CALC-xx#E1** (ver `matriz-rot.md#E1`): golden tests em **`E1-T04`**
 > (`tests/.../E1/CalculoItemFinanceiroParityTests.cs`, `GeracaoParcelasCalcTests.cs`,
 > `ArredondamentoFinanceiroTests.cs` + `golden/CALC-E1-*.csv`).
+
+---
+
+## `#E3` — Caixa e Banco (E3-T01)
+
+**Classes auditadas:** `CaixaBanco` (869) · `ContaBancaria` (1704) · `CaixaBancoUsuario` (350) ·
+`SaldoCaixaBanco` (322) · `SaldoRateio` (382) · `Cobrador` (367) · `IndiceConversor` (222,
+**sem tabela** — vira serviço). Colunas confirmadas contra `legacy-schema/fin_columns.txt`.
+**~40 colunas de integração de `FINCONTABANCARIA` marcadas `[E14]`** (CLR-03).
+
+| ID | Origem legada | Camada / Classe | Regra / Condição | Mensagem legada | Destino backend | Destino frontend | Cobre |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **VAL-E3-01** | `CaixaBanco.cs:ValidarUsuario` | Domínio | Se parâmetro `VinculaCaixaBancoUsuario` ligado: não pode haver usuário repetido na lista `Usuarios` do caixa. | *(LanguageManager item 1)* | `CaixaBancoService` → `Result.Fail` | `zod.superRefine` (unicidade na grade) | RN-05-019 |
+| **VAL-E3-02** | `CaixaBanco.cs:ValidarContaBancaria` | Domínio | Conta Banco com `EnviarSped` → instituição financeira fiscal obrigatória. | *"Para conta bancária, a instituição financeira para SPED, deve ser informado a instituição financeira fiscal."* | `Result.Fail` | `required` condicional | RN-05-006 |
+| **VAL-E3-03** | `CaixaBanco.cs:ValidarContaBancaria` | Domínio | `EnviarSped` **e** `ContaTerceiro` não podem estar ambos marcados. | *"...ao MARCAR 'Enviar SPED (Bloco 1601)', deve ser DESMARCADO 'Conta de terceiro'."* | `Result.Fail` | `zod.superRefine` | RN-05-006 |
+| **VAL-E3-04** | `CaixaBanco.cs:ValidarContaBancaria` | Domínio (cross MOD-02) | Instituição financeira do SPED deve ser Pessoa **Jurídica**. | *"...deve ser do tipo 'Jurídica'."* | `Result.Fail` (consulta AcessoGlobal por `int`) | N/A | RN-05-006 |
+| **VAL-E3-05** | `CaixaBanco.cs:ValidarContaBancaria` | Domínio (cross MOD-02) | Instituição financeira do SPED deve ter **CNPJ** preenchido. | *"...deve ser preenchido o CNPJ."* | `Result.Fail` | N/A | RN-05-006 |
+| **VAL-E3-06** | `CaixaBanco.cs:ValidarContaBancaria` | Domínio | `ContaBancariaTipo == Investimento` → `IdContaBancariaVinculada` obrigatória. | *"Para conta bancária do tipo 'Investimento', deve ser informada a conta vinculada."* | `Result.Fail` | `required` condicional | RN-05-006 |
+| **VAL-E3-07** | `CaixaBanco.cs:ValidarContaBancaria` | Domínio | Conta vinculada de investimento deve ser **diferente** do próprio `IdCaixaBanco`. | *"...a conta vinculada deve ser DIFERENTE do ID da conta bancária."* | `Result.Fail` | `zod.superRefine` | RN-05-006 |
+| **VAL-E3-08** | `CaixaBanco.cs:ValidarPeriodoCaixa` | Domínio / Estado (OnBeforeExecutarPersistir) | Para **inativar** um caixa (`TipoConta == Caixa`, persistido, `Ativo == false`, era ativo): o domínio-período pertencente deve estar **fechado** (`DataFechamento > MinValue`). | *"Para inativar este caixa deve ser fechado seu domínio período pertencente ao domínio '{0}'."* | `CaixaBancoService` consulta E2 → `Result.Fail` | N/A | RN-05-013, RN-05-019 |
+| **VAL-E3-09** | `CaixaBanco.cs:ValidarControleCaixaBanco` (static) | Domínio / Parâmetro | `VinculaCaixaBancoUsuario` e `TrabalhaComDominio` são **mutuamente exclusivos**. | *"Os parâmetros 'Vincular caixa/banco por usuário' e 'Trabalha com domínio financeiro' somente um deles pode estar marcado."* | serviço de parâmetro → `Result.Fail` | N/A | RN-05-013, RN-05-019 |
+| **VAL-E3-10** | `CaixaBanco.cs:ValidarCaixaPeriodo` | Domínio / Consulta | Com `TrabalhaComDominio`: caixa=Banco exige domínio do usuário com `MovimentoBanco`; caixa vinculado a domínio só é movimentável por usuário que trabalha com domínio. | *"O usuário logado não possui um domínio financeiro cadastrado." / "...configurado para não efetuar movimento de banco." / "O caixa informado '({0})' está vinculado a um domínio..."* | `CaixaBancoService.ValidarCaixaPeriodoAsync` → `Result.Fail` | N/A | RN-05-013, RN-05-019 |
+| **VAL-E3-11** | `CaixaBancoUsuario.cs:ValidarUsuarioUnico` | Domínio | Usuário não pode repetir na lista de usuários do caixa. | *"Este usuário já foi informado."* | `Result.Fail` | `zod.superRefine` | RN-05-019 |
+| **VAL-E3-12** | `CaixaBancoUsuario.cs:IdUsuario.set` | Domínio / Estado | Não é permitido alterar o usuário depois de salvo. | *"NÃO é permitido alterar usuário após ter sido salvo."* | `Result.Fail` | campo desabilitado em edição | RN-05-019 |
+| **VAL-E3-13** `[E14]` | `ContaBancaria.cs:Validate` | Domínio | `!geraBoleto && (geraRemessa \|\| processaRetorno)` → erro. | *(LanguageManager item 2)* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-14** `[E14]` | `ContaBancaria.cs:Validate` | Domínio | `geraBoleto` + `BoletoBeneficiarioDiferente` → entidade beneficiária obrigatória. | *"Deve ser informado na conta bancária o beneficiário do boleto."* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-15** `[E14]` | `ContaBancaria.cs:Validate` | Domínio | `geraBoleto` + `BoletoSacadoAvalista` → entidade sacado/avalista obrigatória. | *"Deve ser informado na conta bancária o sacado/avalista do boleto."* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-16** `[E14]` | `ContaBancaria.cs:Validate` | Domínio | `processaRetorno && !geraRemessa` → erro. | *(LanguageManager item 3)* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-17** | `ContaBancaria.cs:Validate` | Domínio | `ContaTerceiro` → `Titular` **e** `CpfCnpj` obrigatórios. | *(LanguageManager item 4)* | `Result.Fail` (núcleo — `ContaTerceiro`/`Titular` são E3; `CpfCnpj` da conta fica no bloco E14, mas a regra é núcleo) | `required` condicional | RN-05-006 |
+| **VAL-E3-18** `[E14]` | `ContaBancaria.cs:ValidaDiasProtesto` | Domínio | `DiasParaProtesto` entre 5 e 55 (quando `> 0`; máx. 55 só se banco usa negativação). | *"...deve ser informado no MÍNIMO 5 (cinco) dias." / "...no MÁXIMO 55 (cinquenta e cinco) dias."* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-19** `[E14]` | `ContaBancaria.cs:CpfCnpj.set` (linha 877) | Domínio | Dígito verificador de CPF/CNPJ da conta bancária. | *(`ValorInvalidoException.CnpjCpfInvalido`)* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-20** | `IndiceConversor.cs:ConverterIndice` (198/201) + `RetornarIndice` (94) | Serviço | Índice de origem/destino não nulos; e deve existir valor do índice para a data (lista não vazia e valor ≠ 0). | *"IndiceOrigem/IndiceDestino" (`ValorNulo`)* · *(`DataSemIndiceEconomico`, sigla + data)* | `ConversorIndiceService` — guardas + `Result.Fail` (`DataSemIndiceEconomico`); ver CALC-E3-05..07 | N/A | RN-05-008 |
+| **VAL-E3-21** `[E14]` | `ContaBancaria.cs:GeraBoleto.set` / `GeraRemessa.set` / `ProcessaRetorno.set` (1058/1080/1102) | Domínio | Ao ligar boleto / remessa / retorno, a **agência** deve estar informada. | *"Para gerar boleto/remessa / processar arquivo de retorno, deve ser informado a agência."* | **E14** | **E14** | RN-05-016 |
+
+> **VAL-xx#E3 = 21** (6 marcadas `[E14]`, tratadas no épico E14 — CLR-03). Cobertura por
+> `[Fact]`: **E3-T05** (`service`) — 1 por `VAL-E3-01..12, 17, 20`; **E14-T0x** —
+> `VAL-E3-13..16, 18, 19, 21`.
