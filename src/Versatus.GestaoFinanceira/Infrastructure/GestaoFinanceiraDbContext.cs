@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Versatus.GestaoFinanceira.Domain.Bancos;
 
 namespace Versatus.GestaoFinanceira.Infrastructure;
 
@@ -20,6 +21,14 @@ public class GestaoFinanceiraDbContext : DbContext
 
     // Os DbSet<T> das entidades são registrados por épico (E1/E3 em diante),
     // nas tarefas E?-T04 "DbSets + teste de mapeamento".
+
+    // E3 — Caixa e Banco (E3-T04)
+    public DbSet<CaixaBanco> CaixasBanco => Set<CaixaBanco>();
+    public DbSet<CaixaBancoUsuario> CaixaBancoUsuarios => Set<CaixaBancoUsuario>();
+    public DbSet<ContaBancaria> ContasBancarias => Set<ContaBancaria>();
+    public DbSet<SaldoCaixaBanco> SaldosCaixaBanco => Set<SaldoCaixaBanco>();
+    public DbSet<SaldoRateio> SaldosRateio => Set<SaldoRateio>(); // sem chave — só leitura
+    public DbSet<Cobrador> Cobradores => Set<Cobrador>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
