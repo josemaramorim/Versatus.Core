@@ -7,10 +7,10 @@ namespace Versatus.GestaoFinanceira.Domain.Bancos;
 // FINCAIXABANCO. Mapa: analysis/E3-caixa-banco.md §2.3.
 //
 // ESCOPO E3 = SÓ O NÚCLEO (12 colunas + 6 de auditoria), por decisão do usuário em
-// 2026-09-24 (E3-T02). As demais colunas (carteira, nosso-número, remessa/retorno, boleto,
-// SPED — lista em §2.3 "[E14]") entram nesta entidade no épico E14. Atenção: 6 delas são
-// NOT NULL no banco (GERABOLETO, GERAREMESSA, PROCESSARETORNO, BOLETOBENEFICIARIODIFERENTE,
-// BOLETOSACADOAVALISTA, ENVIARSPED) — o mapping do E3-T03 precisa garantir valor no INSERT.
+// 2026-09-24 (E3-T02), + ENVIARSPED e CPFCNPJ, promovidas no E3-T05 (decisão do usuário em
+// 2026-09-24) porque as regras núcleo VAL-E3-02..05 e VAL-E3-17 dependem delas. As demais
+// colunas (carteira, nosso-número, remessa/retorno, boleto — lista em §2.3 "[E14]") entram
+// no épico E14; 5 delas são NOT NULL e ficam como shadow properties no mapping.
 //
 // POCO SÓ DE DADOS (Artigo III). VAL-E3-02..07 / 17 → serviços (E3-T05).
 public class ContaBancaria
@@ -39,6 +39,12 @@ public class ContaBancaria
 
     /// <summary>FK lógica para a instituição financeira (MOD-02), usada no SPED — VAL-E3-02.</summary>
     public int? IdInstituicaoFinanceira { get; set; }
+
+    /// <summary>Envia a conta no SPED, bloco 1601 (ENVIARSPED) — VAL-E3-02..05.</summary>
+    public bool EnviarSped { get; set; }
+
+    /// <summary>CPF/CNPJ do titular da conta de terceiro (CPFCNPJ) — VAL-E3-17.</summary>
+    public string? CpfCnpj { get; set; }
 
     // Auditoria
     public int? IdUsuarioInclusao { get; set; }

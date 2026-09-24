@@ -101,6 +101,8 @@
 | **VAL-E3-20** | `IndiceConversor.cs:ConverterIndice` (198/201) + `RetornarIndice` (94) | Serviço | Índice de origem/destino não nulos; e deve existir valor do índice para a data (lista não vazia e valor ≠ 0). | *"IndiceOrigem/IndiceDestino" (`ValorNulo`)* · *(`DataSemIndiceEconomico`, sigla + data)* | `ConversorIndiceService` — guardas + `Result.Fail` (`DataSemIndiceEconomico`); ver CALC-E3-05..07 | N/A | RN-05-008 |
 | **VAL-E3-21** `[E14]` | `ContaBancaria.cs:GeraBoleto.set` / `GeraRemessa.set` / `ProcessaRetorno.set` (1058/1080/1102) | Domínio | Ao ligar boleto / remessa / retorno, a **agência** deve estar informada. | *"Para gerar boleto/remessa / processar arquivo de retorno, deve ser informado a agência."* | **E14** | **E14** | RN-05-016 |
 
-> **VAL-xx#E3 = 21** (6 marcadas `[E14]`, tratadas no épico E14 — CLR-03). Cobertura por
-> `[Fact]`: **E3-T05** (`service`) — 1 por `VAL-E3-01..12, 17, 20`; **E14-T0x** —
+> **VAL-xx#E3 = 21** (7 marcadas `[E14]`, tratadas no épico E14 — CLR-03). Cobertura por
+> `[Fact]`: **E3-T05** (`service`) — 1 por `VAL-E3-01..12, 17` + `VAL-E1-27`
+> (`tests/.../E3/CaixaBancoServiceTests.cs`, `ContaBancariaServiceTests.cs`); **E3-T09** —
+> `VAL-E3-20` (movida em 2026-09-24: vive no `ConversorIndiceService`); **E14-T0x** —
 > `VAL-E3-13..16, 18, 19, 21`.

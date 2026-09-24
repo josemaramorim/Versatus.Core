@@ -5,7 +5,7 @@ using Versatus.GestaoFinanceira.Domain.Bancos;
 namespace Versatus.GestaoFinanceira.Infrastructure.Mappings;
 
 // FINCONTABANCARIA (55 colunas) — analysis/E3-caixa-banco.md §2.3. Escopo E3 = núcleo
-// (12 colunas + auditoria); as colunas [E14] entram no épico E14.
+// (12 colunas + auditoria) + ENVIARSPED/CPFCNPJ (E3-T05); as colunas [E14] entram no épico E14.
 public class ContaBancariaMapping : IEntityTypeConfiguration<ContaBancaria>
 {
     public void Configure(EntityTypeBuilder<ContaBancaria> builder)
@@ -61,6 +61,13 @@ public class ContaBancariaMapping : IEntityTypeConfiguration<ContaBancaria>
 
         builder.Property(x => x.IdInstituicaoFinanceira).HasColumnName("IDGLOINSTITUICAOFINANCEIRA");
 
+        builder.Property(x => x.EnviarSped).HasColumnName("ENVIARSPED").IsRequired();
+
+        builder.Property(x => x.CpfCnpj)
+            .HasColumnName("CPFCNPJ")
+            .HasMaxLength(14)
+            .IsUnicode(false);
+
         // Colunas [E14] NOT NULL fora da entidade: shadow properties para o INSERT não violar a
         // restrição. Valor = default do construtor legado (ContaBancaria.cs:88-94, todas false).
         // No UPDATE o EF só grava propriedades modificadas — valores existentes são preservados.
@@ -70,7 +77,6 @@ public class ContaBancariaMapping : IEntityTypeConfiguration<ContaBancaria>
         builder.Property<bool>("ProcessaRetorno").HasColumnName("PROCESSARETORNO").IsRequired();
         builder.Property<bool>("BoletoBeneficiarioDiferente").HasColumnName("BOLETOBENEFICIARIODIFERENTE").IsRequired();
         builder.Property<bool>("BoletoSacadoAvalista").HasColumnName("BOLETOSACADOAVALISTA").IsRequired();
-        builder.Property<bool>("EnviarSped").HasColumnName("ENVIARSPED").IsRequired();
 
         // Auditoria
         builder.Property(x => x.IdUsuarioInclusao).HasColumnName("IDGLOUSUARIOINCLUSAO");

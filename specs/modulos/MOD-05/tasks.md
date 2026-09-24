@@ -152,7 +152,8 @@
 ### E3-T05 · Serviços + repositórios E3 (CRUD + RTV) · tipo: service
 - **Objetivo:** `ICaixaBancoService`/`CaixaBancoService` (CRUD + usuários em lote), `IContaBancariaService` (núcleo), `ICobradorService`; repositórios CQRS; paginação materializada. 1 `[Fact]` por `VAL-xx#E3`.
 - **Cria:** `Domain/Services/*`, `Domain/Repositories/*`, `Infrastructure/Repositories/*`, `tests/.../E3/*ServiceTests.cs`.
-- **Cobre:** todas as `VAL-xx#E3`; RN-05-005, RN-05-019.
+- **Cobre:** todas as `VAL-xx#E3` exceto `[E14]` e `VAL-E3-20` (→ E3-T09); `VAL-E1-27`; `OP-E3-01..05, 07`; RN-05-005, RN-05-019.
+- **Decisões do usuário (2026-09-24):** (1) `ENVIARSPED` e `CPFCNPJ` promovidas a propriedades reais de `ContaBancaria` (VAL-E3-02..05/17 dependem delas — toca `Domain/Bancos/ContaBancaria.cs` e `ContaBancariaMapping.cs`); (2) VAL-E3-04/05 via porta `IInstituicaoFinanceiraConsulta` + adapter SQL só-leitura (`GLOINSTITUICAOFINANCEIRA`/`GLOENTIDADE`/`GLOENTIDADEJURIDICA`); (3) VAL-E3-08/10 via porta `IDominioFinanceiroConsulta` + adapter SQL só-leitura **temporário**, substituído no E2; (4) `VAL-E3-20` e `OP-E3-08` movidas para o **E3-T09** (mesmo código das `CALC`). VAL-E3-09 recebe o `PeriodoStatus` do chamador (`PeriodosAbertos` é E2).
 - **Constituição:** Artigo IV, VI, VII.4/VII.5.
 - **Branch:** `feat/mod-05-e3-servicos` · **Commit:** `feat(mod-05): serviços E3 + testes RTV (E3-T05)` · **Depende de:** E3-T04
 
@@ -178,7 +179,7 @@
 ### E3-T09 · Paridade de saldo e conversão por índice · tipo: parity
 - **Objetivo:** `SaldoCalculadora` (Saldo/SaldoConciliado — `CALC-E3-01/02/03`), `SaldoRateio` (`CALC-E3-04`, **8 casas**) e `ConversorIndiceService` (`CALC-E3-05/06/07` — realiza o gancho `ConverterIndice` deixado em `CalculadoraItemFinanceiroBase` no E1-T03). Transcrever **sem refatorar** (Regra 5); golden tests com igualdade exata de `decimal`.
 - **Cria:** `Application/Bases/ConversorIndiceService.cs`, `Domain/Services/SaldoCalculadora.cs`, `tests/.../E3/*ParityTests.cs`, `golden/CALC-E3-*.csv` (origem conforme `research.md §5`).
-- **Cobre:** todas as `CALC-xx#E3`; RN-05-005, RN-05-008.
+- **Cobre:** todas as `CALC-xx#E3` + `VAL-E3-20` (guardas do conversor) + `OP-E3-08` (consulta de saldo por data/tipo) — movidas do E3-T05 em 2026-09-24; RN-05-005, RN-05-008.
 - **Constituição:** Artigo IX.3.
 - **Branch:** `feat/mod-05-e3-paridade` · **Commit:** `test(mod-05): paridade de saldo e conversão por índice (E3-T09)` · **Depende de:** E3-T05
 
