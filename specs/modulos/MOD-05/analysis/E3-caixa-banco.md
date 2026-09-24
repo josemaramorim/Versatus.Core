@@ -99,8 +99,7 @@ PK **`(IDFINCAIXABANCO, IDGLOFILIAL, DATASALDO)`**.
 ### 2.5 `FINSALDORATEIO` (11) → `SaldoRateio`
 
 PK **`(IDGLOFILIAL, IDFINCLASSE, IDGLOCENTROCUSTO, IDGLOPROJETOS, DATASALDO)`** — as 3 dimensões
-são **`int?`** no schema (parte da PK sendo anulável — preservar como está; `DÚVIDA-E3-1` para o
-`E3-T03` confirmar o comportamento do EF com PK anulável, provável uso de valor sentinela `0`).
+são **`int?`** no schema (parte da PK sendo anulável — preservar como está; **`DÚVIDA-E3-1` resolvida no E3-T03**: não há PK física — mapeada `HasNoKey`, ver §4).
 
 | Coluna | Tipo (NULL) | Propriedade |
 | :--- | :--- | :--- |
@@ -146,7 +145,7 @@ Consome `IIndiceEconomico` do MOD-02 por `int` lógico. Fórmulas: `CALC-E3-05..
   `[Fact]` de VAL-E1-27 vai para `E3-T05`.
 - **VAL-E3-08 / -10** dependem da **máquina de estados do período (E2)** — o teste de `E3-T05`
   mocka a porta de "período aberto/fechado"; a integração real fecha no E2.
-- **`SaldoRateio` PK com colunas anuláveis** (`DÚVIDA-E3-1`) — confirmar no `E3-T03` (mapeamento).
+- ~~**`SaldoRateio` PK com colunas anuláveis** (`DÚVIDA-E3-1`)~~ — **resolvida no `E3-T03` (2026-09-24):** `FINSALDORATEIO` **não tem PRIMARY KEY** no banco (só o índice UNIQUE `IDX_FINSALDORATEIO` sobre as 5 colunas + 3 índices por dimensão); linhas com dimensão NULL são esperadas (`SaldoRateioHelper` compara `IS NULL AND IS NULL`). Quem grava é o recálculo de saldo por SQL direto (acesso.global `SaldoRateioHelper`); a classe do financeiro só lê. Mapeada como **entidade sem chave (`HasNoKey`, só leitura)**.
 - **`FININDICECONVERSOR` não existe** no schema — confirmado que `IndiceConversor` é serviço.
 - **~40 colunas `[E14]` de `FINCONTABANCARIA`** + `VAL-E3-13..16, 18, 19` + os sequenciais de
   arquivo de `OP-E3-05/06` → épico **E14**.

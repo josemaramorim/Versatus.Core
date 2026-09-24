@@ -143,7 +143,7 @@
 - **Branch:** `feat/mod-05-e3-mappings` · **Commit:** `feat(mod-05): mappings Fluent API E3 (E3-T03)` · **Depende de:** E3-T02
 
 ### E3-T04 · DbSets E3 + teste de mapeamento · tipo: dbcontext
-- **Objetivo:** registrar DbSets no `GestaoFinanceiraDbContext`; teste InMemory materializa/persiste cada entidade e valida PK composta.
+- **Objetivo:** registrar DbSets no `GestaoFinanceiraDbContext`; teste InMemory materializa/persiste cada entidade e valida PK composta. `SaldoRateio` é **sem chave** (`HasNoKey`, `DÚVIDA-E3-1` resolvida no E3-T03): o teste só valida o modelo/consulta, não persiste. `ContaBancaria`: validar que as 6 shadow properties `[E14]` NOT NULL gravam `false` no INSERT.
 - **Cria:** altera `GestaoFinanceiraDbContext.cs`; `tests/.../E3/MapeamentoE3Tests.cs`.
 - **Cobre:** E3-T03.
 - **Pronto quando:** `dotnet test` verde.
