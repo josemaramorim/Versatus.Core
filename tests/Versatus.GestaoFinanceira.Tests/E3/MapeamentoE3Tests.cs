@@ -134,7 +134,8 @@ public class MapeamentoE3Tests
             conta.PermiteEmitirCheque.Should().BeTrue();
             conta.ContaBancariaTipo.Should().Be(TipoContaBancaria.Investimento);
 
-            // Colunas [E14] NOT NULL fora da entidade — default do construtor legado (false).
+            // Colunas NOT NULL de boleto/remessa ([E14], shadow) + ENVIARSPED (propriedade real desde
+            // o E3-T05) — default do construtor legado (false).
             foreach (var coluna in new[] { "GeraBoleto", "GeraRemessa", "ProcessaRetorno",
                          "BoletoBeneficiarioDiferente", "BoletoSacadoAvalista", "EnviarSped" })
             {
