@@ -115,7 +115,7 @@ Módulos mais isolados, podem ser atacados em paralelo após Fase 1.
 | MOD-02 | Acesso Global | 1 | ✔️ Concluído | Fases 1-10 completas, 32 testes passando |
 | MOD-03 | Gestão Material | 2 | 🔄 Em progresso | Fases 1-3 prontas — ver `prompts-execucao/` |
 | MOD-04 | Faturamento | 3 | 📝 Rascunho | Aguarda MOD-03 |
-| MOD-05 | Gestão Financeira | 4 | 🔄 SDD completo (pré-implementação) | `specs/modulos/MOD-05/` — spec v2.3, clarify (13 CLR), plan, data-model, research, contracts, tasks (~90), analyze parcial. Branch `docs/mod-05-sdd`. |
+| MOD-05 | Gestão Financeira | 4 | 🔄 Em progresso | SDD 1-5 concluído (`specs/modulos/MOD-05/`); implementação: Fase S, E0, E1 e E3 (Caixa/Banco) em `develop`; próximo épico E2. Ver Log de Progresso em `04-CONTRATO-DA-IA.md` §5. |
 | MOD-06 | Gestão Compra | 2 | 📝 Rascunho | |
 | MOD-07 | Gestão Tributo | 1 | 🔄 Em progresso | Fases 1-4 OK; Fase 5 SPED — ver `prompts-execucao/` |
 | MOD-08 | NFe | 3 | 📝 Rascunho | |
