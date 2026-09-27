@@ -3,6 +3,7 @@ using Versatus.Framework.Pagination;
 using Versatus.Framework.Sequences;
 using Versatus.Framework.Validation;
 using Versatus.GestaoFinanceira.Domain.Bancos;
+using Versatus.GestaoFinanceira.Domain.DTOs;
 using Versatus.GestaoFinanceira.Domain.Repositories;
 
 namespace Versatus.GestaoFinanceira.Domain.Services;
@@ -16,19 +17,38 @@ public class CobradorService(ICobradorRepository repository, IGeradorSequencial 
     public const string NomeSequencial = "Cobrador";
     public const string MsgNaoEncontrado = "Cobrador não encontrado.";
 
-    public async Task<PagedResult<Cobrador>> ListarPaginadoAsync(string? texto, bool? ativo, int page, int limit,
-        CancellationToken cancellationToken = default)
+    public async Task<PagedResult<CobradorDto>> ListarPaginadoAsync(FiltroCobradorDto filtro, CancellationToken cancellationToken = default)
     {
-        // Artigo VII.5 — materializa antes de paginar (SQL Server 2008).
-        var todos = await repository.ListarAsync(contexto.IdFilial, texto, ativo, cancellationToken);
-        var pagina = Math.Max(page, 1);
-        var tamanho = Math.Max(limit, 1);
+        ArgumentNullException.ThrowIfNull(filtro);
 
-        return new PagedResult<Cobrador>([.. todos.Skip((pagina - 1) * tamanho).Take(tamanho)], todos.Count);
+        // Artigo VII.5 — materializa antes de paginar (SQL Server 2008).
+        var todos = await repository.ListarAsync(contexto.IdFilial, filtro.Texto, filtro.Ativo, cancellationToken);
+        var pagina = Math.Max(filtro.Page, 1);
+        var tamanho = Math.Max(filtro.Limit, 1);
+
+        return new PagedResult<CobradorDto>([.. todos.Skip((pagina - 1) * tamanho).Take(tamanho).Select(BancosDtoMapper.ParaDto)], todos.Count);
     }
 
-    public Task<Cobrador?> ObterPorIdAsync(int idCobrador, int idFilial, CancellationToken cancellationToken = default)
-        => repository.ObterAsync(idCobrador, idFilial, cancellationToken);
+    public async Task<CobradorDto?> ObterPorIdAsync(int idCobrador, int idFilial, CancellationToken cancellationToken = default)
+        => await repository.ObterAsync(idCobrador, idFilial, cancellationToken) is { } cobrador ? BancosDtoMapper.ParaDto(cobrador) : null;
+
+    public async Task<Result<CobradorDto>> CriarAsync(SalvarCobradorDto dto, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+        return ParaResultadoDto(await CriarAsync(BancosDtoMapper.ParaEntidade(0, contexto.IdFilial, dto), cancellationToken));
+    }
+
+    public async Task<Result<CobradorDto>> AtualizarAsync(int idCobrador, int idFilial, SalvarCobradorDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+        return ParaResultadoDto(await AtualizarAsync(BancosDtoMapper.ParaEntidade(idCobrador, idFilial, dto), cancellationToken));
+    }
+
+    private static Result<CobradorDto> ParaResultadoDto(Result<Cobrador> resultado)
+        => resultado.IsSuccess
+            ? Result<CobradorDto>.Ok(BancosDtoMapper.ParaDto(resultado.Value!))
+            : Result<CobradorDto>.Fail([.. resultado.Errors]);
 
     public async Task<Result<Cobrador>> CriarAsync(Cobrador cobrador, CancellationToken cancellationToken = default)
     {

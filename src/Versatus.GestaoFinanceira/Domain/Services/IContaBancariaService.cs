@@ -1,15 +1,17 @@
 using Versatus.Framework.Validation;
 using Versatus.GestaoFinanceira.Domain.Bancos;
+using Versatus.GestaoFinanceira.Domain.DTOs;
 
 namespace Versatus.GestaoFinanceira.Domain.Services;
 
 /// <summary>Conta bancária — núcleo E3 (FINCONTABANCARIA). Integração bancária → E14.</summary>
 public interface IContaBancariaService
 {
-    Task<ContaBancaria?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default);
+    Task<ContaBancariaDto?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default);
 
     /// <summary>Persiste a conta (OP-E3-05, sem os sequenciais de arquivo [E14]) em 1 transação.</summary>
-    Task<Result<ContaBancaria>> AtualizarAsync(ContaBancaria conta, CancellationToken cancellationToken = default);
+    Task<Result<ContaBancariaDto>> AtualizarAsync(int idCaixaBanco, int idFilial, AtualizarContaBancariaDto dto,
+        CancellationToken cancellationToken = default);
 
     /// <summary>Validações núcleo de <c>ContaBancaria.Validate</c> — VAL-E3-17.</summary>
     ValidationResult Validar(ContaBancaria conta);

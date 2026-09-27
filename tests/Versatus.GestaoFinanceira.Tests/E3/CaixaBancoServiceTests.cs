@@ -525,7 +525,7 @@ public class CaixaBancoServiceTests
         await c.SemearAsync(CenarioE3.Caixa(1, ContaTipo.Caixa), CenarioE3.Caixa(2, ContaTipo.Banco),
             CenarioE3.Caixa(3, ContaTipo.Banco), outraFilial);
 
-        var r = await c.CaixaBancoService().ListarPaginadoAsync(null, null, ContaTipo.Banco, null, page: 2, limit: 1);
+        var r = await c.CaixaBancoService().ListarPaginadoAsync(new FiltroCaixaBancoDto(IdTipoConta: (int)ContaTipo.Banco, Page: 2, Limit: 1));
 
         r.Total.Should().Be(2);
         r.Items.Single().IdCaixaBanco.Should().Be(3);

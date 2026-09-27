@@ -1,6 +1,7 @@
 using Versatus.Framework.Context;
 using Versatus.Framework.Validation;
 using Versatus.GestaoFinanceira.Domain.Bancos;
+using Versatus.GestaoFinanceira.Domain.DTOs;
 using Versatus.GestaoFinanceira.Domain.Repositories;
 
 namespace Versatus.GestaoFinanceira.Domain.Services;
@@ -16,8 +17,19 @@ public class ContaBancariaService(IContaBancariaRepository repository, IContexto
     public const string MsgContaTerceiro =
         "Para cadastrar uma conta de terceiro tem que informar o nome do titular e o CPF/CNPJ do mesmo.";
 
-    public Task<ContaBancaria?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default)
-        => repository.ObterAsync(idCaixaBanco, idFilial, cancellationToken);
+    public async Task<ContaBancariaDto?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default)
+        => await repository.ObterAsync(idCaixaBanco, idFilial, cancellationToken) is { } conta ? BancosDtoMapper.ParaDto(conta) : null;
+
+    public async Task<Result<ContaBancariaDto>> AtualizarAsync(int idCaixaBanco, int idFilial, AtualizarContaBancariaDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+
+        var resultado = await AtualizarAsync(BancosDtoMapper.ParaEntidade(idCaixaBanco, idFilial, dto), cancellationToken);
+        return resultado.IsSuccess
+            ? Result<ContaBancariaDto>.Ok(BancosDtoMapper.ParaDto(resultado.Value!))
+            : Result<ContaBancariaDto>.Fail([.. resultado.Errors]);
+    }
 
     public async Task<Result<ContaBancaria>> AtualizarAsync(ContaBancaria conta, CancellationToken cancellationToken = default)
     {
