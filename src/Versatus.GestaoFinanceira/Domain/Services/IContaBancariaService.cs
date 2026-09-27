@@ -13,6 +13,12 @@ public interface IContaBancariaService
     Task<Result<ContaBancariaDto>> AtualizarAsync(int idCaixaBanco, int idFilial, AtualizarContaBancariaDto dto,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// VAL-E3-23..26 — efeitos dos setters do legado (terceiro, SPED, tipo da conta, conta
+    /// vinculada). Aplicado antes das validações; não grava nada.
+    /// </summary>
+    Task NormalizarAsync(ContaBancaria conta, int idFilial, CancellationToken cancellationToken = default);
+
     /// <summary>Validações núcleo de <c>ContaBancaria.Validate</c> — VAL-E3-17.</summary>
     ValidationResult Validar(ContaBancaria conta);
 

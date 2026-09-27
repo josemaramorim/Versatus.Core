@@ -23,6 +23,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IContaBancariaService, ContaBancariaService>();
         services.AddScoped<ICobradorService, CobradorService>();
 
+        // E3 — listas de consulta da tela Caixa/Banco (E3-T07)
+        services.AddScoped<ILookupFinanceiroConsulta, LookupFinanceiroConsulta>();
+        services.AddScoped<ILookupFinanceiroService, LookupFinanceiroService>();
+
         return services;
     }
 }
