@@ -35,7 +35,8 @@ builder.Services.AddDbContext<TributoDbContext>(options =>
     options.UseSqlServer(writeConnectionString));
 
 builder.Services.AddDbContext<GestaoFinanceiraDbContext>(options =>
-    options.UseSqlServer(writeConnectionString));
+    options.UseSqlServer(writeConnectionString,
+        sql => sql.MigrationsHistoryTable(GestaoFinanceiraDbContext.TabelaHistoricoMigrations)));
 
 // DbContexts para LEITURA (Read Replica DB desativado de tracking para alta performance)
 builder.Services.AddDbContext<AcessoGlobalReadDbContext>(options =>

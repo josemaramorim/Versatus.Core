@@ -175,6 +175,7 @@
 ### E3-T08 · Migration EF Core E3 · tipo: migration
 - **Objetivo:** primeira migration do `GestaoFinanceiraDbContext` cobrindo E3; validar contra o banco real (schema-first — a migration não recria tabelas, só sincroniza o modelo).
 - **Cria:** `Infrastructure/Migrations/*`.
+- **Decisões do usuário (2026-09-27):** (1) **baseline vazia** `BaselineE3` — `Up`/`Down` sem operações, só o snapshot do modelo E3; (2) **não registrada** no banco nesta tarefa (script conferido: só cria a tabela de histórico e insere a baseline, nenhum DDL em `FIN*`); (3) ferramenta de design no próprio módulo (`Microsoft.EntityFrameworkCore.Design` com `PrivateAssets=all` + `GestaoFinanceiraDbContextFactory`); (4) histórico próprio `__EFMigrationsHistory_GestaoFinanceira` (também configurado no `Program.cs` da WebAPI). Validação contra o banco real: 88 colunas mapeadas sem divergência de nome/tipo/nulidade; 27 colunas `[E14]` fora do modelo, todas anuláveis. **Achado:** a `InitialCreate` do AcessoGlobal faz `CreateTable` de tabelas do legado (com tipos `nvarchar`/`bit`/`datetime2`) e nunca foi aplicada (`__EFMigrationsHistory` vazia) — não serve de modelo.
 - **Branch:** `feat/mod-05-e3-migration` · **Commit:** `setup(mod-05): migration inicial E3 (E3-T08)` · **Depende de:** E3-T04
 
 ### E3-T09 · Paridade de saldo e conversão por índice · tipo: parity
