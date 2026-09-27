@@ -100,8 +100,16 @@
 | **VAL-E3-19** `[E14]` | `ContaBancaria.cs:CpfCnpj.set` (linha 877) | Domínio | Dígito verificador de CPF/CNPJ da conta bancária. | *(`ValorInvalidoException.CnpjCpfInvalido`)* | **E14** | **E14** | RN-05-016 |
 | **VAL-E3-20** | `IndiceConversor.cs:ConverterIndice` (198/201) + `RetornarIndice` (94) | Serviço | Índice de origem/destino não nulos; e deve existir valor do índice para a data (lista não vazia e valor ≠ 0). | *"IndiceOrigem/IndiceDestino" (`ValorNulo`)* · *(`DataSemIndiceEconomico`, sigla + data)* | `ConversorIndiceService` — guardas + `Result.Fail` (`DataSemIndiceEconomico`); ver CALC-E3-05..07 | N/A | RN-05-008 |
 | **VAL-E3-21** `[E14]` | `ContaBancaria.cs:GeraBoleto.set` / `GeraRemessa.set` / `ProcessaRetorno.set` (1058/1080/1102) | Domínio | Ao ligar boleto / remessa / retorno, a **agência** deve estar informada. | *"Para gerar boleto/remessa / processar arquivo de retorno, deve ser informado a agência."* | **E14** | **E14** | RN-05-016 |
+| **VAL-E3-22** | `CaixaBanco.cs:655` (setter `TipoConta`) | Domínio / setter | Caixa → `TipoContaCaixa = Normal` quando não informado; Banco → sem tipo de caixa. | — (efeito) | `CaixaBancoService` (normaliza antes de validar) | `onChange` do Tipo (UI-03) | RN-05-006 |
+| **VAL-E3-23** | `ContaBancaria.cs:432-439` (`LimpaDadosTerceiro`) | Domínio / setter | Sem conta de terceiro → titular e CPF/CNPJ vazios. | — (efeito) | `ContaBancariaService.NormalizarAsync` | `onChange` (UI-09) | RN-05-006 |
+| **VAL-E3-24** | `ContaBancaria.cs:1190-1195` (setter `EnviarSped`) | Domínio / setter | Sem Enviar SPED → instituição financeira vazia. | — (efeito) | idem | `onChange` (UI-13) | RN-05-006 |
+| **VAL-E3-25** | `ContaBancaria.cs:1347-1375` (setter `ContaBancariaTipo`) | Domínio / setter | Conta corrente → sem conta vinculada; Investimento → zera agência, número, dígito, limite, terceiro e cheque. | — (efeito) | idem | `onChange` (UI-16) | RN-05-006 |
+| **VAL-E3-26** | `ContaBancaria.cs:444-470` (`SetDadosBancoContaVinculada`) | Domínio / setter | Investimento com conta vinculada → copia dela agência, número, dígito, limite, terceiro, titular e CPF/CNPJ. | — (efeito) | idem | cópia ao escolher a vinculada (UI-17) | RN-05-006 |
 
-> **VAL-xx#E3 = 21** (7 marcadas `[E14]`, tratadas no épico E14 — CLR-03). Cobertura por
+> **VAL-xx#E3 = 26** (7 marcadas `[E14]`, tratadas no épico E14 — CLR-03). **VAL-E3-22..26**
+> acrescentadas no **E3-T07** (2026-09-27): efeitos de setter achados na auditoria do
+> `FCaixaBanco` que não tinham linha; por decisão do usuário, aplicados na tela **e** no backend —
+> `[Fact]` em `tests/.../E3/NormalizacaoCaixaBancoTests.cs`. Cobertura por
 > `[Fact]`: **E3-T05** (`service`) — 1 por `VAL-E3-01..12, 17` + `VAL-E1-27`
 > (`tests/.../E3/CaixaBancoServiceTests.cs`, `ContaBancariaServiceTests.cs`); **E3-T09** —
 > `VAL-E3-20` (movida em 2026-09-24: vive no `ConversorIndiceService`); **E14-T0x** —

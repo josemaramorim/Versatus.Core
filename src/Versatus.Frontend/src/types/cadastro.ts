@@ -81,6 +81,15 @@ export abstract class BaseCadastroConfig<T> {
     return form;
   }
 
+  /**
+   * Parâmetros extras da query da listagem paginada (GET /paginado), montados a partir dos
+   * filtros aplicados. Implementação padrão: nenhum. Sobrescreva quando a API da tela usar
+   * nomes de filtro próprios (ex.: Caixa/Banco usa `texto`, `idTipoConta`, `ativo`).
+   */
+  getExtraListParams(_filters: Record<string, any>): Record<string, string> {
+    return {};
+  }
+
   // Gancho opcional para processamento antes de salvar
   beforeSave(record: T): T {
     return record;

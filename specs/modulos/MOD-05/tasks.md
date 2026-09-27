@@ -168,6 +168,7 @@
 - **Objetivo:** completar `docs/spec_fcaixabanco.md` (RTV via `legacy-validation-audit` em `FCaixaBanco.cs` + `FBaseCadastro`), depois `src/pages/Financeiro/FCaixaBanco/` (types, schema, `CaixaBancoCadastroConfig.tsx` estendendo `BaseCadastroConfig<T>`, `index.tsx`) + `schema.test.ts` (Vitest) por regra RTV. Campos obrigatórios com `required` (Lei 10). Sem abas/campos de boleto/remessa/retorno (E14).
 - **Cria:** `src/Versatus.Frontend/src/pages/Financeiro/FCaixaBanco/*`.
 - **Cobre:** `VAL-xx#E3` visuais.
+- **Decisões do usuário (2026-09-27, spec v1.1):** (1) endpoints de consulta `GET /api/financeiro/lookups/*` (agência, usuário, instituição PJ, plano contábil analítico, conta corrente) no MOD-05; (2) efeitos de setter do legado → `VAL-E3-22..26`, aplicados na tela **e** no backend (`ContaBancariaService.NormalizarAsync`); (3) rota `/financeiro/caixabanco` (rotina 29 já existente, sem alterar o banco). Também altera `types/cadastro.ts` + `useCrudListState.ts` (gancho `getExtraListParams`) e `AppShell.tsx` (rota).
 - **Pronto quando:** `npm run build` + `npm test` verdes.
 - **Branch:** `feat/mod-05-e3-frontend` · **Commit:** `feat(mod-05): tela Caixa/Banco React (E3-T07)` · **Depende de:** E3-T06
 

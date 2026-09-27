@@ -54,3 +54,17 @@ true no DTO. (`Nome`/`IdEntidade` obrigatórios: sem linha na Matriz RTV — só
 (saldo anterior, débito, crédito, conciliado). Sem escrita direta — atualizado pelos
 Handlers de movimento/liquidação. **Não implementado no E3-T06:** depende de `OP-E3-08`/
 `CALC-E3-03`, movidas para o **E3-T09** (2026-09-24).
+
+## Listas de consulta da tela (E3-T07 — `DÚVIDA-CB5`)
+
+`GET /api/financeiro/lookups/{lista}?texto=` (Read) → `IReadOnlyList<ItemLookupDto(Id, Descricao)>`,
+no máximo 100 itens, filtro por código ou descrição. SQL só-leitura (`LookupFinanceiroConsulta`),
+porque MOD-02/contábil ainda não expõem essas consultas.
+
+| `{lista}` | Tabelas | Filtro fixo (legado) |
+| :--- | :--- | :--- |
+| `agencias` | `GLOAGENCIA` + `GLOBANCO` | — |
+| `usuarios` | `GLOUSUARIO` | — |
+| `instituicoes-financeiras` | `GLOINSTITUICAOFINANCEIRA` + `GLOENTIDADE` | só Pessoa Jurídica (`FCaixaBanco.cs:2387`) |
+| `planos-contabeis` | `CONPLANOCONTABIL` | filial do contexto, só analítico `IDTIPO = 34` (`CaixaBanco.cs:460`) |
+| `contas-correntes` | `FINCAIXABANCO` + `FINCONTABANCARIA` | filial do contexto, só Conta corrente (`FCaixaBanco.cs:2372`) |

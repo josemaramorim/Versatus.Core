@@ -44,6 +44,7 @@ export function useCrudListState<T>(
         role: Array.isArray(filters.role) ? filters.role.join(',') : (filters.role || ''),
         tipoPessoa: filters.tipoPessoa !== undefined && filters.tipoPessoa !== null ? String(filters.tipoPessoa) : ''
       });
+      Object.entries(config.getExtraListParams(filters)).forEach(([chave, valor]) => params.set(chave, valor));
 
       const response = await fetch(`${config.getApiEndpoint()}/paginado?${params.toString()}`, {
         headers: getApiHeaders()

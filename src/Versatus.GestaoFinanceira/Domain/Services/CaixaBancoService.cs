@@ -377,6 +377,17 @@ public class CaixaBancoService(
     private async Task<ValidationResult> ValidarPersistenciaAsync(CaixaBanco caixa, ContaBancaria? conta, bool contaPersistida,
         bool? ativoPersistido, CancellationToken cancellationToken)
     {
+        // VAL-E3-22 — CaixaBanco.cs:655 (setter TipoConta): Caixa assume tipo de caixa Normal quando
+        // não informado; Banco não tem tipo de caixa.
+        if (caixa.TipoConta == ContaTipo.Banco)
+            caixa.TipoContaCaixa = null;
+        else if (caixa.TipoConta == ContaTipo.Caixa && caixa.TipoContaCaixa is null)
+            caixa.TipoContaCaixa = TipoContaCaixa.Normal;
+
+        // VAL-E3-23..26 — setters da conta bancária (antes das validações, como no legado).
+        if (caixa.TipoConta == ContaTipo.Banco && conta is not null)
+            await contaBancariaService.NormalizarAsync(conta, contexto.IdFilial, cancellationToken);
+
         var ids = caixa.Usuarios.Select(u => u.IdUsuario).ToList();
 
         var resultado = ValidarUsuarioUnico(ids);

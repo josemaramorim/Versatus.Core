@@ -10,6 +10,7 @@ import { useTabs, TabScopeContext } from '../../context/TabsContext';
 import { FEntidade } from '../../pages/AcessoGlobal/FEntidade';
 import { FParametro } from '../../pages/AcessoGlobal/FParametro';
 import { FCondicaoPagamento } from '../../pages/AcessoGlobal/FCondicaoPagamento';
+import { FCaixaBanco } from '../../pages/Financeiro/FCaixaBanco';
 import { DashboardScreen } from './DashboardScreen';
 
 /** Mapa de rota → componente correspondente */
@@ -17,6 +18,8 @@ const PAGINA_MAP: Record<string, React.ComponentType> = {
   '/acesso-global/entidade': FEntidade,
   '/acesso-global/parametro': FParametro,
   '/acesso-global/condicao-pagamento': FCondicaoPagamento,
+  // Rotina 29 (GLOROTINA, RotaWeb NULL) → prefixo do módulo + 'caixabanco' (MenuService.FormatRota).
+  '/financeiro/caixabanco': FCaixaBanco,
 };
 
 /** Mapa de rota → título legível da aba */
@@ -24,6 +27,7 @@ const ROTA_TITULO_MAP: Record<string, string> = {
   '/acesso-global/entidade': 'Cadastro Entidade',
   '/acesso-global/parametro': 'Parâmetros',
   '/acesso-global/condicao-pagamento': 'Condições de Pagamento',
+  '/financeiro/caixabanco': 'Caixa / Banco',
 };
 
 /** Componente memoizado para congelar renderizações de abas inativas */

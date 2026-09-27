@@ -3,6 +3,7 @@ using Versatus.Framework.Validation;
 using Versatus.GestaoFinanceira.Domain.Bancos;
 using Versatus.GestaoFinanceira.Domain.DTOs;
 using Versatus.GestaoFinanceira.Domain.Repositories;
+using Versatus.SharedKernel.Enums;
 
 namespace Versatus.GestaoFinanceira.Domain.Services;
 
@@ -39,6 +40,8 @@ public class ContaBancariaService(IContaBancariaRepository repository, IContexto
         if (existente is null)
             return Result<ContaBancaria>.Fail(new ValidationError(nameof(ContaBancaria.IdCaixaBanco), "Conta bancária não encontrada."));
 
+        await NormalizarAsync(conta, contexto.IdFilial, cancellationToken);
+
         var validacao = Validar(conta);
         if (!validacao.IsValid)
             return Result<ContaBancaria>.Fail([.. validacao.Errors]);
@@ -53,6 +56,55 @@ public class ContaBancariaService(IContaBancariaRepository repository, IContexto
         await transacao.CommitAsync(cancellationToken);
 
         return Result<ContaBancaria>.Ok(existente);
+    }
+
+    // VAL-E3-23..26 — efeitos dos setters do legado (achado do E3-T07; decisão do usuário em
+    // 2026-09-27: aplicar também no backend). Estado final equivalente ao do objeto legado depois
+    // que a tela atribui os campos; roda antes das validações, como os setters.
+    public async Task NormalizarAsync(ContaBancaria conta, int idFilial, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(conta);
+
+        // VAL-E3-25 — ContaBancaria.cs:1347-1375 (setter ContaBancariaTipo): limpa a conta vinculada;
+        // Investimento zera os dados bancários, conta de terceiro e cheque.
+        if (conta.ContaBancariaTipo != TipoContaBancaria.Investimento)
+        {
+            conta.IdContaBancariaVinculada = null;
+        }
+        else
+        {
+            conta.IdAgencia = 0;
+            conta.NumeroConta = string.Empty;
+            conta.DigitoConta = null;
+            conta.ContaTerceiro = false;
+            conta.PermiteEmitirCheque = false;
+            conta.Limite = 0m;
+
+            // VAL-E3-26 — ContaBancaria.cs:444-470 (SetDadosBancoContaVinculada): copia os dados
+            // bancários da conta vinculada.
+            if (conta.IdContaBancariaVinculada is { } idVinculada
+                && await repository.ObterAsync(idVinculada, idFilial, cancellationToken) is { } vinculada)
+            {
+                conta.IdAgencia = vinculada.IdAgencia;
+                conta.NumeroConta = vinculada.NumeroConta;
+                conta.DigitoConta = vinculada.DigitoConta;
+                conta.Limite = vinculada.Limite;
+                conta.ContaTerceiro = vinculada.ContaTerceiro;
+                conta.Titular = vinculada.Titular;
+                conta.CpfCnpj = vinculada.CpfCnpj;
+            }
+        }
+
+        // VAL-E3-23 — ContaBancaria.cs:432-439 (LimpaDadosTerceiro).
+        if (!conta.ContaTerceiro)
+        {
+            conta.Titular = null;
+            conta.CpfCnpj = null;
+        }
+
+        // VAL-E3-24 — ContaBancaria.cs:1190-1195 (setter EnviarSped).
+        if (!conta.EnviarSped)
+            conta.IdInstituicaoFinanceira = null;
     }
 
     // ContaBancaria.cs:202 — só a regra núcleo; as de boleto/remessa/protesto são [E14].

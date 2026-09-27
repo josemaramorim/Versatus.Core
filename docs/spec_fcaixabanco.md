@@ -2,178 +2,221 @@
 
 > **Tipo:** Spec Funcional — **template de referência do MOD-05 (Padrão A)**
 > **Módulo:** Gestão Financeira (`Versatus.GestaoFinanceira`)
-> **Versão:** 0.1 (rascunho — a completar na tarefa `E3-T07` com `legacy-validation-audit`)
-> **Padrão de Tela:** **Padrão A — CRUD Padrão** (herda `FBaseCadastro`)
+> **Versão:** 1.1 (aprovada e implementada na tarefa `E3-T07`, 2026-09-27)
+> **Padrão de Tela:** **Padrão A — CRUD Padrão** (`FCaixaBanco : FBaseCadastro`; Novo/Editar/Excluir + grade)
 > **Legado:** `cliente/cliente.aplicativo/aplicativo.gestao.financeira/FCaixaBanco.cs` (3017 l) ·
-> objeto `servidor/objeto de negócio/gestao.financeira/CaixaBanco.cs` (869 l) +
-> `ContaBancaria.cs` (1704 l)
-> **Contrato backend:** [`specs/modulos/MOD-05/contracts/caixa-banco.md`](../specs/modulos/MOD-05/contracts/caixa-banco.md)
-> **Modelo de dados:** [`specs/modulos/MOD-05/data-model.md §3.1–3.4`](../specs/modulos/MOD-05/data-model.md)
->
-> ⚠️ Esta spec estabelece **estrutura e decisões de mapeamento**. A extração 100% da
-> Matriz RTV (Seção 6) é feita na tarefa `E3-T07` rodando `legacy-validation-audit` +
-> `legacy-operation-audit` em `FCaixaBanco.cs` e classes-pai.
+> objetos `servidor/objeto de negócio/gestao.financeira/CaixaBanco.cs` (869 l) +
+> `ContaBancaria.cs` (1704 l) + `CaixaBancoUsuario.cs` (350 l)
+> **Contrato backend (implementado no E3-T06):** [`specs/modulos/MOD-05/contracts/caixa-banco.md`](../specs/modulos/MOD-05/contracts/caixa-banco.md)
+> **Mapa coluna → propriedade:** [`specs/modulos/MOD-05/analysis/E3-caixa-banco.md §2`](../specs/modulos/MOD-05/analysis/E3-caixa-banco.md)
+> **Matriz RTV do épico:** [`specs/modulos/MOD-05/matriz-rtv.md#E3`](../specs/modulos/MOD-05/matriz-rtv.md)
 
 ---
 
-## 1. Objetivo
+## 1. Resumo e Objetivo
 
-Cadastrar **caixas** (dinheiro/tesouraria) e **contas bancárias** de cada filial, que são
-a base de todo movimento financeiro, liquidação, cheque e conciliação. Quando o tipo é
-banco, o registro ganha o bloco `ContaBancaria` (agência, conta, dígito, titular, limite)
-e — em telas de E14 — os parâmetros de boleto/remessa/retorno. Controla também os
-**usuários autorizados** por caixa/banco.
+Cadastrar **caixas** (dinheiro/tesouraria) e **contas bancárias** de cada filial — base de
+movimento financeiro, liquidação, cheque e conciliação. Quando o tipo é **Banco**, o registro
+ganha a aba **Conta bancária** (agência, número/dígito, titular, limite, conta vinculada, SPED).
+Controla também os **usuários autorizados** por caixa/banco (quando o parâmetro
+`VinculaCaixaBancoUsuario` está ligado). Boleto/remessa/retorno **não** entram nesta tela
+(épico E14 — CLR-03).
 
 ---
 
-## 2. Endpoints da API
+## 2. Mapeamento de Entidades e Banco de Dados
 
-Conforme `contracts/caixa-banco.md`:
+- **Tabelas:** `FINCAIXABANCO` (PK `IDFINCAIXABANCO, IDGLOFILIAL`) · `FINCONTABANCARIA` (1:1, mesma
+  PK) · `FINCAIXABANCOUSUARIO` (PK `+ IDGLOUSUARIO`).
+- **Anuláveis (tipos `?`):** `UltimaDataConferida`, `Saldo`, `ContaContabil`, `IdPlanoContabil`,
+  `IdTipoContaCaixa`; na conta: `Titular`, `DigitoConta`, `Limite`, `CreditoPendente`,
+  `DebitoPendente`, `ChequePendente`, `IdContaBancariaVinculada`, `IdInstituicaoFinanceira`,
+  `CpfCnpj`; auditoria (6 colunas).
+- **NOT NULL (→ `required` na UI, Lei 10):** `Descricao`, `TipoConta`; na conta: `IdAgencia`,
+  `NumeroConta`, `ContaBancariaTipo`. No legado a obrigatoriedade vem do binder
+  (`binderControlContaBancaria.ValidateRequiredControls()` — `FCaixaBanco.cs:2310`), sem
+  atributo no objeto.
+
+---
+
+## 3. Requisitos Arquiteturais & Boas Práticas
+
+- Backend **já implementado** (E3-T05/T06): POCO em `Domain/Bancos/`, Fluent API em
+  `Infrastructure/Mappings/`, serviços `ICaixaBancoService`/`IContaBancariaService` com
+  `Result<T>`, controllers finos, CQRS (leitura `ReadContext`, escrita `Context`), paginação
+  materializada (SQL Server 2008).
+- Frontend: `src/pages/Financeiro/FCaixaBanco/` (`types.ts`, `schema.ts`,
+  `CaixaBancoCadastroConfig.tsx` estendendo `BaseCadastroConfig<T>`, `index.tsx`,
+  `schema.test.ts`), no mesmo padrão de `AcessoGlobal/FCondicaoPagamento`.
+
+### 3.1 Enumerações (valores do banco — `GLOTIPOENUMERADO`, via `useEnumOptions(idPai)`)
+
+| Enum | Coluna | `idPai` | Valores |
+|---|---|---|---|
+| `ContaTipo` | `FINCAIXABANCO.IDTIPOCONTA` | 174 | 175 Caixa · 176 Banco |
+| `TipoContaCaixa` | `FINCAIXABANCO.IDTIPOCONTACAIXA` | 1481 | 1482 Normal · 1483 Cofre |
+| `TipoContaBancaria` | `FINCONTABANCARIA.IDTIPOCONTABANCARIA` | 1478 | 1479 Conta corrente · 1480 Investimento |
+
+Resolve `DÚVIDA-CB1` da versão 0.1.
+
+---
+
+## 4. Endpoints REST da Web API (implementados no E3-T06)
 
 | Método | Rota | Função |
 |---|---|---|
-| `GET` | `/api/financeiro/caixa-banco/paginado?page&limit&search&ativo&idTipoConta&entraFluxoCaixa` | Listagem paginada (em memória — SQL Server 2008) |
-| `GET` | `/api/financeiro/caixa-banco/{idFilial}/{id}` | Registro por chave composta (inclui `ContaBancaria` quando banco) |
-| `POST` | `/api/financeiro/caixa-banco` | Criar (gera sequencial por filial) |
-| `PUT` | `/api/financeiro/caixa-banco/{idFilial}/{id}` | Atualizar |
-| `DELETE` | `/api/financeiro/caixa-banco/{idFilial}/{id}` | Excluir (bloqueado se em uso) |
-| `GET` | `/api/financeiro/caixa-banco/{idFilial}/{id}/usuarios` | Usuários autorizados |
-| `PUT` | `/api/financeiro/caixa-banco/{idFilial}/{id}/usuarios` | Salvar usuários (lista) |
-| `GET` | `/api/financeiro/conta-bancaria/{idFilial}/{id}` / `PUT` | Bloco bancário (núcleo) |
-
-> **Chave composta:** todas as rotas de detalhe usam `{idFilial}/{id}` (`FINCAIXABANCO` PK
-> = `IDFINCAIXABANCO, IDGLOFILIAL`). `id` = `IdCaixaBanco`.
+| `GET` | `/api/financeiro/caixa-banco/paginado?texto&ativo&idTipoConta&entraFluxoCaixa&page&limit` | Grade |
+| `GET` | `/api/financeiro/caixa-banco/{idFilial}/{id}` | Registro + usuários + bloco `contaBancaria` (quando Banco) |
+| `POST` | `/api/financeiro/caixa-banco` | Criar (`CriarCaixaBancoDto`, com `usuarios[]` e `contaBancaria`) |
+| `PUT` | `/api/financeiro/caixa-banco/{idFilial}/{id}` | Atualizar (`AtualizarCaixaBancoDto`) |
+| `DELETE` | `/api/financeiro/caixa-banco/{idFilial}/{id}` | Excluir |
+| `GET`/`PUT` | `/api/financeiro/caixa-banco/{idFilial}/{id}/usuarios` | Usuários (a tela usa o POST/PUT do caixa, que já grava a lista) |
+| `GET`/`PUT` | `/api/financeiro/conta-bancaria/{idFilial}/{id}` | Bloco bancário isolado (não usado pela tela) |
+| `GET` | `/api/parametro/{chave}` (MOD-02) | `VINCULACAIXABANCOUSUARIO`, `HABILITAPROCESSOCONTABILIZACAO` |
+| `GET` | `/api/TipoEnumerado/{idPai}` (MOD-02) | Opções dos enums (§3.1) |
 
 ---
 
-## 3. Conversão de Dados e Enums (Legado vs. Frontend)
+## 5. Interface Gráfica Frontend (React + MUI)
 
-> Valores inteiros preservados de `Projeto.Geral.Enumerado`. Inventário fino na tarefa
-> `E0-T01` (`specs/modulos/MOD-05/enums.md`). Frontend carrega via `useEnumOptions`.
+### 5.1 Grade
 
-| Enumeração | Coluna legada | Uso |
+| Coluna | Campo | Observação |
 |---|---|---|
-| **TipoConta** | `FINCAIXABANCO.IDTIPOCONTA` | Caixa / Banco (define abas visíveis) — `DÚVIDA: confirmar valores em E0-T01` |
-| **TipoContaCaixa** | `IDTIPOCONTACAIXA` (nullable) | subtipo quando Caixa |
-| **TipoContaBancaria** | `FINCONTABANCARIA.IDTIPOCONTABANCARIA` | subtipo quando Banco |
-| **TipoArquivoRemessaRetorno** | `FINCONTABANCARIA.IDTIPOARQUIVOREMESSARETORNO` (nullable) | layout CNAB (só telas E14) |
-
-Booleanos (`smallint` no banco → `bool`): `ATIVO`, `ENTRAFLUXOCAIXA`,
-`PERMITEEMITIRCHEQUE`, `CONTATERCEIRO`; (E14) `GERABOLETO`, `GERAREMESSA`,
-`PROCESSARETORNO`, `ENVIARSPED`, `BOLETOBENEFICIARIODIFERENTE`, `BOLETOSACADOAVALISTA`.
-
----
-
-## 4. Colunas da Listagem (Grid)
-
-| Coluna | Campo interno | Observação |
-|---|---|---|
-| Código | `idCaixaBanco` | por filial |
+| Código | `idCaixaBanco` | |
 | Descrição | `descricao` | |
-| Tipo | `idTipoConta` | "Caixa" / "Banco" (Chip) |
-| Entra Fluxo de Caixa | `entraFluxoCaixa` | ícone sim/não |
-| Saldo | `saldo` | `decimal?`, formatação monetária (read-only) |
+| Tipo | `idTipoConta` | Chip "Caixa"/"Banco" |
+| Tipo conta caixa | `idTipoContaCaixa` | "Normal"/"Cofre" (vazio quando Banco) |
+| Entra fluxo de caixa | `entraFluxoCaixa` | ícone sim/não |
 | Situação | `ativo` | Chip verde "Ativo" / vermelho "Inativo" |
 
----
+Filtros: texto (código ou descrição), Tipo, Situação, Entra fluxo de caixa.
 
-## 5. Campos do Formulário e Regras de Interface
+### 5.2 Formulário — cabeçalho e aba **Geral** (sempre visível)
 
-Cabeçalho + abas condicionais pelo campo **Tipo** (`idTipoConta`). No legado, o layout
-usa `panelGeral`, `panelTipoContaCaixa`, `panelTipoContaBanco`, `groupBoxDadosConta`,
-`tabPageContaBancaria`, `tabPageContabil` — e `tabPageBoleto`/`tabPageRemessa`/`tabPageRetorno`
-que **pertencem ao épico E14** (não entram nesta tela nesta rodada — ver `spec.md §1.5`).
+| # | Campo (legado) | Propriedade | Componente | `required` | Regra de UI (legado) |
+|---|---|---|---|---|---|
+| 1 | Código | `idCaixaBanco` | `TextField` readonly | — | gerado pelo servidor |
+| 2 | Descrição (`textEditNome`) | `descricao` | `TextField` (máx. 100) | ✅ | |
+| 3 | Ativo (`checkEditAtivo`) | `ativo` | `Switch` | — | default `true` |
+| 4 | Tipo conta (`comboBoxTipoConta`) | `idTipoConta` | `Select` (enum 174) | ✅ | **UI-01**, **UI-02** |
+| 5 | Tipo conta caixa (`comboBoxTipoContaCaixa`) | `idTipoContaCaixa` | `Select` (enum 1481) | — | **UI-03** |
+| 6 | Entra na previsão/fluxo (`checkEditEntraPrevisao`) | `entraFluxoCaixa` | `Switch` | — | |
+| 7 | Usuários (`gridFormEditorUsuario`) | `usuarios[]` | grade de usuários | — | **UI-04**, VAL-E3-01/11 |
 
-### 5.1 Dados Gerais (cabeçalho — sempre visível)
+### 5.3 Aba **Conta bancária** (`tabPageContaBancaria`) — só quando Tipo = Banco (**UI-05**)
 
-| Campo | Componente | Obrigatório | Regra |
-|---|---|---|---|
-| Código | `TextField` readonly | — | `idCaixaBanco` (gerado) |
-| Descrição | `TextField` | ✅ `required` | `DESCRICAO varchar(100)` — não vazia |
-| Tipo | `Select` | ✅ `required` | `TipoConta`; muda abas/painéis visíveis; readonly após ter movimento |
-| Entra no Fluxo de Caixa | `Switch` | — | `ENTRAFLUXOCAIXA` |
-| Ativo | `Switch` | — | `ATIVO`; default `true` |
-| Conta Contábil | `TextField` / lookup | — | `CONTACONTABIL varchar(20)` + `IDCONPLANOCONTABIL` (aba Contábil; só se `HabilitaProcessoContabilizacao`) |
+| # | Campo (legado) | Propriedade | Componente | `required` | Regra de UI (legado) |
+|---|---|---|---|---|---|
+| 8 | Tipo conta bancária (`comboBoxTipoContaBanco`, no `panelTipoContaBanco` do cabeçalho) | `idTipoContaBancaria` | `Select` (enum 1478) — exibido no cabeçalho, ao lado do Tipo | ✅ | **UI-06**, **UI-07** |
+| 9 | Agência (`lookupAgencia`) | `idAgencia` | lookup | ✅ | **UI-08** |
+| 10 | Número da conta / Dígito | `numeroConta` (máx. 15) / `digitoConta` (máx. 2) | `TextField` ×2 | ✅ / — | **UI-08** |
+| 11 | Limite (`calcEditLimite`) | `limite` | `TextField` numérico | — | **UI-08** |
+| 12 | Conta de terceiro (`checkGroupContaTerceiro`) | `contaTerceiro` | `Checkbox` (grupo) | — | **UI-09**, VAL-E3-17 |
+| 13 | Titular | `titular` (máx. 50) | `TextField` | condicional | dentro do grupo terceiro — VAL-E3-17 |
+| 14 | CPF/CNPJ titular | `cpfCnpj` (máx. 14) | `TextField` c/ máscara | condicional | dentro do grupo terceiro — VAL-E3-17 |
+| 15 | Permite emitir cheque (`checkGroupCheque`) | `permiteEmitirCheque` | `Checkbox` | — | **UI-10** |
+| 16 | Conta vinculada (`lookupEditContaVinculada`) | `idContaBancariaVinculada` | lookup de contas | condicional | **UI-11**, **UI-12**, VAL-E3-06/07 |
+| 17 | Enviar SPED (Bloco 1601) (`checkGrouprEnviarSped`) | `enviarSped` | `Checkbox` (grupo) | — | **UI-13**, VAL-E3-02..05 |
+| 18 | Instituição financeira fiscal (`lookupEditInstituicaoFinanceiraSPED`) | `idInstituicaoFinanceira` | lookup (só PJ) | condicional | **UI-14**, VAL-E3-02..05 |
+| — | Crédito/Débito/Cheque pendente | `creditoPendente`… | somente exibição | — | mantidos pelos Handlers de movimento |
 
-### 5.2 Aba "Dados da Conta" — visível quando Tipo = **Banco**
+Fora desta tela (E14): `groupBoxDadosBoleto` (Gera boleto/remessa/retorno), abas
+Boleto/Remessa/Retorno, botões "Manutenção nosso número/número remessa", impresso de cheque
+(`IdDocumentoImpressao`).
 
-| Campo | Componente | Obrigatório | Regra |
-|---|---|---|---|
-| Agência | `LookupEdit` (banco/agência) | ✅ | `FINCONTABANCARIA.IDGLOAGENCIA` |
-| Número da Conta | `TextField` | ✅ | `NUMEROCONTA varchar(15)` |
-| Dígito | `TextField` | — | `DIGITOCONTA varchar(2)` |
-| Titular | `TextField` | — | `TITULAR varchar(50)` |
-| CPF/CNPJ do Titular | `TextField` c/ máscara | — | `CPFCNPJ varchar(14)` |
-| Tipo de Conta Bancária | `Select` | ✅ | `IDTIPOCONTABANCARIA` |
-| Limite | `TextField` numérico | — | `LIMITE numeric(23,8)` → `decimal?` |
-| Permite Emitir Cheque | `Switch` | — | `PERMITEEMITIRCHEQUE` |
-| Conta de Terceiro | `Switch` | — | `CONTATERCEIRO` |
-| Conta Vinculada | `Select` (outra conta) | — | `IDFINCONTABANCARIAVINCULADA` |
-| Instituição Financeira | `Select` | — | `IDGLOINSTITUICAOFINANCEIRA` |
+### 5.4 Aba **Contábil** (`tabPageContabil`) — só com `HabilitaProcessoContabilizacao` (**UI-15**)
 
-> Campos **read-only nesta tela** (só exibidos): `CREDITOPENDENTE`, `DEBITOPENDENTE`,
-> `CHEQUEPENDENTE` — mantidos pelos Handlers de movimento.
-> Campos de **boleto/remessa/retorno** (`TIPOCARTEIRA`, `ULTIMONOSSONUMERO`, `GERABOLETO`,
-> `DIRETORIO*`, `IDFINITEMFINANCEIRO*`, …) **não aparecem aqui** — épico E14.
+| # | Campo | Propriedade | Componente | `required` |
+|---|---|---|---|---|
+| 19 | Plano contábil (`lookupEditPlanoContabil`) | `idPlanoContabil` | lookup | — |
 
-### 5.3 Aba "Usuários" — sempre visível
+> `ContaContabil` (varchar 20) **não tem controle no formulário legado** (só `IdPlanoContabil`
+> está ligado) — não aparece na tela; o valor existente é preservado no PUT.
 
-Grid editável (`gridFormEditorUsuario` no legado): adiciona/remove `GloUsuario` autorizado
-no caixa/banco. Salvamento junto com o registro (endpoint `.../usuarios` PUT em lote).
+### 5.5 Padrões obrigatórios (skill `migrate-crud`)
 
-### 5.4 Comportamento condicional
-
-- Trocar **Tipo** de Banco→Caixa com dados bancários preenchidos: confirmar descarte.
-- Tipo readonly quando o caixa/banco já tem `SaldoCaixaBanco`, `Dominio` ou `Movimento`.
-- Botões "Manutenção Nosso Número" / "Manutenção Número Remessa" (legado): **removidos
-  desta tela** → ficam nas telas de E14.
+Floating label `variant="outlined"`; `required` em todo campo ✅; banner "Alterações não
+salvas" ao cancelar e confirmação ao fechar a aba; Chip verde/vermelho de situação.
 
 ---
 
 ## 6. Regras de Negócio e Matriz RTV
 
-> **A completar em `E3-T07`** com `legacy-validation-audit` em `FCaixaBanco.cs` +
-> `FBaseCadastro` + `CaixaBanco.cs`/`ContaBancaria.cs`. Esqueleto:
+**Herança:** `FCaixaBanco : FBaseCadastro` — o fluxo Novo/Salvar/Excluir/Desfazer vem da base
+(`BaseCadastroConfig<T>` no novo sistema). Nenhuma validação de campo própria em `FBaseCadastro`
+além da obrigatoriedade do binder (§2).
 
-| ID | Origem Legada | Camada | Regra / Condição | Mensagem Legada | Destino Backend (`Result<T>`) | Destino Frontend (Zod + MUI) |
-|---|---|---|---|---|---|---|
-| VAL-01 | `CaixaBanco.cs:Validar` (a confirmar) | Domínio | `Descricao` obrigatória | *"Informe a descrição."* (confirmar) | `if (string.IsNullOrWhiteSpace(dto.Descricao))` | `z.string().min(1)` + `required` |
-| VAL-02 | idem | Domínio | `IdTipoConta` obrigatório | *"Informe o tipo da conta."* | `if (dto.IdTipoConta is null or 0)` | `z.number()` + `required` no Select |
-| VAL-03 | `ContaBancaria.cs` | Domínio | Quando Banco, `NumeroConta` obrigatória | *"Informe o número da conta."* | condicional por tipo | `superRefine` |
-| VAL-04 | `CaixaBanco.cs:ExecutarExcluir` | Estado | Bloquear exclusão se há `Dominio`/`SaldoCaixaBanco`/`DocumentoParcela`/`Movimento` | *"Caixa/Banco possui movimentação e não pode ser excluído."* (confirmar) | `if (await _repo.EmUsoAsync(...))` | *N/A (backend)* |
-| VAL-05 | `CaixaBanco.cs:774 ValidarControleCaixaBanco` | Domínio/Parâmetro | Regra condicionada a parâmetro de controle de caixa/banco | *(confirmar)* | replicar comportamento condicional (Regra 16) | *N/A* |
-| … | | | | | | |
+### 6.1 Validações de domínio (backend já implementado — `matriz-rtv.md#E3`)
 
-**Herança:** `FCaixaBanco : FBaseCadastro` — incluir as validações de `FBaseCadastro`
-(`ValidarCamposBase`, evento de salvar) no escopo da auditoria.
+| ID | Regra | Mensagem legada | Backend (E3-T05) | Frontend (Zod + MUI) |
+|---|---|---|---|---|
+| VAL-E3-01 | Com `VinculaCaixaBancoUsuario`: usuário repetido | "Não é permitido repetir usuário(s). Verifique." | `CaixaBancoService` | `superRefine` unicidade |
+| VAL-E3-02 | Enviar SPED → instituição financeira obrigatória | "Para conta bancária, a instituição financeira para SPED, deve ser informado a instituição financeira fiscal." | idem | `superRefine` (required condicional) |
+| VAL-E3-03 | Enviar SPED e Conta de terceiro não podem estar ambos marcados | "Para conta bancária, ao MARCAR a opção 'Enviar SPED (Bloco 1601)', deve ser DESMARCADO a opção 'Conta de terceiro'." | idem | `superRefine` |
+| VAL-E3-04/05 | Instituição SPED deve ser PJ e ter CNPJ | (mensagens legadas) | idem (consulta MOD-02) | N/A — lookup já filtra PJ (UI-14); resto no backend |
+| VAL-E3-06 | Investimento → conta vinculada obrigatória | "Para conta bancária do tipo 'Investimento', deve ser informada a conta vinculada." | idem | `superRefine` |
+| VAL-E3-07 | Conta vinculada ≠ a própria conta | "…a conta vinculada deve ser DIFERENTE do ID da conta bancária." | idem | `superRefine` (em edição) |
+| VAL-E3-08 | Inativar caixa com domínio-período aberto | "Para inativar este caixa deve ser fechado seu domínio período…" | idem (porta E2) | N/A (backend) |
+| VAL-E3-09/10 | Parâmetros exclusivos / caixa movimentável | — | idem | N/A (usadas por outras telas) |
+| VAL-E3-11 | Usuário já informado na grade | "Este usuário já foi informado." | idem | `superRefine` unicidade |
+| VAL-E3-12 | Não alterar usuário de linha salva | "NÃO é permitido alterar usuário após ter sido salvo." | idem | coluna usuário readonly em linha já salva |
+| VAL-E3-17 | Conta de terceiro → titular **e** CPF/CNPJ | "Para cadastrar uma conta de terceiro tem que informar o nome do titular e o CPF/CNPJ do mesmo." | `ContaBancariaService` | `superRefine` |
+
+### 6.2 Regras de tela (achadas no `FCaixaBanco.cs` e nos setters — novas nesta auditoria)
+
+| ID | Origem legada | Regra | Destino |
+|---|---|---|---|
+| UI-01 | `FCaixaBanco.cs:2637-2658` `LigarTabGeral` | Abas desabilitadas até escolher o Tipo | `index.tsx` |
+| UI-02 | `FCaixaBanco.cs:2269-2283` `BinderEnableChanging` + `2657` | Tipo **bloqueado** depois de salvo (só editável na inclusão) | `index.tsx` (readonly em edição) |
+| UI-03 | `CaixaBanco.cs:655` (setter `TipoConta`) + `FCaixaBanco.cs:2848-2850` | Tipo = Caixa → `TipoContaCaixa = Normal (1482)` e campo visível; Banco → vazio e oculto. Campo readonly depois de salvo | `types`/`index.tsx` |
+| UI-04 | `FCaixaBanco.cs:2626-2627` | Grade de usuários só visível com `VinculaCaixaBancoUsuario` | `index.tsx` |
+| UI-04a | `FCaixaBanco.cs:2412-2421` `ValidarCaixaBancoUsuario` | Com o parâmetro ligado e **sem** usuários: pedir confirmação — "Está configurado para controlar caixa/banco por usuário, sendo necessário informar qual(is) usuário(s) terá(ão) acesso a esta conta. Deseja salvar este caixa/banco sem informar usuário(s)?" | `index.tsx` (diálogo antes do salvar) |
+| UI-05 | `FCaixaBanco.cs:2823-2839` `AtivarContaBancaria` | Aba Conta bancária só com Tipo = Banco | `index.tsx` |
+| UI-06 | `FCaixaBanco.cs:2851` | Tipo conta bancária readonly depois de salvo | `index.tsx` |
+| UI-07 | `FCaixaBanco.cs:2439-2462` `ValidarTipoContaBancaria` | Ao abrir a aba sem tipo: "Deve ser informado o tipo da conta bancária." e volta para Geral | `schema` (`required`) + `index.tsx` |
+| UI-08 | `FCaixaBanco.cs:2685,2694` | Dados da conta (agência, número, dígito, limite) **só editáveis em Conta corrente**; em Investimento ficam desabilitados | `index.tsx` |
+| UI-09 | `ContaBancaria.cs:1112-1123` + `432-439` `LimpaDadosTerceiro` | Desmarcar "Conta de terceiro" **limpa** titular e CPF/CNPJ | `index.tsx` (on change) |
+| UI-10 | `FCaixaBanco.cs:2683,2692` | "Permite emitir cheque" só visível em Conta corrente | `index.tsx` |
+| UI-11 | `FCaixaBanco.cs:2681,2693` | Grupo "Conta vinculada" só visível em Investimento | `index.tsx` |
+| UI-12 | `FCaixaBanco.cs:2372-2385,2426-2434` | Lookup de conta vinculada só lista **Conta corrente**; se não for: "Para conta vinculada, deve ser informada uma conta bancária do tipo 'Conta corrente'." | lookup + `superRefine` |
+| UI-13 | `ContaBancaria.cs:1183-1196` (setter `EnviarSped`) | Desmarcar "Enviar SPED" **limpa** a instituição financeira | `index.tsx` (on change) |
+| UI-14 | `FCaixaBanco.cs:2387-2391` | Lookup de instituição financeira só lista Pessoa **Jurídica** | lookup |
+| UI-15 | `FCaixaBanco.cs:2630-2631` | Aba Contábil só com `HabilitaProcessoContabilizacao` | `index.tsx` |
+| UI-16 | `ContaBancaria.cs:1347-1375` (setter `ContaBancariaTipo`) | Mudar o tipo da conta bancária limpa a conta vinculada; para **Investimento** zera agência, número, dígito, limite, conta de terceiro, permite cheque (e boleto/remessa/retorno) | `index.tsx` (on change) — ver `DÚVIDA-CB6` |
+| UI-17 | `ContaBancaria.cs:444-470` `SetDadosBancoContaVinculada` (setter `IdContaBancariaVinculada`) | Escolher a conta vinculada **copia** dela agência, número, dígito, limite, conta de terceiro, titular e CPF/CNPJ | ver `DÚVIDA-CB6` |
 
 ---
 
 ## 7. Critérios de Aceite
 
-- **C1 (Listagem):** `GET /paginado` retorna `200` com itens + total; filtros `ativo`,
-  `idTipoConta` funcionam; paginação em memória.
-- **C2 (Detalhe por chave composta):** `GET /{idFilial}/{id}` retorna o registro e, quando
-  banco, o bloco `ContaBancaria` **com as 55 propriedades** (Regra 4).
-- **C3 (Criação):** `POST` gera `IdCaixaBanco` via `GeradorSequencialService` (nunca
-  IDENTITY); `201`.
-- **C4 (Validação):** dados inválidos → `400` com `ValidationError[]` e a mensagem legada.
-- **C5 (Abas condicionais):** trocar Tipo mostra/esconde a aba "Dados da Conta"; campos
-  obrigatórios da aba só validam quando visível.
-- **C6 (Obrigatoriedade visual):** todo campo `✅` tem `required` no MUI (asterisco).
-- **C7 (Usuários em lote):** `PUT .../usuarios` substitui a lista; `200`.
-- **C8 (Testes):** `CaixaBancoServiceTests` cobre 100% da Matriz RTV (Seção 6);
-  `schema.test.ts` cobre cada regra Zod. `dotnet test` + `npm test` verdes.
-- **C9 (Escopo):** nenhuma aba/campo de boleto/remessa/retorno nesta tela (E14).
+- **C1 (Listagem):** grade carrega `GET /paginado` com filtros; paginação no servidor (em memória).
+- **C2 (Detalhe):** editar carrega o registro e, quando Banco, a aba Conta bancária preenchida.
+- **C3 (Criação/Edição):** salvar envia o DTO completo (caixa + usuários + conta); `201`/`200`;
+  erros do backend (`400`) exibidos com a mensagem legada.
+- **C4 (Abas condicionais):** UI-01, UI-05, UI-10, UI-11, UI-15 respeitadas.
+- **C5 (Obrigatoriedade visual):** todo campo ✅ tem `required` (asterisco); campos condicionais
+  validam só quando visíveis.
+- **C6 (Efeitos de campo):** UI-03, UI-09, UI-13, UI-16, UI-17 reproduzidos.
+- **C7 (Testes):** `schema.test.ts` com 1 teste por regra Zod (VAL-E3-01, 02, 03, 06, 07, 11, 17,
+  UI-07, UI-12) + campos obrigatórios; `npm run build` e `npm test` verdes.
+- **C8 (Escopo):** nenhum campo/aba de boleto/remessa/retorno (E14).
 
 ---
 
 ## 8. Pendências e Dúvidas
 
-- `DÚVIDA-CB1`: valores inteiros de `TipoConta` / `TipoContaBancaria` / `TipoContaCaixa`
-  (resolver em `E0-T01`).
-- `DÚVIDA-CB2`: mensagens legadas exatas de `VAL-01..05` (resolver em `E3-T07` com o
-  legado real).
-- `DÚVIDA-CB3`: quais parâmetros de `GloParametro` condicionam `ValidarControleCaixaBanco`
-  e `HabilitaProcessoContabilizacao` (Regra 16).
-- `DÚVIDA-CB4`: o legado permite excluir caixa/banco em algum cenário, ou só inativar?
+- ~~`DÚVIDA-CB1`~~ resolvida (§3.1). ~~`DÚVIDA-CB2`~~ resolvida (mensagens em §6). ~~`DÚVIDA-CB3`~~
+  resolvida: `VINCULACAIXABANCOUSUARIO` e `HABILITAPROCESSOCONTABILIZACAO` (UI-04, UI-15).
+- `DÚVIDA-CB4` (exclusão × inativação): o legado permite excluir (`CaixaBanco.ExecutarExcluir`);
+  bloqueio por uso vem das FKs do banco (hoje o DELETE bloqueado volta `500` — ver PR #27).
+- ~~`DÚVIDA-CB5`~~ **decidida (2026-09-27): criar endpoints de consulta** — `GET /api/financeiro/lookups/*` (ver `contracts/caixa-banco.md`). Texto original: não existem na API endpoints de consulta para
+  **Agência** (`GLOAGENCIA` nem mapeada no MOD-02), **Usuário**, **Instituição financeira** e
+  **Plano contábil**. Conta vinculada pode usar o `/paginado` do próprio caixa-banco, mas a
+  lista não traz o tipo da conta bancária (UI-12).
+- ~~`DÚVIDA-CB6`~~ **decidida (2026-09-27): tela + backend** — viraram `VAL-E3-22..26` na Matriz RTV. Texto original: estão em setters do
+  objeto de negócio legado e **não entraram na Matriz RTV/ROT** do E3 — o backend do E3-T05
+  **não** os aplica. Implementar só na tela, ou também no backend?
+- ~~`DÚVIDA-CB7`~~ **decidida (2026-09-27): rota `/financeiro/caixabanco`**, sem alterar o banco. Texto original: a rotina 29 "Caixa/Conta" (`FCaixaBanco`) já está em `GLOROTINA`
+  com `RotaWeb = NULL` → o menu gera `/financeiro/caixabanco`. Registrar a tela nessa rota, ou
+  gravar `RotaWeb = 'caixa-banco'` no banco (como foi feito para `condicao-pagamento`)?
