@@ -1,7 +1,7 @@
 # Spec Funcional: Breadcrumb e Navegação para o Início
 
 > **Tipo:** Spec de infraestrutura de frontend (transversal — vale para todas as telas de cadastro)
-> **Versão:** 0.1 (rascunho — 2026-09-27) · **Status:** aguardando aprovação
+> **Versão:** 1.0 (2026-09-27) · **Status:** aprovada pelo usuário (decisões NB1–NB4 em §8)
 > **Origem:** relato do usuário com captura de tela de `/financeiro/caixabanco` — o breadcrumb
 > mostra `Dashboard / Cadastros Base / Caixa / Banco`, caminho que não existe no menu, e o
 > clique em "Dashboard" não leva ao dashboard.
@@ -88,19 +88,19 @@ migration. Não depende do E3-T07; o E3-T07 só se beneficia.
 | R2 | Se a rota aparecer em mais de um lugar do menu, vale a **primeira ocorrência** na ordem da árvore (mesma regra de `MapearRotinasDaArvore` no backend). |
 | R3 | Um nível de menu com o **mesmo nome do módulo** (sem diferenciar maiúsculas nem acentos) é omitido — evita "Gestão Financeira › Gestão Financeira". |
 | R4 | **Início** é clicável: chama `irParaInicio()`, mostra o dashboard e leva a URL para `/`. |
-| R5 | **Módulo** é clicável: seleciona o módulo na barra lateral (`setModuloAtivo`) sem trocar de tela — ver `DÚVIDA-NB2`. |
-| R6 | **Níveis de menu** são texto (não clicáveis): no menu são pastas, sem tela própria. |
+| R5 | **Módulo** é texto (não clicável) — decisão NB2: a troca de módulo continua pelo seletor do topo; um nível que parece link e não navega repetiria o problema P2. |
+| R6 | **Níveis de menu** são texto (não clicáveis): no menu são pastas, sem tela própria. Nomes em caixa alta vindos do banco (ex.: módulo "GESTÃO FINANCEIRA") são exibidos em formato de título — só na exibição (NB4). |
 | R7 | **Rotina**: texto na lista; no formulário vira link "voltar para a lista" (com o aviso de alterações não salvas que já existe) e ganha o sufixo `Novo` / `Editar`. |
 | R8 | Se a rota **não estiver no menu** (tela aberta por URL sem rotina no banco), o caminho vira `Início › {título da tela}` — nunca um caminho inventado. |
 | R9 | Nenhum item do breadcrumb usa `href="#"`; itens clicáveis são botões/links com `onClick`. |
-| R10 | Título da aba = nome da rotina no menu (`rotina.nome`), venha ela do menu, dos favoritos ou da URL. `ROTA_TITULO_MAP` só é usado quando a rota não está no menu (R8). O título grande da página (`config.getTitulo()`) não muda — ver `DÚVIDA-NB3`. |
+| R10 | Título da aba = nome da rotina no menu (`rotina.nome`), venha ela do menu, dos favoritos ou da URL. `ROTA_TITULO_MAP` só é usado quando a rota não está no menu (R8). O título grande da página (`config.getTitulo()`) não muda (NB3). |
 
 ### 4.1 Como fica na tela Caixa/Banco
 
 ```
 Lista:       Início › Gestão Financeira › Cadastros › Caixa/Conta
 Formulário:  Início › Gestão Financeira › Cadastros › Caixa/Conta › Editar
-              (link)   (link: módulo)     (texto)     (link: voltar)
+              (link)   (texto)            (texto)     (link: voltar)
 Aba:         [Caixa/Conta ×]      Título da página: Caixa / Banco
 ```
 
@@ -111,7 +111,7 @@ Aba:         [Caixa/Conta ×]      Título da página: Caixa / Banco
    nível repetido omitido, rota ausente, rota duplicada (primeira vence), submenu em 2+ níveis.
 2. **`TabsContext.irParaInicio()`** e `AppShell` mostrando o dashboard com `abaAtivaId === null`
    (R4); `TabBar` com o botão Início e sem destaque de aba nesse estado.
-3. **`AppBreadcrumbs`** (R1, R4-R7, R9) consumindo `useCaminhoRotina()`.
+3. **`AppBreadcrumbs`** (R1, R4-R7, R9) consumindo `useCaminhoRotina()`, com a formatação de caixa alta (NB4).
 4. Trocar o bloco fixo em **`CadastroBasePage`** e **`BaseCadastro`** pelo componente.
 5. **Título da aba pelo menu (R10):** `AppShell` usa `montarCaminhoRotina(...).rotina.nome` ao
    abrir a aba pela URL; `ROTA_TITULO_MAP` fica como reserva.
@@ -133,13 +133,14 @@ Aba:         [Caixa/Conta ×]      Título da página: Caixa / Banco
 - Sincronizar a URL ao trocar de aba (hoje a URL só muda no carregamento; pode ser outra spec).
 - Mudar nomes de menu/rotina no banco.
 
-## 8. Dúvidas para decisão
+## 8. Decisões (usuário, 2026-09-27)
 
-- **`DÚVIDA-NB1` — rótulo do primeiro nível:** "Início" (proposto) ou manter "Dashboard"?
-- **`DÚVIDA-NB2` — clique no módulo (R5):** só selecionar o módulo na barra lateral (proposto),
-  ou também ir ao Início, ou não ser clicável?
-- **`DÚVIDA-NB3` — nomes divergentes:** menu "Caixa/Conta" × tela "Caixa / Banco" (o form legado se
-  chama "Caixa / Banco"). Proposto: aba e breadcrumb com o nome do menu; título da página com o nome
-  da tela. Alternativa: tudo com o nome do menu.
-- **`DÚVIDA-NB4` — maiúsculas:** o banco guarda módulos em caixa alta ("GESTÃO FINANCEIRA").
-  Proposto: exibir no breadcrumb em formato de título ("Gestão Financeira"), sem alterar o banco.
+- **NB1 — rótulo do primeiro nível:** **"Início"** (não "Dashboard") — diz o que o clique faz.
+- **NB2 — clique no módulo:** **texto, não clicável** (ajuste da proposta original, que era
+  selecionar o módulo na barra lateral). A troca de módulo continua pelo seletor do topo; só
+  "Início" e "voltar para a lista" são clicáveis.
+- **NB3 — nomes divergentes:** aba e breadcrumb com o **nome do menu** ("Caixa/Conta"); título da
+  página com o **nome da tela** ("Caixa / Banco", como no legado). Unificar os nomes, se desejado,
+  é alteração do cadastro de menu no banco — fora desta spec.
+- **NB4 — maiúsculas:** exibir em formato de título ("Gestão Financeira") **só na exibição**,
+  sem alterar o banco (as tabelas de menu são compartilhadas com o legado).
