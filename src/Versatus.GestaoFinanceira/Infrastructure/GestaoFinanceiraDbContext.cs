@@ -9,6 +9,12 @@ namespace Versatus.GestaoFinanceira.Infrastructure;
 /// </summary>
 public class GestaoFinanceiraDbContext : DbContext
 {
+    /// <summary>
+    /// Histórico de migrations próprio do módulo (decisão do usuário em 2026-09-27, E3-T08): não
+    /// mistura com o <c>__EFMigrationsHistory</c> compartilhado. Usado na WebAPI e na fábrica de design.
+    /// </summary>
+    public const string TabelaHistoricoMigrations = "__EFMigrationsHistory_GestaoFinanceira";
+
     public GestaoFinanceiraDbContext(DbContextOptions<GestaoFinanceiraDbContext> options)
         : base(options)
     {
