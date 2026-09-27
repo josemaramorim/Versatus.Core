@@ -5,6 +5,8 @@ import { TopBar } from './TopBar';
 import { TabBar } from './TabBar';
 import { ContextualSidebar } from './ContextualSidebar';
 import { useTabs, TabScopeContext } from '../../context/TabsContext';
+import { useMenu } from '../../context/MenuContext';
+import { montarCaminhoRotina } from '../../hooks/caminhoRotina';
 
 // Importações de todas as páginas — keep-alive: ficam montadas, apenas ocultas por CSS
 import { FEntidade } from '../../pages/AcessoGlobal/FEntidade';
@@ -22,7 +24,7 @@ const PAGINA_MAP: Record<string, React.ComponentType> = {
   '/financeiro/caixabanco': FCaixaBanco,
 };
 
-/** Mapa de rota → título legível da aba */
+/** Título reserva da aba — só quando a rota não está no menu (R8/R10 da spec de breadcrumb). */
 const ROTA_TITULO_MAP: Record<string, string> = {
   '/acesso-global/entidade': 'Cadastro Entidade',
   '/acesso-global/parametro': 'Parâmetros',
@@ -50,6 +52,7 @@ const TabKeepAliveWrapper = React.memo<{
 
 export const AppShell: React.FC = () => {
   const { abas, abaAtivaId, abrirAba } = useTabs();
+  const { modulos, isLoading: carregandoMenu } = useMenu();
   const location = useLocation();
   const initializedRef = useRef(false);
   const lastPathRef = useRef<string | null>(null);
@@ -57,18 +60,22 @@ export const AppShell: React.FC = () => {
   // Sincronização da URL inicial / mudança de URL no navegador
   useEffect(() => {
     const currentPath = location.pathname;
-    const titulo = ROTA_TITULO_MAP[currentPath];
+    if (!PAGINA_MAP[currentPath]) {
+      lastPathRef.current = currentPath;
+      return;
+    }
+    // R10 — título = nome da rotina no menu (igual a abrir pela barra lateral); aguarda o menu carregar.
+    if (carregandoMenu) return;
+    const titulo = montarCaminhoRotina(modulos, currentPath)?.rotina ?? ROTA_TITULO_MAP[currentPath] ?? currentPath;
 
-    if (titulo) {
-      const jaExisteAbaParaPath = abas.some(a => a.rota === currentPath);
-      const pathMudou = lastPathRef.current !== null && lastPathRef.current !== currentPath;
-      if (!initializedRef.current || (pathMudou && !jaExisteAbaParaPath)) {
-        initializedRef.current = true;
-        abrirAba({ titulo, rota: currentPath });
-      }
+    const jaExisteAbaParaPath = abas.some(a => a.rota === currentPath);
+    const pathMudou = lastPathRef.current !== null && lastPathRef.current !== currentPath;
+    if (!initializedRef.current || (pathMudou && !jaExisteAbaParaPath)) {
+      initializedRef.current = true;
+      abrirAba({ titulo, rota: currentPath });
     }
     lastPathRef.current = currentPath;
-  }, [location.pathname, abrirAba]);
+  }, [location.pathname, abrirAba, carregandoMenu, modulos]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -95,8 +102,8 @@ export const AppShell: React.FC = () => {
               position: 'relative',
             }}
           >
-            {/* Dashboard institucional quando não há abas de rotinas abertas */}
-            {abas.length === 0 && <DashboardScreen />}
+            {/* Início (dashboard): sem abas abertas ou quando o usuário escolhe "Início" (R4) */}
+            {(abas.length === 0 || abaAtivaId === null) && <DashboardScreen />}
 
             {/* Keep-Alive Memoizado: cada aba fica montada em memória e isolada com seu próprio ID no TabScopeContext */}
             {abas.map(aba => {
