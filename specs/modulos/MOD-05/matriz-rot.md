@@ -81,7 +81,13 @@
 
 > **OP-xx#E3 = 8 · CALC-xx#E3 = 7.** `OP` cobertas por `E3-T04` (DbSets/mapeamento) e `E3-T05`
 > (serviços + testes de integração — `OP-E3-01..05, 07`); **`OP-E3-08`** (consulta de saldo)
-> movida para o **`E3-T09`** em 2026-09-24, junto com `CALC-E3-03`, que usa a mesma seleção. `CALC` cobertas por **`E3-T09`** (`parity` — saldos +
+> movida para o **`E3-T09`** em 2026-09-24, junto com `CALC-E3-03`, que usa a mesma seleção.
+> **E3-T09 (2026-09-27):** golden `origem=legado` gerados executando o código legado em .NET Framework 4
+> (`specs/modulos/MOD-05/golden/legado/GeradorGoldenE3.cs` → `tests/.../E3/golden/CALC-E3-*.csv`, 50 casos).
+> **Achado:** `Funcoes.Arredondar` guarda só 15 dígitos significativos (`Convert.ToDecimal(double)`) e herda o
+> ruído do `double` — com 8 casas (CALC-E3-04) valores ≥ 1 milhão perdem a 8ª casa. **Decisão do usuário:**
+> reproduzir o legado → `ArredondamentoFinanceiro` passou a transcrever o algoritmo literal em `double`
+> (entrada/saída `decimal`); a emulação só em `decimal` divergia em 1 de 279 golden. Vale também para o E1. `CALC` cobertas por **`E3-T09`** (`parity` — saldos +
 > conversão por índice; o `IndiceConversor` vira `ConversorIndiceService` e realiza o gancho
 > `ConverterIndice` deixado em `CalculadoraItemFinanceiroBase` no E1-T03). Gate:
 > `/analyze MOD-05 --epico E3`.

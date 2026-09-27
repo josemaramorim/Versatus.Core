@@ -1,0 +1,6 @@
+caso;inicialSemData;saldo;esperado;origem
+inicial_sem_data;true;150.55;0;legado
+sem_registro;false;;0;legado
+com_registro;false;150.55;150.55;legado
+com_registro_arredonda;false;150.555;150.56;legado
+com_registro_negativo;false;-0.005;-0.01;legado

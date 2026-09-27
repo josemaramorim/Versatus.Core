@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <None Update="E1\golden\*.csv" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="E3\golden\*.csv" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

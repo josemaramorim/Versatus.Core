@@ -9,7 +9,7 @@ namespace Versatus.GestaoFinanceira.Api.Controllers;
 // Adaptador HTTP fino (Artigo IV / Regra 17): só ICaixaBancoService; Result → 400.
 [ApiController]
 [Route("api/financeiro/caixa-banco")]
-public class CaixaBancoController(ICaixaBancoService service) : ControllerBase
+public class CaixaBancoController(ICaixaBancoService service, ISaldoCalculadora saldos) : ControllerBase
 {
     [HttpGet("paginado")]
     public async Task<IActionResult> ListarPaginado([FromQuery] FiltroCaixaBancoDto filtro, CancellationToken cancellationToken)
@@ -62,6 +62,11 @@ public class CaixaBancoController(ICaixaBancoService service) : ControllerBase
         var resultado = await service.SalvarUsuariosAsync(id, idFilial, dto, cancellationToken);
         return resultado.IsSuccess ? Ok(resultado.Value) : Falha(resultado.Errors);
     }
+
+    /// <summary>Saldo do caixa na data (OP-E3-08 — E3-T09); sem <c>data</c>, o último saldo.</summary>
+    [HttpGet("{idFilial:int}/{id:int}/saldo")]
+    public async Task<IActionResult> ObterSaldo(int idFilial, int id, [FromQuery] DateTime? data, CancellationToken cancellationToken)
+        => await saldos.ObterSaldoAsync(id, idFilial, data, cancellationToken) is { } dto ? Ok(dto) : NotFound();
 
     private BadRequestObjectResult Falha(IReadOnlyList<ValidationError> erros)
         => BadRequest(new { message = erros.Count > 0 ? erros[0].Mensagem : "Erro de validação.", errors = erros });

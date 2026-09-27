@@ -1,0 +1,11 @@
+caso;data;modo;esperado;origem
+dia_util;2026-09-23;210;2026-09-23;legado
+sabado_proximo;2026-09-26;210;2026-09-28;legado
+sabado_anterior;2026-09-26;106;2026-09-25;legado
+domingo_proximo;2026-09-27;107;2026-09-28;legado
+natal_sexta_proximo;2026-12-25;210;2026-12-28;legado
+natal_sexta_anterior;2026-12-25;106;2026-12-24;legado
+ano_novo_quinta_anterior;2026-01-01;106;2025-12-31;legado
+feriado_por_data;2026-02-17;210;2026-02-18;legado
+feriado_por_data_anterior;2026-02-17;106;2026-02-16;legado
+modo_nao_informado;2026-11-15;0;2026-11-16;legado

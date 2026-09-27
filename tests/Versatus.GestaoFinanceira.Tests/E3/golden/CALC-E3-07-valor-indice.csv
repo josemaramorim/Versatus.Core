@@ -1,0 +1,8 @@
+caso;ehPadrao;tipoCorrecao;data;lista;esperado;origem
+padrao;true;110;2026-03-15;mensal;1;legado
+mensal_marco;false;110;2026-03-15;mensal;1.03;legado
+mensal_dezembro;false;110;2026-12-31;mensal;1.12;legado
+mensal_valor_zero;false;110;2026-04-10;mensal;ERRO:DataSemIndiceEconomico;legado
+diario_dia_10;false;109;2026-09-10;diario;5.01;legado
+diario_dia_30;false;109;2026-09-30;diario;5.03;legado
+lista_vazia;false;110;2026-03-15;vazia;ERRO:DataSemIndiceEconomico;legado
