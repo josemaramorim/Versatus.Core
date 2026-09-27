@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Versatus.GestaoFinanceira.Application.Bases;
 using Versatus.GestaoFinanceira.Domain.Repositories;
 using Versatus.GestaoFinanceira.Domain.Services;
 using Versatus.GestaoFinanceira.Infrastructure.Repositories;
@@ -26,6 +27,13 @@ public static class ServiceCollectionExtensions
         // E3 — listas de consulta da tela Caixa/Banco (E3-T07)
         services.AddScoped<ILookupFinanceiroConsulta, LookupFinanceiroConsulta>();
         services.AddScoped<ILookupFinanceiroService, LookupFinanceiroService>();
+
+        // E3 — saldos e conversão por índice (E3-T09)
+        services.AddScoped<ISaldoCaixaBancoRepository, SaldoCaixaBancoRepository>();
+        services.AddScoped<ISaldoCalculadora, SaldoCalculadora>();
+        services.AddScoped<IIndiceEconomicoConsulta, IndiceEconomicoConsulta>();
+        services.AddScoped<ICalendarioConsulta, CalendarioConsulta>();
+        services.AddScoped<IConversorIndiceService, ConversorIndiceService>();
 
         return services;
     }

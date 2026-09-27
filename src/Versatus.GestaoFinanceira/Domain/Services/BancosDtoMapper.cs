@@ -30,6 +30,10 @@ internal static class BancosDtoMapper
         x.IdContaBancariaVinculada, (int)x.ContaBancariaTipo, x.IdInstituicaoFinanceira, x.EnviarSped, x.CpfCnpj,
         x.IdUsuarioInclusao, x.DataInclusao, x.HoraInclusao, x.IdUsuarioAlteracao, x.DataAlteracao, x.HoraAlteracao);
 
+    public static SaldoCaixaBancoDto ParaDto(SaldoCaixaBanco x) => new(
+        x.IdCaixaBanco, x.IdFilial, x.DataSaldo, x.SaldoAnterior, x.TotalDebito, x.TotalCredito, SaldoCalculadora.Saldo(x),
+        x.SaldoAnteriorConciliado, x.TotalDebitoConciliado, x.TotalCreditoConciliado, SaldoCalculadora.SaldoConciliado(x), x.Conferido);
+
     public static CobradorDto ParaDto(Cobrador x) => new(
         x.IdCobrador, x.IdFilial, x.IdEntidade, x.Nome, x.Ativo, x.IdUsuario, x.IdMeioContato,
         x.IdUsuarioInclusao, x.DataInclusao, x.HoraInclusao, x.IdUsuarioAlteracao, x.DataAlteracao, x.HoraAlteracao);

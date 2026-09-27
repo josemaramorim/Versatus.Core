@@ -1,0 +1,13 @@
+caso;saldoAnterior;totalCredito;totalDebito;esperado;origem
+simples;1000;250.35;100.10;1150.25;legado
+zero;0;0;0;0;legado
+negativo;-500.25;100;50.5;-450.75;legado
+soma_0_1_0_2;0.1;0.2;0;0.3;legado
+meio_centavo_2_675;2.675;0;0;2.68;legado
+meio_centavo_1_005;1.005;0;0;1.01;legado
+meio_centavo_1_015;1.015;0;0;1.02;legado
+meio_centavo_negativo;-2.675;0;0;-2.68;legado
+oito_casas;1234.56789012;0.00000001;0.00499999;1234.56;legado
+grande;99999999.995;0;0;100000000;legado
+debito_maior;10.10;0.05;20.20;-10.05;legado
+credito_debito_iguais;100;33.335;33.335;100;legado

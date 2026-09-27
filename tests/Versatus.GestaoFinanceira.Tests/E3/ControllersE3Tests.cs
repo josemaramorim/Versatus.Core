@@ -34,7 +34,7 @@ public class ControllersE3Tests
     {
         var service = new Mock<ICaixaBancoService>();
 
-        var r = await new CaixaBancoController(service.Object).ObterPorId(CenarioE3.Filial, 9, default);
+        var r = await new CaixaBancoController(service.Object, Mock.Of<ISaldoCalculadora>()).ObterPorId(CenarioE3.Filial, 9, default);
 
         r.Should().BeOfType<NotFoundResult>();
     }
@@ -46,7 +46,7 @@ public class ControllersE3Tests
         service.Setup(x => x.CriarAsync(It.IsAny<CriarCaixaBancoDto>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<CaixaBancoDto>.Ok(CaixaDto(100)));
 
-        var r = await new CaixaBancoController(service.Object).Criar(CriarDto(), default);
+        var r = await new CaixaBancoController(service.Object, Mock.Of<ISaldoCalculadora>()).Criar(CriarDto(), default);
 
         var criado = r.Should().BeOfType<CreatedAtActionResult>().Subject;
         criado.ActionName.Should().Be(nameof(CaixaBancoController.ObterPorId));
@@ -60,7 +60,7 @@ public class ControllersE3Tests
         service.Setup(x => x.CriarAsync(It.IsAny<CriarCaixaBancoDto>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<CaixaBancoDto>.Fail(Erro));
 
-        var r = await new CaixaBancoController(service.Object).Criar(CriarDto(), default);
+        var r = await new CaixaBancoController(service.Object, Mock.Of<ISaldoCalculadora>()).Criar(CriarDto(), default);
 
         r.Should().BeOfType<BadRequestObjectResult>();
     }
@@ -70,7 +70,7 @@ public class ControllersE3Tests
     {
         var service = new Mock<ICaixaBancoService>();
 
-        var r = await new CaixaBancoController(service.Object).Atualizar(CenarioE3.Filial, 9,
+        var r = await new CaixaBancoController(service.Object, Mock.Of<ISaldoCalculadora>()).Atualizar(CenarioE3.Filial, 9,
             new AtualizarCaixaBancoDto("X", (int)ContaTipo.Caixa, true, false, null, null, null, null, null, null, null), default);
 
         r.Should().BeOfType<NotFoundResult>();
@@ -85,7 +85,7 @@ public class ControllersE3Tests
         service.Setup(x => x.ObterPorIdAsync(1, CenarioE3.Filial, It.IsAny<CancellationToken>())).ReturnsAsync(CaixaDto());
         service.Setup(x => x.ExcluirAsync(1, CenarioE3.Filial, It.IsAny<CancellationToken>())).ReturnsAsync(ValidationResult.Ok());
 
-        var r = await new CaixaBancoController(service.Object).Excluir(CenarioE3.Filial, 1, default);
+        var r = await new CaixaBancoController(service.Object, Mock.Of<ISaldoCalculadora>()).Excluir(CenarioE3.Filial, 1, default);
 
         r.Should().BeOfType<NoContentResult>();
     }
@@ -97,7 +97,7 @@ public class ControllersE3Tests
         service.Setup(x => x.SalvarUsuariosAsync(1, CenarioE3.Filial, It.IsAny<SalvarCaixaBancoUsuariosDto>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<IReadOnlyList<CaixaBancoUsuarioDto>>.Fail(Erro));
 
-        var r = await new CaixaBancoController(service.Object).SalvarUsuarios(CenarioE3.Filial, 1,
+        var r = await new CaixaBancoController(service.Object, Mock.Of<ISaldoCalculadora>()).SalvarUsuarios(CenarioE3.Filial, 1,
             new SalvarCaixaBancoUsuariosDto([new CaixaBancoUsuarioItemDto(7)]), default);
 
         r.Should().BeOfType<BadRequestObjectResult>();
@@ -109,7 +109,7 @@ public class ControllersE3Tests
     public async Task CaixaBanco_PostBancoComConta_RetornaDtoComContaEUsuarios()
     {
         using var c = new CenarioE3();
-        var controller = new CaixaBancoController(c.CaixaBancoService());
+        var controller = new CaixaBancoController(c.CaixaBancoService(), Mock.Of<ISaldoCalculadora>());
 
         var r = await controller.Criar(CriarDto(ContaTipo.Banco, ContaDto(), [8, 7]), default);
 
@@ -126,7 +126,7 @@ public class ControllersE3Tests
     public async Task CaixaBanco_PostContaDeTerceiroIncompleta_Retorna400ComMensagemDoLegado()
     {
         using var c = new CenarioE3();
-        var controller = new CaixaBancoController(c.CaixaBancoService());
+        var controller = new CaixaBancoController(c.CaixaBancoService(), Mock.Of<ISaldoCalculadora>());
 
         var r = await controller.Criar(CriarDto(ContaTipo.Banco, ContaDto(contaTerceiro: true)), default);
 

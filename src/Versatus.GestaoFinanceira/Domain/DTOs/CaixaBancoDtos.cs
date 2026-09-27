@@ -87,6 +87,24 @@ public sealed record AtualizarCaixaBancoDto(
 /// <summary>PUT /usuarios — grade inteira de usuários do caixa (OP-E3-07).</summary>
 public sealed record SalvarCaixaBancoUsuariosDto(IReadOnlyList<CaixaBancoUsuarioItemDto> Itens);
 
+/// <summary>
+/// Saldo do caixa na data (GET /saldo — SaldoCaixaBanco.Retornar, OP-E3-08). <c>Saldo</c> e
+/// <c>SaldoConciliado</c> são calculados (CALC-E3-01/02), não colunas.
+/// </summary>
+public sealed record SaldoCaixaBancoDto(
+    int IdCaixaBanco,
+    int IdFilial,
+    DateTime DataSaldo,
+    decimal? SaldoAnterior,
+    decimal? TotalDebito,
+    decimal? TotalCredito,
+    decimal Saldo,
+    decimal? SaldoAnteriorConciliado,
+    decimal? TotalDebitoConciliado,
+    decimal? TotalCreditoConciliado,
+    decimal SaldoConciliado,
+    bool Conferido);
+
 /// <summary>Conta bancária — núcleo E3. Integração bancária (boleto/remessa/retorno) → E14.</summary>
 public sealed record ContaBancariaDto(
     int IdCaixaBanco,
