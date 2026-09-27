@@ -9,25 +9,25 @@ namespace Versatus.GestaoFinanceira.Domain.Services;
 /// <summary>Caixa/Banco (FINCAIXABANCO) + usuários (FINCAIXABANCOUSUARIO) + conta bancária 1:1.</summary>
 public interface ICaixaBancoService
 {
-    Task<PagedResult<CaixaBanco>> ListarPaginadoAsync(string? texto, bool? ativo, ContaTipo? tipoConta, bool? entraFluxoCaixa,
-        int page, int limit, CancellationToken cancellationToken = default);
+    Task<PagedResult<CaixaBancoListaDto>> ListarPaginadoAsync(FiltroCaixaBancoDto filtro, CancellationToken cancellationToken = default);
 
-    Task<CaixaBanco?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default);
+    Task<CaixaBancoDto?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default);
 
     /// <summary>OP-E3-01/03/04/07 — cria o caixa (+ usuários + conta bancária quando Banco) em 1 transação.</summary>
-    Task<Result<CaixaBanco>> CriarAsync(CaixaBanco caixa, ContaBancaria? conta, CancellationToken cancellationToken = default);
+    Task<Result<CaixaBancoDto>> CriarAsync(CriarCaixaBancoDto dto, CancellationToken cancellationToken = default);
 
     /// <summary>OP-E3-01/03/04/07 — atualiza o caixa (+ usuários + conta bancária) em 1 transação.</summary>
-    Task<Result<CaixaBanco>> AtualizarAsync(CaixaBanco caixa, ContaBancaria? conta, CancellationToken cancellationToken = default);
+    Task<Result<CaixaBancoDto>> AtualizarAsync(int idCaixaBanco, int idFilial, AtualizarCaixaBancoDto dto,
+        CancellationToken cancellationToken = default);
 
     /// <summary>OP-E3-02 — exclui conta bancária, usuários e caixa em 1 transação.</summary>
     Task<ValidationResult> ExcluirAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<CaixaBancoUsuario>> ListarUsuariosAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<CaixaBancoUsuarioDto>> ListarUsuariosAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default);
 
     /// <summary>OP-E3-07 — sincroniza a grade de usuários do caixa (VAL-E3-11/12).</summary>
-    Task<Result<IReadOnlyList<CaixaBancoUsuario>>> SalvarUsuariosAsync(int idCaixaBanco, int idFilial,
-        IReadOnlyList<CaixaBancoUsuarioItemDto> itens, CancellationToken cancellationToken = default);
+    Task<Result<IReadOnlyList<CaixaBancoUsuarioDto>>> SalvarUsuariosAsync(int idCaixaBanco, int idFilial,
+        SalvarCaixaBancoUsuariosDto dto, CancellationToken cancellationToken = default);
 
     /// <summary>VAL-E3-01 — CaixaBanco.ValidarUsuario (usuário repetido, com o parâmetro VinculaCaixaBancoUsuario).</summary>
     Task<ValidationResult> ValidarUsuarioAsync(CaixaBanco caixa, CancellationToken cancellationToken = default);

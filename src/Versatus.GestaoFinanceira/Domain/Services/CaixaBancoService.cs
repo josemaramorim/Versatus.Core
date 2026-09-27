@@ -67,23 +67,78 @@ public class CaixaBancoService(
 
     // ---- Consultas (ReadConnection) ------------------------------------------------------
 
-    public async Task<PagedResult<CaixaBanco>> ListarPaginadoAsync(string? texto, bool? ativo, ContaTipo? tipoConta,
-        bool? entraFluxoCaixa, int page, int limit, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<CaixaBancoListaDto>> ListarPaginadoAsync(FiltroCaixaBancoDto filtro,
+        CancellationToken cancellationToken = default)
     {
-        // Artigo VII.5 — materializa antes de paginar (SQL Server 2008).
-        var todos = await repository.ListarAsync(contexto.IdFilial, texto, ativo, tipoConta, entraFluxoCaixa, cancellationToken);
-        var pagina = Math.Max(page, 1);
-        var tamanho = Math.Max(limit, 1);
+        ArgumentNullException.ThrowIfNull(filtro);
 
-        return new PagedResult<CaixaBanco>([.. todos.Skip((pagina - 1) * tamanho).Take(tamanho)], todos.Count);
+        // Artigo VII.5 — materializa antes de paginar (SQL Server 2008).
+        var todos = await repository.ListarAsync(contexto.IdFilial, filtro.Texto, filtro.Ativo, (ContaTipo?)filtro.IdTipoConta,
+            filtro.EntraFluxoCaixa, cancellationToken);
+        var pagina = Math.Max(filtro.Page, 1);
+        var tamanho = Math.Max(filtro.Limit, 1);
+
+        return new PagedResult<CaixaBancoListaDto>(
+            [.. todos.Skip((pagina - 1) * tamanho).Take(tamanho).Select(BancosDtoMapper.ParaListaDto)], todos.Count);
     }
 
-    public Task<CaixaBanco?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default)
-        => repository.ObterAsync(idCaixaBanco, idFilial, cancellationToken);
+    public async Task<CaixaBancoDto?> ObterPorIdAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default)
+    {
+        var caixa = await repository.ObterAsync(idCaixaBanco, idFilial, cancellationToken);
+        if (caixa is null)
+            return null;
 
-    public Task<IReadOnlyList<CaixaBancoUsuario>> ListarUsuariosAsync(int idCaixaBanco, int idFilial,
+        var conta = await contaBancariaRepository.ObterAsync(idCaixaBanco, idFilial, cancellationToken);
+        return BancosDtoMapper.ParaDto(caixa, conta);
+    }
+
+    public async Task<IReadOnlyList<CaixaBancoUsuarioDto>> ListarUsuariosAsync(int idCaixaBanco, int idFilial,
         CancellationToken cancellationToken = default)
-        => repository.ListarUsuariosAsync(idCaixaBanco, idFilial, cancellationToken);
+        => [.. (await repository.ListarUsuariosAsync(idCaixaBanco, idFilial, cancellationToken)).Select(BancosDtoMapper.ParaDto)];
+
+    // ---- Persistência — contrato em DTO (E3-T06) ---------------------------------------------
+
+    public async Task<Result<CaixaBancoDto>> CriarAsync(CriarCaixaBancoDto dto, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+
+        var caixa = BancosDtoMapper.ParaEntidade(0, contexto.IdFilial, dto.Descricao, dto.IdTipoConta, dto.Ativo, dto.EntraFluxoCaixa,
+            dto.UltimaDataConferida, dto.Saldo, dto.ContaContabil, dto.IdPlanoContabil, dto.IdTipoContaCaixa, dto.Usuarios);
+        var conta = dto.ContaBancaria is null ? null : BancosDtoMapper.ParaEntidade(0, contexto.IdFilial, dto.ContaBancaria);
+
+        var resultado = await CriarAsync(caixa, conta, cancellationToken);
+        return await ParaResultadoDtoAsync(resultado, cancellationToken);
+    }
+
+    public async Task<Result<CaixaBancoDto>> AtualizarAsync(int idCaixaBanco, int idFilial, AtualizarCaixaBancoDto dto,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+
+        var caixa = BancosDtoMapper.ParaEntidade(idCaixaBanco, idFilial, dto.Descricao, dto.IdTipoConta, dto.Ativo, dto.EntraFluxoCaixa,
+            dto.UltimaDataConferida, dto.Saldo, dto.ContaContabil, dto.IdPlanoContabil, dto.IdTipoContaCaixa, dto.Usuarios);
+        var conta = dto.ContaBancaria is null ? null : BancosDtoMapper.ParaEntidade(idCaixaBanco, idFilial, dto.ContaBancaria);
+
+        var resultado = await AtualizarAsync(caixa, conta, cancellationToken);
+        return await ParaResultadoDtoAsync(resultado, cancellationToken);
+    }
+
+    public Task<Result<IReadOnlyList<CaixaBancoUsuarioDto>>> SalvarUsuariosAsync(int idCaixaBanco, int idFilial,
+        SalvarCaixaBancoUsuariosDto dto, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dto);
+        return SalvarUsuariosAsync(idCaixaBanco, idFilial, dto.Itens ?? [], cancellationToken);
+    }
+
+    private async Task<Result<CaixaBancoDto>> ParaResultadoDtoAsync(Result<CaixaBanco> resultado, CancellationToken cancellationToken)
+    {
+        if (!resultado.IsSuccess)
+            return Result<CaixaBancoDto>.Fail([.. resultado.Errors]);
+
+        // Relê pela ReadConnection o estado gravado (caixa + usuários + conta).
+        var dto = await ObterPorIdAsync(resultado.Value!.IdCaixaBanco, resultado.Value.IdFilial, cancellationToken);
+        return Result<CaixaBancoDto>.Ok(dto!);
+    }
 
     // ---- Persistência (WriteConnection) --------------------------------------------------
 
@@ -209,30 +264,30 @@ public class CaixaBancoService(
         return ValidationResult.Ok();
     }
 
-    public async Task<Result<IReadOnlyList<CaixaBancoUsuario>>> SalvarUsuariosAsync(int idCaixaBanco, int idFilial,
+    public async Task<Result<IReadOnlyList<CaixaBancoUsuarioDto>>> SalvarUsuariosAsync(int idCaixaBanco, int idFilial,
         IReadOnlyList<CaixaBancoUsuarioItemDto> itens, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(itens);
 
         var existente = await repository.ObterParaEdicaoAsync(idCaixaBanco, idFilial, cancellationToken);
         if (existente is null)
-            return Result<IReadOnlyList<CaixaBancoUsuario>>.Fail(new ValidationError(nameof(CaixaBanco.IdCaixaBanco), MsgNaoEncontrado));
+            return Result<IReadOnlyList<CaixaBancoUsuarioDto>>.Fail(new ValidationError(nameof(CaixaBanco.IdCaixaBanco), MsgNaoEncontrado));
 
         var salvos = existente.Usuarios.Select(u => u.IdUsuario).ToHashSet();
 
         // VAL-E3-12 — CaixaBancoUsuario.IdUsuario.set: linha salva não troca de usuário.
         if (itens.Any(i => i.IdUsuarioSalvo is { } anterior && anterior != 0 && anterior != i.IdUsuario && salvos.Contains(anterior)))
-            return Result<IReadOnlyList<CaixaBancoUsuario>>.Fail(new ValidationError(nameof(CaixaBancoUsuario.IdUsuario), MsgAlterarUsuarioSalvo));
+            return Result<IReadOnlyList<CaixaBancoUsuarioDto>>.Fail(new ValidationError(nameof(CaixaBancoUsuario.IdUsuario), MsgAlterarUsuarioSalvo));
 
         var ids = itens.Select(i => i.IdUsuario).ToList();
 
         var unico = ValidarUsuarioUnico(ids);
         if (!unico.IsValid)
-            return Result<IReadOnlyList<CaixaBancoUsuario>>.Fail([.. unico.Errors]);
+            return Result<IReadOnlyList<CaixaBancoUsuarioDto>>.Fail([.. unico.Errors]);
 
         var vinculo = await ValidarUsuarioAsync(ids, cancellationToken);
         if (!vinculo.IsValid)
-            return Result<IReadOnlyList<CaixaBancoUsuario>>.Fail([.. vinculo.Errors]);
+            return Result<IReadOnlyList<CaixaBancoUsuarioDto>>.Fail([.. vinculo.Errors]);
 
         await using var transacao = await repository.IniciarTransacaoAsync(cancellationToken);
 
@@ -241,7 +296,7 @@ public class CaixaBancoService(
         await repository.SaveChangesAsync(cancellationToken);
         await transacao.CommitAsync(cancellationToken);
 
-        return Result<IReadOnlyList<CaixaBancoUsuario>>.Ok([.. existente.Usuarios.OrderBy(u => u.IdUsuario)]);
+        return Result<IReadOnlyList<CaixaBancoUsuarioDto>>.Ok([.. existente.Usuarios.OrderBy(u => u.IdUsuario).Select(BancosDtoMapper.ParaDto)]);
     }
 
     // ---- Validações ------------------------------------------------------------------------

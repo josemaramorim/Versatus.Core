@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Versatus.Framework.Sequences;
 using Versatus.GestaoFinanceira.Domain.Bancos;
+using Versatus.GestaoFinanceira.Domain.DTOs;
 using Versatus.GestaoFinanceira.Domain.Services;
 
 namespace Versatus.GestaoFinanceira.Tests.E3;
@@ -78,7 +79,7 @@ public class CobradorServiceTests
         using var c = new CenarioE3();
         await c.SemearAsync(Novo(1, "Ana"), Novo(2, "Bruno"), Novo(3, "Ana Paula"));
 
-        var r = await c.CobradorService().ListarPaginadoAsync("Ana", null, page: 1, limit: 1);
+        var r = await c.CobradorService().ListarPaginadoAsync(new FiltroCobradorDto("Ana", Page: 1, Limit: 1));
 
         r.Total.Should().Be(2);
         r.Items.Single().IdCobrador.Should().Be(1);
