@@ -6,7 +6,7 @@ import type { TabItem, TabFormMode } from '../types/tabs';
 interface TabsContextState {
   /** Lista completa de abas abertas */
   abas: TabItem[];
-  /** ID da aba atualmente visível */
+  /** ID da aba atualmente visível; `null` = Início (dashboard), com as abas mantidas abertas */
   abaAtivaId: string | null;
   /**
    * ID da aba que solicitou fechamento mas possui alterações não salvas.
@@ -24,6 +24,8 @@ interface TabsContextState {
   cancelarFechamento: () => void;
   /** Torna uma aba a ativa sem criar nem fechar nenhuma. */
   ativarAba: (id: string) => void;
+  /** Mostra o Início (dashboard) sem fechar as abas — elas seguem montadas (keep-alive). */
+  irParaInicio: () => void;
   /** Marca ou desmarca a aba como "suja" (alterações não salvas) */
   marcarDirty: (id: string, dirty: boolean) => void;
   /** Define o modo do formulário ativo na aba (browse / insert / edit) */
@@ -94,6 +96,10 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAbaAtivaId(id);
   }, []);
 
+  const irParaInicio = useCallback(() => {
+    setAbaAtivaId(null);
+  }, []);
+
   const marcarDirty = useCallback((id: string, dirty: boolean) => {
     setAbas(prev => prev.map(a => a.id === id ? { ...a, isDirty: dirty } : a));
   }, []);
@@ -111,6 +117,7 @@ export const TabsProvider: React.FC<{ children: React.ReactNode }> = ({ children
       fecharAba,
       cancelarFechamento,
       ativarAba,
+      irParaInicio,
       marcarDirty,
       marcarModo
     }}>

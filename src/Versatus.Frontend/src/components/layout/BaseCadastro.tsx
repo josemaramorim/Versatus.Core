@@ -4,8 +4,6 @@ import {
   Card,
   Button,
   Typography,
-  Breadcrumbs,
-  Link,
   IconButton,
   Alert,
   Stack
@@ -19,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { BaseCadastroProps } from '../../types/cadastro';
 import { useTabs, useCurrentTabId } from '../../context/TabsContext';
+import { AppBreadcrumbs } from './AppBreadcrumbs';
 
 /**
  * BaseCadastro — Componente base herdado por todos os formulários CRUD do ERP.
@@ -103,27 +102,12 @@ export const BaseCadastro: React.FC<BaseCadastroProps> = ({
     <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5, pb: 3, minHeight: '100%', bgcolor: 'background.default' }}>
 
       {/* 1. Breadcrumbs */}
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 1 }}>
-        <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
-          Dashboard
-        </Link>
-        <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
-          Cadastros
-        </Link>
-        {subtituloBreadcrumb && (
-          <Link
-            underline="hover"
-            color="inherit"
-            onClick={handleSairClick}
-            sx={{ fontSize: '0.85rem', cursor: 'pointer' }}
-          >
-            {titulo}
-          </Link>
-        )}
-        <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
-          {subtituloBreadcrumb || titulo}
-        </Typography>
-      </Breadcrumbs>
+      <AppBreadcrumbs
+        tituloTela={titulo}
+        sufixo={subtituloBreadcrumb ?? undefined}
+        onVoltarLista={subtituloBreadcrumb ? handleSairClick : undefined}
+        sx={{ mb: 1 }}
+      />
 
       {/* 2. Top Header — Título + Botões de Ação CRUD */}
       <Box

@@ -4,8 +4,6 @@ import {
   Card, 
   Button, 
   Typography, 
-  Breadcrumbs, 
-  Link,
   Snackbar,
   Alert,
   Badge,
@@ -21,6 +19,7 @@ import { useCrudListState } from '../../hooks/useCrudListState';
 import { CrudTable } from './CrudTable';
 import { CrudFilterDrawer } from './CrudFilterDrawer';
 import { BaseCadastro } from '../layout/BaseCadastro';
+import { AppBreadcrumbs } from '../layout/AppBreadcrumbs';
 
 export interface ICadastroBasePageProps<T> {
   config: BaseCadastroConfig<T>;
@@ -164,17 +163,7 @@ export function CadastroBasePage<T>({
     <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2.5, pb: 3, bgcolor: 'background.default' }}>
       
       {/* 1. Breadcrumbs */}
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 0.5 }}>
-        <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
-          Dashboard
-        </Link>
-        <Link underline="hover" color="inherit" href="#" sx={{ fontSize: '0.85rem' }}>
-          Cadastros Base
-        </Link>
-        <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 500 }}>
-          {config.getTitulo()}
-        </Typography>
-      </Breadcrumbs>
+      <AppBreadcrumbs tituloTela={config.getTitulo()} sx={{ mb: 0.5 }} />
 
       {/* 2. Cabeçalho Principal da Tela de Consulta */}
       <Box 

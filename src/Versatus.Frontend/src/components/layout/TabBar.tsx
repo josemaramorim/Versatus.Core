@@ -5,12 +5,15 @@ import BusinessIcon from '@mui/icons-material/Business';
 import TuneIcon from '@mui/icons-material/Tune';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import { useNavigate } from 'react-router-dom';
 import { useTabs } from '../../context/TabsContext';
 import { TabOverflowMenu } from './TabOverflowMenu';
 
 const TAB_SLOT_WIDTH = 170; // Largura do slot da aba (largura + margem)
 const OVERFLOW_BTN_WIDTH = 80; // Largura reservada para o botão +N
 const PADDING_TOTAL = 24; // Padding horizontal total do container
+const INICIO_BTN_WIDTH = 44; // Botão fixo "Início" à esquerda das abas
 
 function getTabIcon(rota: string) {
   if (rota.includes('entidade')) {
@@ -26,7 +29,9 @@ function getTabIcon(rota: string) {
 }
 
 export const TabBar: React.FC = () => {
-  const { abas, abaAtivaId, ativarAba, fecharAba } = useTabs();
+  const { abas, abaAtivaId, ativarAba, fecharAba, irParaInicio } = useTabs();
+  const navigate = useNavigate();
+  const noInicio = abaAtivaId === null;
   const containerRef = useRef<HTMLDivElement>(null);
   const [visivelCount, setVisivelCount] = useState(abas.length);
 
@@ -36,7 +41,7 @@ export const TabBar: React.FC = () => {
       animId = requestAnimationFrame(() => {
         if (!containerRef.current) return;
         const containerWidth = containerRef.current.offsetWidth;
-        const larguraParaAbas = containerWidth - PADDING_TOTAL;
+        const larguraParaAbas = containerWidth - PADDING_TOTAL - INICIO_BTN_WIDTH;
 
         const cabemSemOverflow = Math.floor(larguraParaAbas / TAB_SLOT_WIDTH);
 
@@ -96,6 +101,27 @@ export const TabBar: React.FC = () => {
         width: '100%',
       }}
     >
+      {/* Início (dashboard) — as abas continuam abertas (spec de breadcrumb, R4) */}
+      <Tooltip title="Início" enterDelay={400}>
+        <IconButton
+          size="small"
+          aria-label="Início"
+          onClick={() => {
+            irParaInicio();
+            navigate('/');
+          }}
+          sx={{
+            alignSelf: 'center',
+            mr: 1,
+            color: noInicio ? 'primary.main' : 'text.secondary',
+            bgcolor: noInicio ? 'background.paper' : 'transparent',
+            '&:hover': { bgcolor: 'action.hover' },
+          }}
+        >
+          <HomeOutlinedIcon sx={{ fontSize: 20 }} />
+        </IconButton>
+      </Tooltip>
+
       {/* Abas visíveis */}
       {abasVisiveis.map(aba => {
         const isAtiva = aba.id === abaAtivaId;
