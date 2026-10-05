@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Versatus.GestaoFinanceira.Domain.Bancos;
+using Versatus.GestaoFinanceira.Domain.Dominio;
 
 namespace Versatus.GestaoFinanceira.Infrastructure;
 
@@ -35,6 +36,17 @@ public class GestaoFinanceiraDbContext : DbContext
     public DbSet<SaldoCaixaBanco> SaldosCaixaBanco => Set<SaldoCaixaBanco>();
     public DbSet<SaldoRateio> SaldosRateio => Set<SaldoRateio>(); // sem chave — só leitura
     public DbSet<Cobrador> Cobradores => Set<Cobrador>();
+
+    // E2 — Domínio e Período (E2-T03)
+    public DbSet<Dominio> Dominios => Set<Dominio>();
+    public DbSet<DominioUsuario> DominioUsuarios => Set<DominioUsuario>();
+    public DbSet<DominioResponsavel> DominioResponsaveis => Set<DominioResponsavel>();
+    public DbSet<DominioPeriodo> DominioPeriodos => Set<DominioPeriodo>();
+    public DbSet<DominioPeriodoFechamento> DominioPeriodoFechamentos => Set<DominioPeriodoFechamento>();
+    public DbSet<DominioPeriodoLacto> DominioPeriodoLactos => Set<DominioPeriodoLacto>();
+    public DbSet<DominioPeriodoFormaPagto> DominioPeriodoFormasPagto => Set<DominioPeriodoFormaPagto>();
+    public DbSet<DominioUsuarioSuprimentoSangria> DominioUsuariosSuprimentoSangria => Set<DominioUsuarioSuprimentoSangria>(); // view — só leitura
+    public DbSet<ResumoDominioPeriodoFormaPagto> ResumosDominioPeriodoFormaPagto => Set<ResumoDominioPeriodoFormaPagto>(); // view — só leitura
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
