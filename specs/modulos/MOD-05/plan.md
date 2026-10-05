@@ -156,7 +156,7 @@ golden values de cálculo virão de (a) execução do legado com entradas contro
 
 | # | Risco | Mitigação |
 | :--- | :--- | :--- |
-| **R-1** | Banco de dev tem só 59 tabelas `Fin%`; faltam `FINPROJECAOFLUXOCAIXA(+LACTO)` e `FINLOGDOMINIOPERIODO`. | Tarefa `analysis` de cada épico reconfirma a existência; se ausente, solicitar dump de schema de **produção** antes de mapear (`data-model.md §4`). |
+| **R-1** | Banco de dev tem só 59 tabelas `Fin%`; faltam `FINPROJECAOFLUXOCAIXA(+LACTO)` e `FINLOGDOMINIOPERIODO`. | Tarefa `analysis` de cada épico reconfirma a existência; se ausente, solicitar dump de schema de **produção** antes de mapear (`data-model.md §4`). **E2 (2026-10-05):** `FINLOGDOMINIOPERIODO` confirmada ausente e `DominioPeriodoLog` sem uso no legado → não migra (D3); resta `FINPROJECAOFLUXOCAIXA*` (E11). |
 | **R-2** | Maioria das tabelas vazia → sem golden values reais para paridade de cálculo. | Golden via execução do legado / conferência manual (`research.md §5`); marcar origem de cada caso. |
 | **R-3** | Nulidade de auditoria **não-uniforme** entre tabelas (`FINDOCUMENTO` tem `DATAALTERACAO`/`HORA*` `NOT NULL`). | `data-model.md` obriga extração coluna a coluna do `fin_columns.txt`; `sdd-analyze` V5 valida. |
 | **R-4** | PK composta com **ordem de coluna variável** (`FINDOCUMENTOPARCELA`/`FINCHEQUERECEBIDOMOVTO` têm filial 1º). | `HasKey(new { ... })` na ordem física; teste de mapeamento por entidade. |

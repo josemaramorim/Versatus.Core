@@ -123,8 +123,7 @@ de cada épico gera suas matrizes.
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | E1 | 2026-09-08 | 0 (após correção) | ✅ | ✅ (bases abstratas — coluna por E3/E4) | ✅ **APROVADO** | 3 MÉDIO de completude de matriz, **corrigidos na rodada** (ver E1 abaixo) |
 | E3 | 2026-09-09 | 0 (após correção) | ✅ (E3-T09 `parity` adicionada) | ✅ (colunas confirmadas vs. `fin_columns.txt`) | ✅ **APROVADO** | 2 MÉDIO (VAL órfã) + 1 MÉDIO (V4: faltava tarefa `parity`), **corrigidos na rodada** (ver E3 abaixo) |
-| E3 | — | — | — | — | ⏳ pendente | — |
-| E2 | — | — | — | — | ⏳ pendente | — |
+| E2 | 2026-10-05 | 0 | ✅ (após correção: E2-T05 reescrita, E2-T08 `parity` adicionada) | ✅ (7 tabelas vs. `fin_columns.txt`; `FINLOGDOMINIOPERIODO` fora — D3) | ✅ **APROVADO** | 2 MÉDIO (V4), **corrigidos na rodada** (ver E2 abaixo) |
 | E4 | — | — | — | — | ⏳ pendente | — |
 | E5 | — | — | — | — | ⏳ pendente | — |
 | E6 | — | — | — | — | ⏳ pendente | — |
@@ -212,6 +211,51 @@ Nenhum achado **CRÍTICO** ou **ALTO**.
 
 ✅ **APROVADO** — `domain`/`dbcontext`/`service`/`parity` do épico E3 (E3-T02..E3-T09)
 liberados para entrar em `develop`. As correções (VAL-E3-20/21, `E3-T09`) estão neste commit.
+
+---
+
+## Rodada incremental E2 — `/analyze MOD-05 --epico E2` (2026-10-05)
+
+**Escopo:** `matriz-rtv.md#E2` (52 `VAL-E2`: 1 `[UI]`, 2 `[E9]`), `matriz-rot.md#E2` (18 `OP-E2` + 8 `CALC-E2`
++ máquina de estados do período), `analysis/E2-dominio.md`. Classes: `Dominio`, `DominioPeriodo`,
+`DominioPeriodoLacto`, `DominioPeriodoFechamento(+Detalhe/+Lista)`, `DominioPeriodoFormaPagto`,
+`DominioPeriodoLog`, `DominioResponsavel(+Lista)`, `DominioUsuario(+Lista)`, `DominioUtil`,
+`PeriodosAbertos` + helpers de saldo do domínio (acesso.global) + 11 telas.
+
+| Verif. | Resultado | Nota |
+| :--- | :--- | :--- |
+| **V1** Constituição (escopo E2) | ✅ PASS | `E2-dominio.md §2` fixa PKs compostas reais (incl. `FINDOMINIOUSUARIO` com filial em 3º), `numeric(23,8)`→`decimal`, `smallint`→`bool`, enums E0, `HORA varchar(8)`→`string`, views só leitura. §4: 1 transação por handler (Art. VII), cross-módulo por portas (Art. VIII — inclusive a **escrita** de parâmetros/perfil do MOD-02, explícita em `IParametroFinanceiroEscrita`). Nenhum código ainda. |
+| **V3** legado → matrizes | ✅ PASS | Todos os 49 `throw` das classes do E2 têm linha `VAL` (`Dominio.cs` 35, `DominioPeriodoLacto.cs` 7, `DominioResponsavel.cs` 2, `DominioUsuario.cs` 4, `PeriodosAbertos.cs` 1); efeitos de setter/lista (VAL-E2-34/37) e regras de tela (VAL-E2-43..52) incluídos. Todo `Persistir*`/`Executar*`/`Efetuar*`/`Calcular*`/`Assimilar*` tem `OP`/`CALC`. Não há `FecharTesouraria` no legado (OP-E2-05 = efeito do fechamento). `DominioPeriodoLog` e `DominioPeriodoLista` = código morto (N/A, justificado). |
+| **V4** matrizes → tasks | ✅ PASS (após correção) | `E2-T04` e `E2-T05` passam a listar os IDs cobertos; `OP-E2-09`, `VAL-E2-18/52` → E9; montagem (c) do OP-E2-12 → E10. 2 lacunas corrigidas (abaixo). |
+| **V5** cobertura de propriedades | ✅ PASS | 98 colunas das 7 tabelas mapeadas em `E2-dominio.md §2` (contra `fin_columns.txt`/`fin_meta.txt`); FK composta de `FINDOMINIOPERIODOLANCTO` para `FINTALAOCHEQUE` e índice UNIQUE de `FINDOMINIOPERIODOFECHAMENTO` conferidos no banco. Propriedades não persistidas do legado (`Status`, `ValorInformado`, `SetarSaldoCaixaBanco`…) viram parâmetros de operação (justificado). `FINLOGDOMINIOPERIODO` ausente e sem uso → fora (D3). |
+
+### Achados (2 · todos MÉDIO · corrigidos nesta rodada)
+
+| # | Sev. | Verif. | Descrição | Ação (aplicada) |
+| :--- | :--- | :--- | :--- | :--- |
+| E2-A01 | MÉDIO | V4 | `E2-T05` previa `FecharTesourariaHandler` e `FecharCaixaHandler`, que não existem no legado, e não previa abertura/fechamento padrão nem suprimento. | `E2-T05` reescrita com os handlers reais (D2) e a lista de `OP`/`VAL` cobertas. |
+| E2-A02 | MÉDIO | V4 | `CALC-E2-01..08` sem tarefa `parity` (estavam numa tarefa `operation`). | Adicionada **`E2-T08`** (`tipo: parity`) em `tasks.md` (IDs estáveis). |
+
+Nenhum achado **CRÍTICO** ou **ALTO**.
+
+### Decisões do usuário registradas (2026-10-05)
+
+D1 hierarquia e obrigatórios das telas → também no backend (`VAL-E2-43..50`) · D2 tesouraria = efeito
+do `FecharPeriodoHandler` · D3 `FINLOGDOMINIOPERIODO`/`DominioPeriodoLog` não migram (R-1 fechado
+para o E2) · D4 movimento financeiro (E5) e cheques (E9) via portas com fake.
+
+### Dependências cross-épico registradas (não bloqueiam o gate)
+
+- **MOD-02 / DÚVIDA herdada do E3:** `IParametroRepository` sem filtro de filial — pré-requisito do **E2-T04**.
+- **E3:** o adapter temporário `DominioFinanceiroConsulta` sai no E2-T04 (`PeriodosAbertosService`).
+- **E5:** `IGeradorMovimentoPeriodo`; consumidores de `EditarCaixaBancoDominioPeriodo` (OP-E2-14).
+- **E9:** `IAtualizadorChequePeriodo`, `SuprimentoChequeHandler` (OP-E2-09), VAL-E2-18/52.
+- **E10:** montagem `AdtoAcerto` do OP-E2-12.
+
+### Veredito E2
+
+✅ **APROVADO** — `domain`/`dbcontext`/`service`/`operation`/`parity` do épico E2 (E2-T02..E2-T08)
+liberados para entrar em `develop`. As correções (E2-T05, E2-T08) estão neste commit.
 
 ---
 
