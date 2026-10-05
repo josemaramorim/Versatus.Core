@@ -132,7 +132,8 @@
 ## 8. Pendências de pesquisa (não bloqueiam `/tasks`)
 
 - DÚVIDA-R1: `FINPROJECAOFLUXOCAIXA(+LACTO)` e `FINLOGDOMINIOPERIODO` ausentes no banco de
-  dev → obter schema de produção antes de E2/E11 (também em `plan.md §7 R-1`).
+  dev → obter schema de produção antes de E2/E11 (também em `plan.md §7 R-1`). **Fechada para o E2
+  (2026-10-05):** `DominioPeriodoLog` é código morto → `FINLOGDOMINIOPERIODO` não migra; vale só para o E11.
 - DÚVIDA-R2: classificação enum vs. FK das colunas `ID*` — por épico.
 - DÚVIDA-R3: base de homologação para golden values de cálculo.
 - Lib CNAB/boleto/OFX: decisão final no `analysis` de E14.

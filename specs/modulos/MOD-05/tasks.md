@@ -194,10 +194,11 @@
 - **Objetivo:** `legacy-validation-audit` + `legacy-operation-audit` em `Dominio` (1717), `DominioPeriodo` (1017), `DominioPeriodoLacto` (823), `DominioPeriodoFechamento`(+Detalhe/+Lista), `DominioPeriodoFormaPagto`, `DominioPeriodoLog`, `DominioResponsavel`, `DominioUsuario`, `PeriodosAbertos` (551). Operações: **AbrirPeriodo**, **FecharPeriodo**, **FecharTesouraria**, **CalcularTotalFormasPagto**. Máquina de estados do período. Reconfirmar `FINLOGDOMINIOPERIODO` no banco (R-1).
 - **Cria:** `matriz-rtv.md#E2`, `matriz-rot.md#E2` (+ máquina de estados), `analysis/E2-dominio.md`.
 - **Cobre:** RN-05-002, RN-05-013, RN-05-019.
+- **Resultado (2026-10-05):** 52 `VAL-E2`, 18 `OP-E2`, 8 `CALC-E2` + máquina de estados (`analysis/E2-dominio.md`). R-1: `FINLOGDOMINIOPERIODO` confirmada ausente; `DominioPeriodoLog` é código morto → **não migra** (decisão D3) — o dump de produção deixa de ser pré-requisito do E2. **Decisões do usuário:** D1 regras de hierarquia/obrigatórios das telas vão também ao backend (`VAL-E2-43..50`); D2 sem `FecharTesouraria` no legado → efeito do `FecharPeriodoHandler`; D4 movimento financeiro (E5) e cheques (E9) via portas.
 - **Branch:** `feat/mod-05-e2-analise` · **Commit:** `docs(mod-05): auditoria E2 Domínio/Período (E2-T01)` · **Depende de:** E3-T08
 
 ### E2-T02 · Entidades + mappings E2 · tipo: domain
-- **Objetivo:** POCOs em `Domain/Dominio/` (`Dominio` com FK `IdCaixaBanco`; `DominioPeriodo` com colunas de data redundantes; `DominioPeriodoFormaPagto.Hora` como `string`) + mappings Fluent API (PK composta, `smallint→bool`).
+- **Objetivo:** POCOs em `Domain/Dominio/` (`Dominio` com FK `IdCaixaBanco`; `DominioPeriodo` com colunas de data redundantes; `DominioPeriodoFormaPagto.Hora` como `string`) + mappings Fluent API (PK composta, `smallint→bool`). Mapa de colunas: `analysis/E2-dominio.md §2` — **7 tabelas** (`FINDOMINIO`, `FINDOMINIOPERIODO`, `…LANCTO`, `…FECHAMENTO` com índice UNIQUE, `…FORMAPAGTO`, `FINDOMINIOUSUARIO`, `FINDOMINIORESPONSAVEL`) + views `VWLDOMINIOUSUARIOSUPRIMENTOSANGRIA` / `VWRESUMODOMINIOPERIODOFORMAPAGTO` (`ToView`, só leitura). `FINLOGDOMINIOPERIODO` fora (D3).
 - **Cria:** `Domain/Dominio/*.cs`, `Infrastructure/Mappings/Dominio*.cs`.
 - **Cobre:** E2-T01; RN-05-002.
 - **Branch:** `feat/mod-05-e2-entidades` · **Commit:** `feat(mod-05): entidades e mappings E2 (E2-T02)` · **Depende de:** E2-T01
@@ -209,13 +210,13 @@
 ### E2-T04 · `PeriodosAbertos` + `DominioService` (CRUD + RTV) · tipo: service
 - **Objetivo:** serviço de consulta `PeriodosAbertos`; CRUD de `Dominio` e cadastros filhos; 1 `[Fact]` por `VAL-xx#E2`.
 - **Cria:** `Domain/Services/DominioService.cs`, `.../PeriodosAbertosService.cs`, repos, testes.
-- **Cobre:** `VAL-xx#E2`; RN-05-002.
+- **Cobre:** `VAL-E2-01..15, 28..37, 42, 50`; `OP-E2-01, 02, 13, 14, 16, 17, 18`; RN-05-002. Substitui o adapter temporário `DominioFinanceiroConsulta` (E3-T05) e fornece o `PeriodoStatus` de VAL-E3-09. **Pré-requisito:** resolver a DÚVIDA do `IParametroRepository` sem filtro de filial (`TrabalhaComDominio`/`DominioPadrao`/`ControleCaixaTesouraria` são por filial).
 - **Branch:** `feat/mod-05-e2-servicos` · **Commit:** `feat(mod-05): serviços E2 + RTV (E2-T04)` · **Depende de:** E2-T03
 
 ### E2-T05 · Handlers de período (ROT) · tipo: operation
-- **Objetivo:** `AbrirPeriodoHandler`, `FecharPeriodoHandler`, `FecharTesourariaHandler`, `FecharCaixaHandler` — 1 transação cada; ordem de persistência de `matriz-rot.md#E2`; `CalcularTotalFormasPagto` (conferido × calculado). Testes de integração + golden por `OP-xx#E2`/`CALC-xx#E2`.
-- **Cria:** `Application/Handlers/Periodo/*.cs`, `tests/.../E2/*OperationTests.cs`, `golden/CALC-E2-*.csv`.
-- **Cobre:** todas as `OP-xx#E2`, `CALC-xx#E2`; RN-05-013.
+- **Objetivo:** `AbrirPeriodoHandler`, `FecharPeriodoHandler` (inclui o fechamento da tesouraria — OP-E2-05), `AbrirDominioPadraoHandler`, `FecharDominioPadraoHandler`, `SuprimentoDinheiroHandler` + `DominioPeriodoLactoService`, `DominioPeriodoFormaPagtoService` (montagens a/b) e `FechamentoPeriodoService` (carga do fechamento) — 1 transação por handler; ordem de persistência de `matriz-rot.md#E2`. Portas `IGeradorMovimentoPeriodo` (E5), `IAtualizadorChequePeriodo` (E9), `IParametroFinanceiroEscrita` e `IOperacaoCaixaConsulta` (MOD-02) testadas com fake (D4). **Corrigido no gate E2 (2026-10-05):** o legado não tem `FecharTesouraria` nem `FecharCaixa` separados (D2). Testes de integração + rollback por `OP-xx#E2`.
+- **Cria:** `Application/Handlers/Periodo/*.cs`, `Application/Ports/*Periodo*.cs`, `tests/.../E2/*OperationTests.cs`.
+- **Cobre:** `OP-E2-03..08, 10..12, 15`; `VAL-E2-16, 17, 19..27, 38..41, 43..49`; RN-05-013. (`OP-E2-09`, `VAL-E2-18, 52` → E9; `CALC-xx#E2` → E2-T08.)
 - **Constituição:** Artigo VII.1/VII.2/VII.3, Artigo IX.2/IX.3.
 - **Branch:** `feat/mod-05-e2-handlers` · **Commit:** `feat(mod-05): handlers de período + ROT (E2-T05)` · **Depende de:** E2-T04
 
@@ -225,6 +226,14 @@
 
 ### E2-T07 · Migration E2 · tipo: migration
 - **Branch:** `feat/mod-05-e2-migration` · **Commit:** `setup(mod-05): migration E2 (E2-T07)` · **Depende de:** E2-T03
+
+### E2-T08 · Paridade do fechamento e do saldo do domínio · tipo: parity
+- **Objetivo:** golden tests de `CALC-E2-01..08` (totais do fechamento **sem arredondamento** — Q1, resumo por forma, `Diferenca`, contagem do detalhe, saldo do domínio por lançamento/forma/recálculo, valores dos lançamentos). Transcrever sem refatorar (Regra 5); igualdade exata de `decimal`. Golden `origem=legado` executando o código legado em .NET Framework 4 (padrão do E3-T09 — DÚVIDA-R3).
+- **Cria:** `Domain/Services/FechamentoPeriodoCalculadora.cs`, `Domain/Services/SaldoDominioCalculadora.cs`, `tests/.../E2/*ParityTests.cs`, `golden/CALC-E2-*.csv`, `golden/legado/GeradorGoldenE2.cs`.
+- **Cobre:** todas as `CALC-xx#E2`; RN-05-005, RN-05-013.
+- **Constituição:** Artigo IX.3.
+- **Adicionada no gate E2 (2026-10-05)** — V4: toda `CALC` precisa de tarefa `parity`.
+- **Branch:** `feat/mod-05-e2-paridade` · **Commit:** `test(mod-05): paridade do fechamento e saldo do domínio (E2-T08)` · **Depende de:** E2-T04
 
 ---
 
