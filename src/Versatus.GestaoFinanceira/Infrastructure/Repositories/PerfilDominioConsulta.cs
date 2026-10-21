@@ -62,6 +62,11 @@ public class PerfilDominioConsulta(GestaoFinanceiraReadDbContext readContext) : 
         return [.. linhas.Select(l => new UsuarioPerfilDominioInfo(l.IdUsuario, l.Nome ?? string.Empty))];
     }
 
+    public async Task<IReadOnlyList<int>> ListarPerfisDoUsuarioAsync(int idUsuario, CancellationToken cancellationToken = default)
+        => await readContext.Database.SqlQuery<int>($"""
+            SELECT IDGLOPERFIL AS Value FROM GLOPERFILUSUARIO WHERE IDGLOUSUARIO = {idUsuario} ORDER BY ORDEM, IDGLOPERFIL
+            """).ToListAsync(cancellationToken);
+
     private sealed record PerfilUsuarioLinha(int IdUsuario, string? Nome, int TotalPerfis, int TotalPerfisDominio);
 
     private sealed record UsuarioPerfilLinha(int IdUsuario, string? Nome);

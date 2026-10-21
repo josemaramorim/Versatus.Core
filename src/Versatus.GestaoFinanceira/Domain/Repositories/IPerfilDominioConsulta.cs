@@ -20,6 +20,9 @@ public interface IPerfilDominioConsulta
     /// </summary>
     Task<IReadOnlyList<UsuarioPerfilDominioInfo>> ListarUsuariosDosPerfisComDominioAsync(int idEmpresa, int idUsuarioLogado,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Perfis do usuário (GLOPERFILUSUARIO) — FDominioPadraoAbertura.CarregarPerfilDominio.</summary>
+    Task<IReadOnlyList<int>> ListarPerfisDoUsuarioAsync(int idUsuario, CancellationToken cancellationToken = default);
 }
 
 /// <param name="PossuiPerfil">O usuário tem ao menos um perfil (GLOPERFILUSUARIO).</param>

@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Versatus.GestaoFinanceira.Application.Bases;
+using Versatus.GestaoFinanceira.Application.Handlers.Periodo;
+using Versatus.GestaoFinanceira.Application.Ports;
+using Versatus.GestaoFinanceira.Application.Services;
 using Versatus.GestaoFinanceira.Domain.Repositories;
 using Versatus.GestaoFinanceira.Domain.Services;
 using Versatus.GestaoFinanceira.Infrastructure.Repositories;
@@ -40,6 +43,23 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPerfilDominioConsulta, PerfilDominioConsulta>();
         services.AddScoped<IPeriodosAbertosService, PeriodosAbertosService>();
         services.AddScoped<IDominioService, DominioService>();
+
+        // E2 — operações de período (E2-T05). E5 (movimento financeiro) e E9 (cheques) entram por porta
+        // com implementação "pendente" que recusa a operação até o épico dono (decisão D4).
+        services.AddScoped<IDominioPeriodoRepository, DominioPeriodoRepository>();
+        services.AddScoped<IOperacaoCaixaConsulta, OperacaoCaixaConsulta>();
+        services.AddScoped<IParametroFinanceiroEscrita, ParametroFinanceiroEscrita>();
+        services.AddScoped<IResumoFormaPagtoConsulta, ResumoFormaPagtoConsulta>();
+        services.AddScoped<IGeradorMovimentoPeriodo, GeradorMovimentoPeriodoPendente>(); // até o E5
+        services.AddScoped<IChequePeriodoPorta, ChequePeriodoPendente>();                // até o E9
+        services.AddScoped<DominioPeriodoLactoService>();
+        services.AddScoped<DominioPeriodoFormaPagtoService>();
+        services.AddScoped<FechamentoPeriodoService>();
+        services.AddScoped<AbrirPeriodoHandler>();
+        services.AddScoped<FecharPeriodoHandler>();
+        services.AddScoped<SuprimentoDinheiroHandler>();
+        services.AddScoped<AbrirDominioPadraoHandler>();
+        services.AddScoped<FecharDominioPadraoHandler>();
 
         return services;
     }
