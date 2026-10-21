@@ -139,8 +139,8 @@ backend** — E2 não tem React nesta rodada. Detalhes e decisões: `analysis/E2
 | **VAL-E2-52** `[E9]` | `FSuprimentoCheque.cs:ValidarContaBancaria` (256, 263) | Tela | Cheque de empresa no suprimento: conta `ContaCorrente` e `PermiteEmitirCheque`. | *"Para conta do tipo 'Banco', deve ser informado conta bancária do tipo 'Conta corrente'."* · *"…que permite emitir cheque."* | **E9** (`SuprimentoChequeHandler`) | **E9** | RN-05-013 |
 
 > **VAL-xx#E2 = 52** (`VAL-E2-51` `[UI]` sem destino backend; `VAL-E2-18`/`-52` `[E9]`). Cobertura por
-> `[Fact]`: **E2-T04** (`service`) — `VAL-E2-01..15, 28..37, 42, 50`; **E2-T05** (`operation`) —
-> `VAL-E2-16, 17, 19..27, 38..41, 43..49`; **E9** — `VAL-E2-18, 52`. `VAL-E2-43..50` vêm de telas e
+> `[Fact]`: **E2-T04** (`service`) — `VAL-E2-01, 07..15, 28..37, 42, 50` (`tests/.../E2/DominioServiceTests.cs`,
+> `PeriodosAbertosServiceTests.cs`); **E2-T05** (`operation`) — `VAL-E2-02..06, 16, 17, 19..27, 38..41, 43..49`; **E9** — `VAL-E2-18, 52`. `VAL-E2-43..50` vêm de telas e
 > foram levadas ao backend pela decisão D1 (2026-10-05).
 
 ## `#E3` — Caixa e Banco (E3-T01)

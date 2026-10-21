@@ -5,56 +5,33 @@ namespace Versatus.GestaoFinanceira.Infrastructure.Repositories;
 
 // Origem: CaixaBanco.cs:ValidarPeriodoCaixa / GetListaDominioPeriodo / ValidarUsuarioCaixaDominio
 // e DominioUsuario.cs:GetDominio (legado).
-// Tabelas: FINDOMINIO, FINDOMINIOPERIODO, FINDOMINIOUSUARIO — colunas conferidas via
-// INFORMATION_SCHEMA (2026-09-24).
+// Tabelas: FINDOMINIO, FINDOMINIOPERIODO, FINDOMINIOUSUARIO.
 //
-// ADAPTER TEMPORÁRIO (decisão do usuário em 2026-09-24, E3-T05): SQL só-leitura na
-// ReadConnection até o épico E2 mapear domínio/período; lá ele é substituído pelos
-// repositórios do E2, mantendo a porta IDominioFinanceiroConsulta.
+// E2-T04: o adapter SQL temporário do E3-T05 passa a consultar as entidades do E2 (DbSets do
+// GestaoFinanceiraReadDbContext), mantendo a porta IDominioFinanceiroConsulta usada pelo E3.
 public class DominioFinanceiroConsulta(GestaoFinanceiraReadDbContext readContext) : IDominioFinanceiroConsulta
 {
     public async Task<IReadOnlyList<DominioPeriodoInfo>> ListarPeriodosDosDominiosDoCaixaAsync(int idCaixaBanco, int idFilial,
         CancellationToken cancellationToken = default)
-        => await readContext.Database.SqlQuery<DominioPeriodoInfo>($"""
-            SELECT P.IDFINDOMINIO AS IdDominio, P.DATAFECHAMENTO AS DataFechamento
-            FROM FINDOMINIO D
-            INNER JOIN FINDOMINIOPERIODO P
-                ON P.IDFINDOMINIOPERIODO = D.IDFINDOMINIOPERIODO AND P.IDGLOFILIAL = {idFilial}
-            WHERE D.IDFINCAIXABANCO = {idCaixaBanco} AND D.IDGLOFILIAL = {idFilial}
-              AND D.ATIVO = 1 AND D.IDFINDOMINIOPERIODO IS NOT NULL
-            """).ToListAsync(cancellationToken);
+        => await (from d in readContext.Dominios
+                  join p in readContext.DominioPeriodos
+                      on new { Id = d.IdDominioPeriodo, d.IdFilial } equals new { Id = (int?)p.IdDominioPeriodo, p.IdFilial }
+                  where d.IdCaixaBanco == idCaixaBanco && d.IdFilial == idFilial && d.Ativo && d.IdDominioPeriodo != null
+                  select new DominioPeriodoInfo(p.IdDominio, p.DataFechamento))
+            .ToListAsync(cancellationToken);
 
     public async Task<bool?> ObterMovimentoBancoDoDominioDoUsuarioAsync(int idUsuario, int idFilial,
         CancellationToken cancellationToken = default)
-    {
-        var linhas = await readContext.Database.SqlQuery<short>($"""
-            SELECT TOP 1 D.MOVIMENTOBANCO AS Value
-            FROM FINDOMINIOUSUARIO U
-            INNER JOIN FINDOMINIO D ON D.IDFINDOMINIO = U.IDFINDOMINIO AND D.IDGLOFILIAL = U.IDGLOFILIAL
-            WHERE U.IDGLOFILIAL = {idFilial} AND U.IDGLOUSUARIO = {idUsuario}
-            ORDER BY U.IDFINDOMINIO
-            """).ToListAsync(cancellationToken);
+        => await (from u in readContext.DominioUsuarios
+                  join d in readContext.Dominios on new { u.IdDominio, u.IdFilial } equals new { d.IdDominio, d.IdFilial }
+                  where u.IdFilial == idFilial && u.IdUsuario == idUsuario
+                  orderby u.IdDominio
+                  select (bool?)d.MovimentoBanco)
+            .FirstOrDefaultAsync(cancellationToken);
 
-        return linhas.Count == 0 ? null : linhas[0] != 0;
-    }
+    public Task<bool> UsuarioPossuiDominioAsync(int idUsuario, int idFilial, CancellationToken cancellationToken = default)
+        => readContext.DominioUsuarios.AnyAsync(u => u.IdFilial == idFilial && u.IdUsuario == idUsuario, cancellationToken);
 
-    public async Task<bool> UsuarioPossuiDominioAsync(int idUsuario, int idFilial, CancellationToken cancellationToken = default)
-    {
-        var total = await readContext.Database.SqlQuery<int>($"""
-            SELECT COUNT(*) AS Value FROM FINDOMINIOUSUARIO
-            WHERE IDGLOFILIAL = {idFilial} AND IDGLOUSUARIO = {idUsuario}
-            """).ToListAsync(cancellationToken);
-
-        return total[0] > 0;
-    }
-
-    public async Task<bool> CaixaPossuiDominioAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default)
-    {
-        var total = await readContext.Database.SqlQuery<int>($"""
-            SELECT COUNT(*) AS Value FROM FINDOMINIO
-            WHERE IDGLOFILIAL = {idFilial} AND IDFINCAIXABANCO = {idCaixaBanco}
-            """).ToListAsync(cancellationToken);
-
-        return total[0] > 0;
-    }
+    public Task<bool> CaixaPossuiDominioAsync(int idCaixaBanco, int idFilial, CancellationToken cancellationToken = default)
+        => readContext.Dominios.AnyAsync(d => d.IdFilial == idFilial && d.IdCaixaBanco == idCaixaBanco, cancellationToken);
 }
