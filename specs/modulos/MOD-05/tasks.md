@@ -210,7 +210,7 @@
 ### E2-T04 · `PeriodosAbertos` + `DominioService` (CRUD + RTV) · tipo: service
 - **Objetivo:** serviço de consulta `PeriodosAbertos`; CRUD de `Dominio` e cadastros filhos; 1 `[Fact]` por `VAL-xx#E2`.
 - **Cria:** `Domain/Services/DominioService.cs`, `.../PeriodosAbertosService.cs`, repos, testes.
-- **Cobre:** `VAL-E2-01..15, 28..37, 42, 50`; `OP-E2-01, 02, 13, 14, 16, 17, 18`; RN-05-002. Substitui o adapter temporário `DominioFinanceiroConsulta` (E3-T05) e fornece o `PeriodoStatus` de VAL-E3-09. **Pré-requisito:** resolver a DÚVIDA do `IParametroRepository` sem filtro de filial (`TrabalhaComDominio`/`DominioPadrao`/`ControleCaixaTesouraria` são por filial).
+- **Cobre:** `VAL-E2-01..15, 28..37, 42, 50`; `OP-E2-01, 02, 13, 14, 16, 17, 18`; RN-05-002. Substitui o adapter temporário `DominioFinanceiroConsulta` (E3-T05) e fornece o `PeriodoStatus` de VAL-E3-09. Parâmetros lidos com `IParametroRepository.GetParametroValorAsync(chave, idEmpresa, idFilial)` (escopo resolvido pelo tipo do parâmetro, como no legado — DÚVIDA de filial **resolvida em 2026-10-21**, branch `fix/mod-02-parametro-escopo`; nível Perfil ainda não suportado).
 - **Branch:** `feat/mod-05-e2-servicos` · **Commit:** `feat(mod-05): serviços E2 + RTV (E2-T04)` · **Depende de:** E2-T03
 
 ### E2-T05 · Handlers de período (ROT) · tipo: operation

@@ -511,9 +511,12 @@ public class CaixaBancoService(
         }
     }
 
+    // Escopo do parâmetro = empresa/filial do contexto, resolvido pelo tipo do parâmetro como no
+    // legado (TRABALHACOMDOMINIO é de Filial; VINCULACAIXABANCOUSUARIO, de Sistema). Sem valor no
+    // escopo → desligado (padrão do tipo Smallint no legado).
     private async Task<bool> ParametroLigadoAsync(string nome, CancellationToken cancellationToken)
     {
-        var valor = await parametroRepository.GetParametroValorAsync(nome, cancellationToken);
+        var valor = await parametroRepository.GetParametroValorAsync(nome, contexto.IdEmpresa, contexto.IdFilial, cancellationToken);
         return bool.TryParse(valor, out var ligado) && ligado;
     }
 
