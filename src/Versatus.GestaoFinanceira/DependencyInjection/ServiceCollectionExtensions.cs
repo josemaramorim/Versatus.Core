@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IContaBancariaRepository, ContaBancariaRepository>();
         services.AddScoped<ICobradorRepository, CobradorRepository>();
         services.AddScoped<IInstituicaoFinanceiraConsulta, InstituicaoFinanceiraConsulta>();
-        services.AddScoped<IDominioFinanceiroConsulta, DominioFinanceiroConsulta>(); // temporário até o E2
+        services.AddScoped<IDominioFinanceiroConsulta, DominioFinanceiroConsulta>(); // sobre as entidades do E2 desde o E2-T04
         services.AddScoped<ICaixaBancoService, CaixaBancoService>();
         services.AddScoped<IContaBancariaService, ContaBancariaService>();
         services.AddScoped<ICobradorService, CobradorService>();
@@ -34,6 +34,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IIndiceEconomicoConsulta, IndiceEconomicoConsulta>();
         services.AddScoped<ICalendarioConsulta, CalendarioConsulta>();
         services.AddScoped<IConversorIndiceService, ConversorIndiceService>();
+
+        // E2 — Domínio e Período (E2-T04)
+        services.AddScoped<IDominioRepository, DominioRepository>();
+        services.AddScoped<IPerfilDominioConsulta, PerfilDominioConsulta>();
+        services.AddScoped<IPeriodosAbertosService, PeriodosAbertosService>();
+        services.AddScoped<IDominioService, DominioService>();
 
         return services;
     }

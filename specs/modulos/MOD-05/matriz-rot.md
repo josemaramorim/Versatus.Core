@@ -117,9 +117,9 @@ curso (parâmetro do handler), nunca persistido.
 | **CALC-E2-08** | `DominioPeriodo.cs:CarregarListaLancamentos` (184) + `DominioPeriodoLacto.Assimilar` (782) | Valor dos lançamentos por status: `Abertura`/`AberturaPadrao`/`SuprimentoDinheiro` → `Valor = ValorInformado = valor` (nenhum lançamento se `valor = 0`); `FechamentoPadrao` → `valor = SaldoDinheiro` do domínio (ignora o informado); `Fechamento` → por forma `Valor = ValorCalculado`, `ValorInformado = ValorConferencia`; cheques → valor de cada cheque/folha. `IdCaixaBanco` do dinheiro: caixa do destino (do domínio padrão no `FechamentoPadrao`). | RN-05-013 |
 
 > **OP-xx#E2 = 18 · CALC-xx#E2 = 8.** Cobertura: **E2-T03** (mapeamento) — estrutura de OP-E2-01;
-> **E2-T04** (`service`) — `OP-E2-01, 02, 13, 14, 16, 17, 18`; **E2-T05** (`operation`) —
+> **E2-T04** (`service`) — `OP-E2-01, 02, 13, 14, 17, 18`; **E2-T05** (`operation`) —
 > `OP-E2-03..08, 10..12, 15`; **E9** — `OP-E2-09` e montagens (d)/(e) do OP-E2-12; **E10** — montagem (c).
-> **CALC** → **`E2-T08`** (`parity`, adicionada na rodada do gate). Golden `origem=legado` executando o
+> **CALC** e **`OP-E2-16`** (movida em 2026-10-21) → **`E2-T08`** (`parity`, adicionada na rodada do gate). Golden `origem=legado` executando o
 > código legado (sem base de homologação — DÚVIDA-R3), como no E3-T09.
 
 ## `#E3` — Caixa e Banco (E3-T01)
