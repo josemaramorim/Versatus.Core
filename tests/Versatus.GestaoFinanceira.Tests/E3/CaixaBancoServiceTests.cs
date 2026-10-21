@@ -22,6 +22,7 @@ namespace Versatus.GestaoFinanceira.Tests.E3;
 /// </summary>
 internal sealed class CenarioE3 : IDisposable
 {
+    public const int Empresa = 1;
     public const int Filial = 10;
     public const int Usuario = 5;
 
@@ -50,13 +51,14 @@ internal sealed class CenarioE3 : IDisposable
             .Options);
 
         Contexto.SetupGet(x => x.IdFilial).Returns(Filial);
+        Contexto.SetupGet(x => x.IdEmpresa).Returns(Empresa);
         Contexto.SetupGet(x => x.IdUsuario).Returns(Usuario);
         Sequencial.Setup(x => x.ProximoAsync(It.IsAny<string>(), SequencialTipo.Filial, It.IsAny<CancellationToken>()))
             .ReturnsAsync(100);
     }
 
     public void Parametro(string nome, bool valor)
-        => Parametros.Setup(x => x.GetParametroValorAsync(nome, It.IsAny<CancellationToken>()))
+        => Parametros.Setup(x => x.GetParametroValorAsync(nome, Empresa, Filial, It.IsAny<CancellationToken>()))
             .ReturnsAsync(valor ? "True" : "False");
 
     public ContaBancariaService ContaBancariaService()
@@ -282,6 +284,20 @@ public class CaixaBancoServiceTests
         c.Parametro(CaixaBancoService.ParametroVinculaCaixaBancoUsuario, true);
 
         var r = await c.CaixaBancoService().ValidarControleCaixaBancoAsync(status);
+
+        r.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task VAL_E3_09_ParametroLigadoEmOutraFilial_NaoValida()
+    {
+        // fix/mod-02-parametro-escopo: o parâmetro é lido na empresa/filial do contexto.
+        using var c = new CenarioE3();
+        c.Parametros.Setup(x => x.GetParametroValorAsync(CaixaBancoService.ParametroVinculaCaixaBancoUsuario,
+                CenarioE3.Empresa, CenarioE3.Filial + 1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync("True");
+
+        var r = await c.CaixaBancoService().ValidarControleCaixaBancoAsync(PeriodoStatus.UsuarioSemPermissao);
 
         r.IsValid.Should().BeTrue();
     }

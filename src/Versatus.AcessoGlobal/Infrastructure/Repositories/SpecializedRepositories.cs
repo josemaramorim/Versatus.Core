@@ -74,4 +74,64 @@ public class ParametroRepository : AcessoGlobalRepositorioBase<Versatus.AcessoGl
                       where p.Chave == chave
                       select pv.Valor).FirstOrDefaultAsync(cancellationToken);
     }
+
+    // GLOPARAMETRO.IDTIPOPARAMETRO = ParametroTipo do legado (geral/tipoenumerado.cs:918).
+    public const int TipoParametroSistema = 159;
+    public const int TipoParametroFilial = 160;
+    public const int TipoParametroPerfil = 161;
+    public const int TipoParametroGrupo = 350;
+    public const int TipoParametroEmpresa = 351;
+
+    // acesso.global/ParametroServidor.cs:240-278 (ParametroValor) e RetornarValor{Sistema,Grupo,
+    // Empresa,Filial}: cada nível exige a combinação exata das chaves de escopo e não recorre ao
+    // nível mais geral. O grupo vem da empresa (GLOEMPRESA.IDGLOGRUPO), pois o contexto não o tem.
+    public async Task<string?> GetParametroValorAsync(string chave, int idEmpresa, int idFilial, CancellationToken cancellationToken = default)
+    {
+        var parametro = await ReadContext.Parametros
+            .Where(p => p.Chave == chave)
+            .Select(p => new { p.IdParam, p.TipoParametro })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (parametro is null)
+            return null;
+
+        var valores = ReadContext.ParametroValores.Where(v => v.IdParametro == parametro.IdParam);
+
+        switch (parametro.TipoParametro)
+        {
+            case TipoParametroPerfil:
+                throw new NotSupportedException(
+                    $"O parâmetro '{chave}' é do nível Perfil, que ainda não é suportado (decisão de 2026-10-21).");
+
+            case TipoParametroGrupo:
+            case TipoParametroEmpresa:
+            case TipoParametroFilial:
+                var idGrupo = await ReadContext.Empresas
+                    .Where(e => e.IdEmpresa == idEmpresa)
+                    .Select(e => (int?)e.IdGrupo)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (idGrupo is null)
+                    return null;
+
+                valores = valores.Where(v => v.IdGrupo == idGrupo && v.IdPerfil == null);
+
+                valores = parametro.TipoParametro switch
+                {
+                    TipoParametroGrupo => valores.Where(v => v.IdEmpresa == null && v.IdFilial == null),
+                    TipoParametroEmpresa => valores.Where(v => v.IdEmpresa == idEmpresa && v.IdFilial == null),
+                    _ => valores.Where(v => v.IdEmpresa == idEmpresa && v.IdFilial == idFilial),
+                };
+
+                return await valores.Select(v => v.Valor).FirstOrDefaultAsync(cancellationToken);
+
+            default:
+                // Sistema (e tipo não informado — o legado cai no ramo de Sistema): o primeiro valor
+                // da lista (ParametroValores[0]); ordenado pela PK para ser determinístico.
+                return await valores
+                    .OrderBy(v => v.IdParametroValor)
+                    .Select(v => v.Valor)
+                    .FirstOrDefaultAsync(cancellationToken);
+        }
+    }
 }
