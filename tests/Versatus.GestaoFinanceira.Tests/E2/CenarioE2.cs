@@ -6,6 +6,9 @@ using Versatus.AcessoGlobal.Domain.Repositories;
 using Versatus.Framework.Context;
 using Versatus.Framework.Sequences;
 using Versatus.Framework.Validation;
+using Versatus.GestaoFinanceira.Application.Handlers.Periodo;
+using Versatus.GestaoFinanceira.Application.Ports;
+using Versatus.GestaoFinanceira.Application.Services;
 using Versatus.GestaoFinanceira.Domain.Bancos;
 using Versatus.GestaoFinanceira.Domain.Dominio;
 using Versatus.GestaoFinanceira.Domain.DTOs;
@@ -40,6 +43,16 @@ internal sealed class CenarioE2 : IDisposable
     public Mock<ICaixaBancoService> ControleCaixaBanco { get; } = new();
     public Mock<IPeriodosAbertosService> Periodos { get; } = new();
 
+    // Portas das operações de período (E2-T05).
+    public Mock<IGeradorMovimentoPeriodo> Movimentos { get; } = new();
+    public Mock<IChequePeriodoPorta> Cheques { get; } = new();
+    public Mock<IOperacaoCaixaConsulta> Operacoes { get; } = new();
+    public Mock<IParametroFinanceiroEscrita> ParametroEscrita { get; } = new();
+    public Mock<IResumoFormaPagtoConsulta> Resumos { get; } = new();
+    public Mock<ISaldoCalculadora> Saldos { get; } = new();
+
+    private int _sequencial = 99;
+
     public CenarioE2()
     {
         _opcoesEscrita = new DbContextOptionsBuilder<GestaoFinanceiraDbContext>()
@@ -54,8 +67,22 @@ internal sealed class CenarioE2 : IDisposable
         Contexto.SetupGet(x => x.IdEmpresa).Returns(Empresa);
         Contexto.SetupGet(x => x.IdFilial).Returns(Filial);
         Contexto.SetupGet(x => x.IdUsuario).Returns(Usuario);
-        Sequencial.Setup(x => x.ProximoAsync(It.IsAny<string>(), SequencialTipo.Filial, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(100);
+        // Sequencial crescente a partir de 100 (o fechamento grava várias linhas na mesma tabela).
+        Sequencial.Setup(x => x.ProximoAsync(It.IsAny<string>(), It.IsAny<SequencialTipo>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => ++_sequencial);
+        Movimentos.Setup(x => x.GerarAsync(It.IsAny<MovimentoPeriodo>(), It.IsAny<CancellationToken>())).ReturnsAsync(ValidationResult.Ok());
+        Cheques.Setup(x => x.AtribuirPeriodoATodosTaloesAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(ValidationResult.Ok());
+        Cheques.Setup(x => x.ListarChequesRecebidosEmAbertoAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<IReadOnlyList<ChequePeriodo>>.Ok([]));
+        Cheques.Setup(x => x.ListarFolhasTalaoDoPeriodoAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<IReadOnlyList<ChequePeriodo>>.Ok([]));
+        Cheques.Setup(x => x.ListarChequesRecebidosDoPeriodoAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<IReadOnlyList<ChequePeriodo>>.Ok([]));
+        Cheques.Setup(x => x.AtribuirPeriodoAChequeRecebidoAsync(It.IsAny<int>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ValidationResult.Ok());
+        Cheques.Setup(x => x.AtribuirPeriodoAFolhaTalaoAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ValidationResult.Ok());
+        Resumos.Setup(x => x.ListarAsync(It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync([]);
 
         // Por padrão: controle de caixa/banco OK, períodos fechados e todo usuário com perfil de domínio.
         ControleCaixaBanco.Setup(x => x.ValidarControleCaixaBancoAsync(It.IsAny<PeriodoStatus>(), It.IsAny<CancellationToken>()))
@@ -86,6 +113,47 @@ internal sealed class CenarioE2 : IDisposable
 
     public PeriodosAbertosService PeriodosAbertosService()
         => new(Repositorio(), Perfis.Object, Parametros.Object, Contexto.Object);
+
+    public DominioPeriodoLactoService LanctoService()
+        => new(new DominioPeriodoRepository(Context, ReadContext), Movimentos.Object, Cheques.Object, Operacoes.Object, Parametros.Object,
+            Sequencial.Object, Contexto.Object);
+
+    public FechamentoPeriodoService FechamentoService() => new(Resumos.Object, Cheques.Object);
+
+    public DominioPeriodoFormaPagtoService FormaPagtoService()
+        => new(new DominioPeriodoRepository(Context, ReadContext), Periodos.Object, Parametros.Object, Sequencial.Object, Contexto.Object);
+
+    public AbrirPeriodoHandler AbrirPeriodo()
+        => new(new DominioPeriodoRepository(Context, ReadContext), Repositorio(), Periodos.Object, ControleCaixaBanco.Object, Perfis.Object,
+            Parametros.Object, Sequencial.Object, LanctoService(), Contexto.Object);
+
+    public FecharPeriodoHandler FecharPeriodo()
+        => new(new DominioPeriodoRepository(Context, ReadContext), Repositorio(), Periodos.Object, ControleCaixaBanco.Object, Perfis.Object,
+            Parametros.Object, Sequencial.Object, LanctoService(), FechamentoService(), Cheques.Object, Contexto.Object);
+
+    public SuprimentoDinheiroHandler SuprimentoDinheiro()
+        => new(new DominioPeriodoRepository(Context, ReadContext), Repositorio(), Periodos.Object, ControleCaixaBanco.Object, Perfis.Object,
+            Parametros.Object, Sequencial.Object, LanctoService(), Contexto.Object);
+
+    public AbrirDominioPadraoHandler AbrirPadrao()
+        => new(new DominioPeriodoRepository(Context, ReadContext), Repositorio(), Periodos.Object, ControleCaixaBanco.Object,
+            new CaixaBancoRepository(Context, ReadContext), Saldos.Object, Perfis.Object, Parametros.Object, ParametroEscrita.Object,
+            Cheques.Object, Sequencial.Object, LanctoService(), Contexto.Object);
+
+    public FecharDominioPadraoHandler FecharPadrao()
+        => new(new DominioPeriodoRepository(Context, ReadContext), Repositorio(), Periodos.Object, ControleCaixaBanco.Object, Perfis.Object,
+            Parametros.Object, ParametroEscrita.Object, Cheques.Object, Sequencial.Object, LanctoService(), Contexto.Object);
+
+    /// <summary>Parâmetros de domínio ligados + operações padrão de suprimento (25, Credora) e sangria (26, Devedora).</summary>
+    public void ConfigurarDominioEOperacoes(int idDominioPadrao = 1)
+    {
+        Parametro("TRABALHACOMDOMINIO", "True");
+        Parametro("DOMINIOPADRAO", idDominioPadrao.ToString());
+        Parametro("OPERACAOPADRAOSUPRIMENTO", "25");
+        Parametro("OPERACAOPADRAOSANGRIA", "26");
+        Operacoes.Setup(x => x.ObterAsync(25, It.IsAny<CancellationToken>())).ReturnsAsync(new OperacaoCaixaInfo(25, 1, NaturezaTipo.Credora, false));
+        Operacoes.Setup(x => x.ObterAsync(26, It.IsAny<CancellationToken>())).ReturnsAsync(new OperacaoCaixaInfo(26, 1, NaturezaTipo.Devedora, false));
+    }
 
     public async Task SemearAsync(params object[] entidades)
     {

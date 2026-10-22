@@ -218,6 +218,7 @@
 - **Cria:** `Application/Handlers/Periodo/*.cs`, `Application/Ports/*Periodo*.cs`, `tests/.../E2/*OperationTests.cs`.
 - **Cobre:** `OP-E2-03..08, 10..12, 15`; `VAL-E2-02..06, 16, 17, 19..27, 38..41, 43..49`; RN-05-013. (`OP-E2-09`, `VAL-E2-18, 52` → E9; `CALC-xx#E2` → E2-T08.)
 - **Constituição:** Artigo VII.1/VII.2/VII.3, Artigo IX.2/IX.3.
+- **Implementado (2026-10-21):** handlers `AbrirPeriodo`, `FecharPeriodo` (com tesouraria), `AbrirDominioPadrao`, `FecharDominioPadrao`, `SuprimentoDinheiro` (`Application/Handlers/Periodo/`) + `DominioPeriodoLactoService`, `DominioPeriodoFormaPagtoService`, `FechamentoPeriodoService`. Portas em `Application/Ports/PortasPeriodo.cs`: `IOperacaoCaixaConsulta`, `IParametroFinanceiroEscrita`, `IResumoFormaPagtoConsulta` com adapter SQL (MOD-02/view); `IGeradorMovimentoPeriodo` (E5) e `IChequePeriodoPorta` (E9) com implementação **pendente que recusa a operação** com mensagem explícita até o épico dono. `SaldoDominioCalculadora` (CALC-E2-05/06) criado aqui porque a gravação dos lançamentos depende dele — o E2-T08 acrescenta os golden. Decisões de implementação: VAL-E2-21 e VAL-E2-05 verificadas antes das regras de tela (eram inalcançáveis pela ordem do legado); usuário do suprimento do fechamento sempre exigido (Q6); texto de `PeriodoNaoAberto` (FBase) não está no repositório — DÚVIDA.
 - **Branch:** `feat/mod-05-e2-handlers` · **Commit:** `feat(mod-05): handlers de período + ROT (E2-T05)` · **Depende de:** E2-T04
 
 ### E2-T06 · Controllers E2 + `contracts/dominio-periodo.md` · tipo: contract
@@ -229,7 +230,7 @@
 
 ### E2-T08 · Paridade do fechamento e do saldo do domínio · tipo: parity
 - **Objetivo:** golden tests de `CALC-E2-01..08` (totais do fechamento **sem arredondamento** — Q1, resumo por forma, `Diferenca`, contagem do detalhe, saldo do domínio por lançamento/forma/recálculo, valores dos lançamentos). Transcrever sem refatorar (Regra 5); igualdade exata de `decimal`. Golden `origem=legado` executando o código legado em .NET Framework 4 (padrão do E3-T09 — DÚVIDA-R3).
-- **Cria:** `Domain/Services/FechamentoPeriodoCalculadora.cs`, `Domain/Services/SaldoDominioCalculadora.cs`, `tests/.../E2/*ParityTests.cs`, `golden/CALC-E2-*.csv`, `golden/legado/GeradorGoldenE2.cs`.
+- **Cria:** golden de `FechamentoPeriodoService` (CALC-E2-01..03) e de `SaldoDominioCalculadora` (CALC-E2-05/06 — classe criada no E2-T05), recálculo do saldo (CALC-E2-07, OP-E2-16), `tests/.../E2/*ParityTests.cs`, `golden/CALC-E2-*.csv`, `golden/legado/GeradorGoldenE2.cs`.
 - **Cobre:** todas as `CALC-xx#E2` + `OP-E2-16` (movida do E2-T04 em 2026-10-21); RN-05-005, RN-05-013.
 - **Constituição:** Artigo IX.3.
 - **Adicionada no gate E2 (2026-10-05)** — V4: toda `CALC` precisa de tarefa `parity`.
